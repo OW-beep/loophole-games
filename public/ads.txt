@@ -1,0 +1,3 @@
+# Replace pub-0000000000000000 with your real AdSense publisher ID
+# before going live. Find it in AdSense > Account > Account information.
+google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

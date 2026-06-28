@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <polygon points="0,14 14,0 64,0 64,64 0,64" fill="#7C5CFF"/>
+  <circle cx="9" cy="9" r="4" fill="#F6F7F4"/>
+  <text x="34" y="42" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#F6F7F4" text-anchor="middle">L</text>
+</svg>
