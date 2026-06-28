@@ -49,6 +49,11 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.svg',
   },
+  other: ADSENSE_CLIENT_ID
+    ? {
+        'google-adsense-account': ADSENSE_CLIENT_ID,
+      }
+    : undefined,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
