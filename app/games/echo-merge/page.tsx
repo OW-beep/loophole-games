@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { getDailyContext } from '@/lib/daily-seed';
 import { EchoMergeBoard } from './EchoMergeBoard';
+import { GameDetails } from '@/components/GameDetails';
+import { getGame } from '@/lib/games/registry';
 
 export const metadata: Metadata = {
   title: 'Echo Merge — a tile puzzle where your last move replays itself',
@@ -12,5 +14,10 @@ export const metadata: Metadata = {
 
 export default function EchoMergePage() {
   const { seed, dateString, puzzleNumber } = getDailyContext('echo-merge');
-  return <EchoMergeBoard seed={seed} dateString={dateString} puzzleNumber={puzzleNumber} />;
+  return (
+    <div>
+      <EchoMergeBoard seed={seed} dateString={dateString} puzzleNumber={puzzleNumber} />
+      <GameDetails game={getGame('echo-merge')!} />
+    </div>
+  );
 }

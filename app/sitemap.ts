@@ -4,7 +4,7 @@ import { GAMES } from '@/lib/games/registry';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://loophole.games';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages = ['', '/about', '/privacy', '/terms'].map((path) => ({
+  const staticPages = ['', '/about', '/faq', '/privacy', '/terms'].map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: new Date(),
     changeFrequency: path === '' ? ('daily' as const) : ('monthly' as const),

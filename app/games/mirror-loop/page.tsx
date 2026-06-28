@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { getDailyContext } from '@/lib/daily-seed';
 import { MirrorLoopBoard } from './MirrorLoopBoard';
+import { GameDetails } from '@/components/GameDetails';
+import { getGame } from '@/lib/games/registry';
 
 export const metadata: Metadata = {
   title: 'Mirror Loop — route three light beams with one shared rotation budget',
@@ -12,5 +14,10 @@ export const metadata: Metadata = {
 
 export default function MirrorLoopPage() {
   const { seed, dateString, puzzleNumber } = getDailyContext('mirror-loop');
-  return <MirrorLoopBoard seed={seed} dateString={dateString} puzzleNumber={puzzleNumber} />;
+  return (
+    <div>
+      <MirrorLoopBoard seed={seed} dateString={dateString} puzzleNumber={puzzleNumber} />
+      <GameDetails game={getGame('mirror-loop')!} />
+    </div>
+  );
 }

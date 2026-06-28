@@ -8,6 +8,9 @@ export function SiteFooter() {
           © {new Date().getFullYear()} Loophole. A new puzzle, every day.
         </p>
         <div className="flex gap-4">
+          <Link href="/faq" className="hover:underline">
+            FAQ
+          </Link>
           <Link href="/privacy" className="hover:underline">
             Privacy
           </Link>

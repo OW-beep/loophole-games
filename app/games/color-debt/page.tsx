@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { getDailyContext } from '@/lib/daily-seed';
 import { ColorDebtBoard } from './ColorDebtBoard';
+import { GameDetails } from '@/components/GameDetails';
+import { getGame } from '@/lib/games/registry';
 
 export const metadata: Metadata = {
   title: 'Color Debt — a match-3 where every match leaves something behind',
@@ -12,5 +14,10 @@ export const metadata: Metadata = {
 
 export default function ColorDebtPage() {
   const { seed, dateString, puzzleNumber } = getDailyContext('color-debt');
-  return <ColorDebtBoard seed={seed} dateString={dateString} puzzleNumber={puzzleNumber} />;
+  return (
+    <div>
+      <ColorDebtBoard seed={seed} dateString={dateString} puzzleNumber={puzzleNumber} />
+      <GameDetails game={getGame('color-debt')!} />
+    </div>
+  );
 }

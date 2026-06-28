@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { getDailyContext } from '@/lib/daily-seed';
 import { GravityWordBoard } from './GravityWordBoard';
+import { GameDetails } from '@/components/GameDetails';
+import { getGame } from '@/lib/games/registry';
 
 export const metadata: Metadata = {
   title: 'Gravity Word — flip gravity to spell words as letters fall',
@@ -12,5 +14,10 @@ export const metadata: Metadata = {
 
 export default function GravityWordPage() {
   const { seed, dateString, puzzleNumber } = getDailyContext('gravity-word');
-  return <GravityWordBoard seed={seed} dateString={dateString} puzzleNumber={puzzleNumber} />;
+  return (
+    <div>
+      <GravityWordBoard seed={seed} dateString={dateString} puzzleNumber={puzzleNumber} />
+      <GameDetails game={getGame('gravity-word')!} />
+    </div>
+  );
 }
