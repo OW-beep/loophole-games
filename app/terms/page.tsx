@@ -3,13 +3,14 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Terms of Use',
   description: 'Terms for using the Loophole puzzle index.',
+  alternates: { canonical: '/terms' },
 };
 
 export default function TermsPage() {
   return (
     <article className="max-w-2xl">
       <h1 className="font-display font-bold text-3xl mb-2">Terms of Use</h1>
-      <p className="stat-line text-ink/40 dark:text-white/30 mb-6">Last updated: edit this date when you publish</p>
+      <p className="stat-line text-ink/40 dark:text-white/30 mb-6">Last updated: June 28, 2026</p>
 
       <div className="space-y-6 text-ink/80 dark:text-white/70 leading-relaxed text-sm">
         <section>
@@ -38,11 +39,11 @@ export default function TermsPage() {
         </section>
         <section>
           <h2 className="font-display font-bold text-lg text-ink dark:text-white mb-2">Changes</h2>
-          <p>[Edit before publishing] We may update these terms as the site evolves.</p>
+          <p>We may update these terms as the site evolves. Material changes will update the date above.</p>
         </section>
         <section>
           <h2 className="font-display font-bold text-lg text-ink dark:text-white mb-2">Contact</h2>
-          <p>[Edit before publishing] your-email@your-domain.com</p>
+          <p>openwave25@gmail.com</p>
         </section>
       </div>
     </article>

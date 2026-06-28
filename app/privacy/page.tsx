@@ -3,13 +3,14 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: 'How Loophole handles data, cookies, and advertising.',
+  alternates: { canonical: '/privacy' },
 };
 
 export default function PrivacyPage() {
   return (
     <article className="max-w-2xl">
       <h1 className="font-display font-bold text-3xl mb-2">Privacy Policy</h1>
-      <p className="stat-line text-ink/40 dark:text-white/30 mb-6">Last updated: edit this date when you publish</p>
+      <p className="stat-line text-ink/40 dark:text-white/30 mb-6">Last updated: June 28, 2026</p>
 
       <div className="space-y-6 text-ink/80 dark:text-white/70 leading-relaxed text-sm">
         <section>
@@ -25,10 +26,9 @@ export default function PrivacyPage() {
         <section>
           <h2 className="font-display font-bold text-lg text-ink dark:text-white mb-2">Advertising</h2>
           <p>
-            [Edit before publishing] This site shows ads served by Google AdSense. Google and
-            its partners may use cookies and similar technologies to serve ads based on your
-            prior visits to this or other websites. You can opt out of personalized advertising
-            by visiting{' '}
+            This site shows ads served by Google AdSense. Google and its partners may use
+            cookies and similar technologies to serve ads based on your prior visits to this or
+            other websites. You can opt out of personalized advertising by visiting{' '}
             <a href="https://adssettings.google.com" className="underline">
               Google&rsquo;s Ads Settings
             </a>
@@ -43,9 +43,9 @@ export default function PrivacyPage() {
         <section>
           <h2 className="font-display font-bold text-lg text-ink dark:text-white mb-2">Analytics</h2>
           <p>
-            [Edit before publishing] If you add an analytics provider (e.g. Vercel Analytics,
-            Plausible, GA4), describe here what it collects and link to its own privacy
-            documentation.
+            This site does not currently use any third-party analytics service. If that
+            changes, this policy will be updated to name the provider and link to its privacy
+            documentation before it&rsquo;s added.
           </p>
         </section>
 
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
 
         <section>
           <h2 className="font-display font-bold text-lg text-ink dark:text-white mb-2">Contact</h2>
-          <p>[Edit before publishing] Questions about this policy: your-email@your-domain.com</p>
+          <p>Questions about this policy: openwave25@gmail.com</p>
         </section>
       </div>
     </article>

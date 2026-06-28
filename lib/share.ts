@@ -8,6 +8,18 @@ export interface ShareData {
   url: string;
 }
 
+/** Appends result params to the base game URL so the unfurled link preview (OG image) reflects this specific result. */
+export function buildResultUrl(baseUrl: string, data: ShareData): string {
+  const params = new URLSearchParams({
+    won: data.won ? '1' : '0',
+    moves: String(data.moves),
+    limit: String(data.movesLimit),
+    puzzle: String(data.puzzleNumber),
+  });
+  if (data.score !== undefined) params.set('score', String(data.score));
+  return `${baseUrl}?${params.toString()}`;
+}
+
 /**
  * Builds a short, emoji-coded share string in the Wordle tradition:
  * a result line that's satisfying to paste, and gives nothing away
@@ -22,15 +34,16 @@ export function buildShareText(data: ShareData): string {
     `Loophole — ${data.gameName} #${data.puzzleNumber}`,
     `${data.won ? 'Solved' : 'Did not solve'} in ${data.moves}/${data.movesLimit} moves`,
     `${scoreLine}${bar}`,
-    data.url,
+    buildResultUrl(data.url, data),
   ].join('\n');
 }
 
 export async function shareResult(data: ShareData): Promise<'shared' | 'copied' | 'failed'> {
   const text = buildShareText(data);
+  const resultUrl = buildResultUrl(data.url, data);
   if (typeof navigator !== 'undefined' && navigator.share) {
     try {
-      await navigator.share({ text, url: data.url });
+      await navigator.share({ text, url: resultUrl });
       return 'shared';
     } catch {
       // user cancelled the native share sheet — not an error, fall through

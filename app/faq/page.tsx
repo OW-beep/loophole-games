@@ -4,6 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'FAQ',
   description: 'Common questions about how Loophole\u2019s daily puzzles, streaks, and games work.',
+  alternates: { canonical: '/faq' },
 };
 
 const FAQS: { q: string; a: React.ReactNode }[] = [

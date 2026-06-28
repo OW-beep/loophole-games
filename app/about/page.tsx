@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'About',
   description: 'What Loophole is, and why every puzzle in it is original.',
+  alternates: { canonical: '/about' },
 };
 
 export default function AboutPage() {

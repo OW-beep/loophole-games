@@ -2,10 +2,15 @@ import { GAMES } from '@/lib/games/registry';
 import { SpecimenCard } from '@/components/SpecimenCard';
 import { DailyBanner } from '@/components/DailyBanner';
 import { AdSlot } from '@/components/AdSlot';
+import { JsonLd } from '@/components/JsonLd';
+import { buildWebsiteJsonLd, buildGameListJsonLd } from '@/lib/structured-data';
 
 export default function HomePage() {
   return (
     <div>
+      <JsonLd data={buildWebsiteJsonLd()} />
+      <JsonLd data={buildGameListJsonLd()} />
+
       <section className="mb-10">
         <p className="stat-line text-ink/50 dark:text-white/40 mb-3">
           Catalog №01–04 · est. 2026
