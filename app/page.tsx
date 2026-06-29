@@ -40,9 +40,12 @@ export default function HomePage() {
         <p className="text-ink/70 dark:text-white/60 mb-3">
           Every mechanic in this index was built from scratch for Loophole. Echo Merge makes
           your previous move replay itself against you. Mirror Loop forces three beams to
-          share one rotation budget. Color Debt punishes big matches with literal debt. Gravity
-          Word turns the whole board into a single falling sentence. None of them are a match-3
-          or a sliding-tile game wearing a new skin.
+          share one rotation budget. Color Debt punishes big matches with literal debt.
+          Gravity Word turns the whole board into a single falling sentence. Fold and Carry
+          Chain ask what happens when combining two numbers has a side effect on a third. Brace
+          Yard turns crate removal into a question of structural support under a tight
+          shipment budget. Splice sorts two strands using nothing but block swaps. None of them
+          are a match-3 or a sliding-tile game wearing a new skin.
         </p>
         <p className="text-ink/70 dark:text-white/60">
           New puzzle specimens get added to the catalog over time — bookmark the index and

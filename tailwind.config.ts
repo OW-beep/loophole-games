@@ -30,6 +30,22 @@ const config: Config = {
           DEFAULT: '#8FAE1B',
           soft: '#EEF5D6',
         },
+        fold: {
+          DEFAULT: '#C9763B',
+          soft: '#F7E9DE',
+        },
+        carry: {
+          DEFAULT: '#3A56B0',
+          soft: '#E2E7F7',
+        },
+        brace: {
+          DEFAULT: '#5C7A8A',
+          soft: '#E5ECEF',
+        },
+        splice: {
+          DEFAULT: '#C23B8E',
+          soft: '#F7E2EF',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

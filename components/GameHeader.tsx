@@ -9,6 +9,10 @@ const TEXT_CLASS: Record<string, string> = {
   mirror: 'text-mirror',
   debt: 'text-debt',
   gravity: 'text-gravity',
+  fold: 'text-fold',
+  carry: 'text-carry',
+  brace: 'text-brace',
+  splice: 'text-splice',
 };
 
 interface GameHeaderProps {

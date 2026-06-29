@@ -1,4 +1,12 @@
-export type GameSlug = 'echo-merge' | 'mirror-loop' | 'color-debt' | 'gravity-word';
+export type GameSlug =
+  | 'echo-merge'
+  | 'mirror-loop'
+  | 'color-debt'
+  | 'gravity-word'
+  | 'fold'
+  | 'carry-chain'
+  | 'brace-yard'
+  | 'splice';
 
 export interface GameMeta {
   slug: GameSlug;
@@ -119,6 +127,109 @@ export const GAMES: GameMeta[] = [
       'Scan for short, common words first (3–4 letters) rather than holding out for a long one — clearing small words faster keeps new letters flowing in, which gives you more shots at bigger words later.',
       'Pay attention to which edge refills after each flip. If you need a specific letter, flipping gravity away from that edge is how you\u2019ll eventually draw a fresh one there.',
       'A flip that clears nothing isn\u2019t wasted — it still reshuffles adjacency, which is often exactly what you need to set up a word on the next flip.',
+    ],
+  },
+  {
+    slug: 'fold',
+    index: '05',
+    name: 'Fold',
+    tagline: 'Fold the strip. Watch the numbers add up.',
+    description:
+      'A strip of numbered cells that you fold in half, again and again. Folded sections always land on top of each other and add together — get the final number to match the target before you run out of folds.',
+    color: 'fold',
+    avgSolveTime: '2:20',
+    difficulty: 'Easy',
+    howToPlay: [
+      'Tap any point between two cells to fold the strip there. The shorter side always folds onto the longer side — that\u2019s just how paper works.',
+      'Wherever the fold causes two cells to land on top of each other, their numbers add together into one cell.',
+      'Keep folding to shrink the strip down to a single cell.',
+      'You win when that final cell matches the target number, with folds left to spare.',
+    ],
+    designNotes: [
+      'Most number-merging puzzles ask you to combine pieces side by side. Fold asks what happens if the combining motion is a literal fold — the geometry of paper-folding means you don\u2019t get to choose which two cells touch independently of each other; an entire side of the strip moves at once.',
+      'Because the shorter flap always folds onto the longer base, every fold is irreversible in a specific, physical way: you can\u2019t un-crease paper. Reaching the target is really a question of choosing your crease points in the right order.',
+    ],
+    strategyTips: [
+      'Folding near the middle shrinks the strip fastest, but folding near an edge lets you control exactly which two cells combine first — sometimes a slow, precise fold beats a fast, blunt one.',
+      'Work out roughly what the last one or two cells need to sum to before you commit to your final folds — it\u2019s easy to overshoot the target in the last move.',
+      'A strip of length 1 can\u2019t be folded any further, so don\u2019t fold so aggressively that you run out of room to course-correct.',
+    ],
+  },
+  {
+    slug: 'carry-chain',
+    index: '06',
+    name: 'Carry Chain',
+    tagline: 'Every merge leaves a little extra behind.',
+    description:
+      'Merge adjacent numbers down a row, but every merge bumps the next number over by one. Land the row\u2019s total on the exact target before you run out of merges.',
+    color: 'carry',
+    avgSolveTime: '2:50',
+    difficulty: 'Medium',
+    howToPlay: [
+      'Tap two adjacent numbers to merge them into one tile holding their sum. The row gets one tile shorter.',
+      'The merge always bumps the very next tile to the right by +1 — a small "carry" that lands whether you want it or not.',
+      'Watch the row\u2019s total at the top. It only changes when a carry actually lands on a tile (a merge at the far right edge wastes its carry).',
+      'You win the moment the total matches the target, with merges left over.',
+    ],
+    designNotes: [
+      'Carry Chain started from a question about 2048-style merging games: what if the act of combining two things always left a small side effect on something else nearby? The "+1 to your neighbor" rule means every merge is doing two things at once — simplifying the row, and quietly inflating the total.',
+      'Because a carry that lands on the rightmost edge is wasted, where you merge matters just as much as what you merge. The same two numbers merged in a different position can produce a different total by the end of the puzzle.',
+    ],
+    strategyTips: [
+      'Track the running total, not just the tile values — the target is about the whole row\u2019s sum, not any single tile.',
+      'Merging near the right edge of the row wastes the carry. If you need every point you can get, merge further left.',
+      'Since each merge adds 0 or 1 to the total sum, you can often work backward from the target to figure out roughly how many merges you have left to spend.',
+    ],
+  },
+  {
+    slug: 'brace-yard',
+    index: '07',
+    name: 'Brace Yard',
+    tagline: 'Ten shipments. Choose the heavy ones wisely.',
+    description:
+      'A yard full of numbered crates, but you only get ten shipments. A crate can only ship while its neighbors can still brace its weight — chase the heavy ones before their support disappears.',
+    color: 'brace',
+    avgSolveTime: '3:30',
+    difficulty: 'Hard',
+    howToPlay: [
+      'Each crate shows a weight. Tap a crate to ship it — but only if it\u2019s currently shippable.',
+      'A crate is shippable if the weights of its remaining orthogonal neighbors add up to at least its own weight, or if it has no neighbors left at all.',
+      'You only have ten shipments total. Every crate you ship adds its weight to your score.',
+      'Reach the target score before your shipments run out. Shipping a crate removes it, which can make its neighbors easier or harder to ship later.',
+    ],
+    designNotes: [
+      'Brace Yard came from a simple observation: a support requirement like this is almost always satisfiable if you ship the whole yard eventually — there\u2019s always some safe order. The real tension only shows up once you can\u2019t ship everything. With just ten shipments out of twenty-five crates, you have to deliberately choose the high-value ones, and the heaviest crates tend to depend on each other for support.',
+      'That last part is the trap: ship one heavy crate too early, and you may have just removed the only thing holding up its heavy neighbor.',
+    ],
+    strategyTips: [
+      'Going purely for the single heaviest crate available, over and over, performs surprisingly well — but watch what it leaves unsupported behind it.',
+      'Two heavy crates that neighbor each other are often safer shipped back-to-back than spread apart, before something else erodes their mutual support.',
+      'A light crate with no neighbors left is always shippable — sometimes it\u2019s worth a "free" shipment just to keep your count moving while you plan the next heavy one.',
+    ],
+  },
+  {
+    slug: 'splice',
+    index: '08',
+    name: 'Splice',
+    tagline: 'Swap a stretch of one strand for the other.',
+    description:
+      'Two strands of numbers, sixteen values between them. Splice matching stretches between the strands until every low number sits in one strand and every high number sits in the other.',
+    color: 'splice',
+    avgSolveTime: '3:10',
+    difficulty: 'Medium',
+    howToPlay: [
+      'Drag across a range of columns to select a stretch, then tap to splice it — that exact stretch swaps places between the top strand and the bottom strand.',
+      'Every value from 1 to 16 appears exactly once across both strands combined.',
+      'You win when the entire top strand holds only 1–8 and the entire bottom strand holds only 9–16, in any order, with splices left to spare.',
+    ],
+    designNotes: [
+      'Splice is built on a simple mathematical fact: swapping the same stretch twice undoes itself completely. That made it possible to generate a guaranteed-solvable puzzle by starting from a solved board and scrambling it with a few splices — the puzzle is fair by construction, not by luck.',
+      'The mechanic is closer to genome-rearrangement problems in computational biology than to anything in a typical puzzle catalog — you\u2019re not matching or merging, you\u2019re sorting two interleaved sequences using only block swaps.',
+    ],
+    strategyTips: [
+      'Scan for the longest stretch where every number in the top strand is already \u2264 8 or every number in the bottom strand is already \u2265 9 — those sections don\u2019t need touching.',
+      'A single splice can fix several misplaced numbers at once if you pick the range carefully, rather than splicing one column at a time.',
+      'If a splice makes things look worse, it might still be progress — sometimes you have to temporarily group the wrong numbers together before a second splice can separate them cleanly.',
     ],
   },
 ];

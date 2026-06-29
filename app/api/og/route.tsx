@@ -9,6 +9,10 @@ const COLOR_HEX: Record<string, string> = {
   mirror: '#0FA89B',
   debt: '#E14B4B',
   gravity: '#8FAE1B',
+  fold: '#C9763B',
+  carry: '#3A56B0',
+  brace: '#5C7A8A',
+  splice: '#C23B8E',
 };
 
 export async function GET(req: NextRequest) {
