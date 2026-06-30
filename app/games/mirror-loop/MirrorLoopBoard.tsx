@@ -6,9 +6,8 @@ import {
   rotateMirror,
   traceBeams,
   getLanes,
-  cellIndex,
+  cellKey,
   GRID_SIZE,
-  ROTATION_BUDGET,
   type MirrorLoopState,
 } from '@/lib/games/mirror-loop';
 import { recordResult, getStreak } from '@/lib/storage';
@@ -25,28 +24,32 @@ function center(r: number, c: number) {
 
 const DIR_ANGLE: Record<string, number> = { up: -90, down: 90, left: 180, right: 0 };
 
-export function MirrorLoopBoard({ seed, dateString, puzzleNumber }: { seed: number; dateString: string; puzzleNumber: number }) {
-  const game = GAMES.find((g) => g.slug === 'mirror-loop')!;
+export function MirrorLoopBoard({
+  seed, dateString, puzzleNumber,
+}: {
+  seed: number; dateString: string; puzzleNumber: number;
+}) {
+  const game = GAMES.find(g => g.slug === 'mirror-loop')!;
   const [state, setState] = useState<MirrorLoopState>(() => createInitialState(seed));
   const [showResult, setShowResult] = useState(false);
   const finishedRef = useRef(false);
   const [streak, setStreak] = useState(0);
-  const lanes = useMemo(() => getLanes(), []);
-  const beams = useMemo(() => traceBeams(state), [state]);
+  const lanes  = useMemo(() => getLanes(), []);
+  const beams  = useMemo(() => traceBeams(state), [state]);
+  const budget = state.wrongAtStart;
 
-  function handleClick(cellIdx: number) {
+  function handleClick(r: number, c: number) {
     if (state.won || state.lost) return;
-    setState((prev) => rotateMirror(prev, cellIdx));
+    setState(prev => rotateMirror(prev, r, c));
   }
 
   useEffect(() => {
     if ((state.won || state.lost) && !finishedRef.current) {
       finishedRef.current = true;
       recordResult('mirror-loop', {
-        date: dateString,
-        won: state.won,
+        date: dateString, won: state.won,
         moves: state.movesUsed,
-        score: beams.filter((b) => b.success).length,
+        score: beams.filter(b => b.success).length,
         elapsedMs: 0,
       });
       setStreak(getStreak('mirror-loop').current);
@@ -54,50 +57,56 @@ export function MirrorLoopBoard({ seed, dateString, puzzleNumber }: { seed: numb
     }
   }, [state.won, state.lost, state.movesUsed, beams, dateString]);
 
+  // Build a set of all mirror cell-keys for hit-testing
+  const mirrorKeys = new Set(lanes.flatMap(l => l.mirrors.map(m => cellKey(m.pos.r, m.pos.c))));
+
   return (
     <div>
-      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={state.movesUsed} movesLimit={ROTATION_BUDGET} />
+      <GameHeader
+        game={game} puzzleNumber={puzzleNumber}
+        movesUsed={state.movesUsed} movesLimit={budget}
+      />
 
-      <p className="stat-line text-ink/50 dark:text-white/40 mb-3">
+      <p className="stat-line text-ink/50 dark:text-white/40 mb-2">
         Rotations left:{' '}
-        <span className="font-mono text-ink dark:text-white">{ROTATION_BUDGET - state.movesUsed}</span>
-        {' '}· tap a mirror tile to rotate it
+        <span className="font-mono text-ink dark:text-white">{budget - state.movesUsed}</span>
+        {' '}· tap a mirror to rotate it · beam stops at first mirror
       </p>
 
       <div className="border-2 border-graphite dark:border-white/80 bg-panel dark:bg-panel-dark mb-5 overflow-hidden">
         <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full h-auto block touch-none">
           {/* grid lines */}
           {Array.from({ length: GRID_SIZE + 1 }, (_, i) => (
-            <g key={`grid-${i}`}>
-              <line x1={i * CELL} y1={0} x2={i * CELL} y2={SIZE} stroke="currentColor" className="text-index dark:text-index-dark" strokeWidth={1} />
-              <line x1={0} y1={i * CELL} x2={SIZE} y2={i * CELL} stroke="currentColor" className="text-index dark:text-index-dark" strokeWidth={1} />
+            <g key={i}>
+              <line x1={i * CELL} y1={0} x2={i * CELL} y2={SIZE}
+                stroke="currentColor" className="text-index dark:text-index-dark" strokeWidth={1} />
+              <line x1={0} y1={i * CELL} x2={SIZE} y2={i * CELL}
+                stroke="currentColor" className="text-index dark:text-index-dark" strokeWidth={1} />
             </g>
           ))}
 
-          {/* beams, drawn before mirrors/targets so glyphs sit on top */}
-          {beams.map((beam) => {
-            const pts = beam.points.map((p) => center(p.r, p.c));
-            const pathStr = pts.map((p) => `${p.x},${p.y}`).join(' ');
-            return (
-              <polyline
-                key={`beam-${beam.laneId}`}
-                points={pathStr}
-                fill="none"
-                stroke={beam.color}
-                strokeWidth={beam.success ? 5 : 3}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity={beam.success ? 0.95 : 0.45}
-              />
-            );
-          })}
+          {/* visible beam segments (emitter → first mirror only) */}
+          {beams.map(beam =>
+            beam.visibleSegments.map((seg, si) => {
+              const f = center(seg.from.r, seg.from.c);
+              const t = center(seg.to.r, seg.to.c);
+              return (
+                <line key={`${beam.laneId}-${si}`}
+                  x1={f.x} y1={f.y} x2={t.x} y2={t.y}
+                  stroke={beam.color} strokeWidth={4}
+                  strokeLinecap="round" opacity={0.7}
+                />
+              );
+            })
+          )}
 
           {/* emitters */}
-          {lanes.map((lane) => {
-            const { x, y } = center(lane.emitterPos.r, lane.emitterPos.c);
+          {lanes.map(lane => {
+            const { x, y } = center(lane.emitter.r, lane.emitter.c);
             const color = state.laneColors[lane.id];
             return (
-              <g key={`emitter-${lane.id}`} transform={`translate(${x},${y}) rotate(${DIR_ANGLE[lane.emitterDir]})`}>
+              <g key={`em-${lane.id}`}
+                transform={`translate(${x},${y}) rotate(${DIR_ANGLE[lane.dir]})`}>
                 <circle r={14} fill={color} />
                 <path d="M -4,-7 L 8,0 L -4,7 Z" fill="white" />
               </g>
@@ -105,61 +114,76 @@ export function MirrorLoopBoard({ seed, dateString, puzzleNumber }: { seed: numb
           })}
 
           {/* targets */}
-          {lanes.map((lane) => {
-            const { x, y } = center(lane.targetPos.r, lane.targetPos.c);
+          {lanes.map(lane => {
+            const { x, y } = center(lane.target.r, lane.target.c);
             const color = state.laneColors[lane.id];
-            const success = beams.find((b) => b.laneId === lane.id)?.success;
+            const ok = beams.find(b => b.laneId === lane.id)?.success;
             return (
-              <circle
-                key={`target-${lane.id}`}
-                cx={x}
-                cy={y}
-                r={13}
-                fill={success ? color : 'none'}
-                stroke={color}
-                strokeWidth={3}
-                opacity={success ? 0.9 : 0.6}
+              <circle key={`tgt-${lane.id}`}
+                cx={x} cy={y} r={13}
+                fill={ok ? color : 'none'}
+                stroke={color} strokeWidth={3}
+                opacity={ok ? 0.9 : 0.5}
               />
             );
           })}
 
-          {/* mirrors */}
-          {lanes.map((lane) => {
-            const { x, y } = center(lane.mirrorPos.r, lane.mirrorPos.c);
-            const cIdx = cellIndex(lane.mirrorPos.r, lane.mirrorPos.c);
-            const orientation = state.orientations[cIdx];
-            const d =
-              orientation === '/'
+          {/* mirrors — clickable */}
+          {lanes.map(lane =>
+            lane.mirrors.map((m, mi) => {
+              const { x, y } = center(m.pos.r, m.pos.c);
+              const key = cellKey(m.pos.r, m.pos.c);
+              const orientation = state.orientations[key];
+              const d = orientation === '/'
                 ? `M ${x - 16},${y + 16} L ${x + 16},${y - 16}`
                 : `M ${x - 16},${y - 16} L ${x + 16},${y + 16}`;
-            return (
-              <g key={`mirror-${lane.id}`}>
-                <rect
-                  x={x - 24}
-                  y={y - 24}
-                  width={48}
-                  height={48}
-                  fill="transparent"
-                  className="cursor-pointer"
-                  onClick={() => handleClick(cIdx)}
-                />
-                <path d={d} stroke="currentColor" className="text-graphite dark:text-white" strokeWidth={4} strokeLinecap="round" />
-              </g>
-            );
-          })}
+              return (
+                <g key={`m-${lane.id}-${mi}`}>
+                  <rect
+                    x={x - 24} y={y - 24} width={48} height={48}
+                    fill="transparent" className="cursor-pointer"
+                    onClick={() => handleClick(m.pos.r, m.pos.c)}
+                  />
+                  <path
+                    d={d}
+                    stroke="currentColor"
+                    className="text-graphite dark:text-white"
+                    strokeWidth={4} strokeLinecap="round"
+                  />
+                </g>
+              );
+            })
+          )}
         </svg>
       </div>
 
+      {/* per-lane status strip */}
+      <div className="flex gap-3 mb-4">
+        {lanes.map(lane => {
+          const ok = beams.find(b => b.laneId === lane.id)?.success;
+          return (
+            <div key={lane.id}
+              className="stat-line flex items-center gap-1.5 px-2 py-1 border border-index dark:border-index-dark">
+              <span
+                className="inline-block w-2 h-2 rounded-full"
+                style={{ background: state.laneColors[lane.id] }}
+              />
+              <span className={ok
+                ? 'text-mirror dark:text-mirror'
+                : 'text-ink/50 dark:text-white/40'}>
+                {ok ? 'Connected' : 'Open'}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
       <ResultModal
-        open={showResult}
-        onClose={() => setShowResult(false)}
-        gameSlug="mirror-loop"
-        gameName="Mirror Loop"
-        puzzleNumber={puzzleNumber}
-        won={state.won}
-        moves={state.movesUsed}
-        movesLimit={ROTATION_BUDGET}
-        score={beams.filter((b) => b.success).length}
+        open={showResult} onClose={() => setShowResult(false)}
+        gameSlug="mirror-loop" gameName="Mirror Loop"
+        puzzleNumber={puzzleNumber} won={state.won}
+        moves={state.movesUsed} movesLimit={budget}
+        score={beams.filter(b => b.success).length}
         streak={streak}
       />
     </div>
