@@ -33,18 +33,18 @@ export const metadata: Metadata = {
     template: '%s · Loophole',
   },
   description:
-    'Four original daily puzzle games you won\u2019t find anywhere else: Echo Merge, Mirror Loop, Color Debt, and Gravity Word. Free to play, one new challenge every day.',
+    'Eight original daily puzzle games you won\u2019t find anywhere else. Free to play, one new challenge every day.',
   openGraph: {
     type: 'website',
     siteName: 'Loophole',
     title: 'Loophole — A new puzzle, every day',
-    description: 'Four original daily puzzle games. Free to play, no download.',
+    description: 'Eight original daily puzzle games. Free to play, no download.',
     images: ['/api/og'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Loophole — A new puzzle, every day',
-    description: 'Four original daily puzzle games. Free to play, no download.',
+    description: 'Eight original daily puzzle games. Free to play, no download.',
     images: ['/api/og'],
   },
   icons: {
