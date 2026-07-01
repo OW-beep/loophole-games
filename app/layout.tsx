@@ -65,21 +65,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Prevents a light-mode flash for users who previously chose dark mode. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('loophole:theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
-          }}
-        />
-        {ADSENSE_ENABLED && ADSENSE_CLIENT_ID && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
-      </head>
+  {/* Google Search Console */}
+  <meta name="google-site-verification" content="KYZp6leIoJkmXQipodIUtUhXTopgEfgqFiQ7eJZuRZA" />
+
+  {/* Prevents a light-mode flash for users who previously chose dark mode. */}
+  <script
+    dangerouslySetInnerHTML={{
+      __html: `(function(){try{var t=localStorage.getItem('loophole:theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
+    }}
+  />
+  {ADSENSE_ENABLED && ADSENSE_CLIENT_ID && (
+    <Script
+      async
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+      crossOrigin="anonymous"
+      strategy="afterInteractive"
+    />
+  )}
+</head>
       <body className={`${display.variable} ${body.variable} ${mono.variable} font-body`}>
         <SiteHeader />
         <main className="max-w-5xl mx-auto px-4 py-10 min-h-[60vh]">{children}</main>
