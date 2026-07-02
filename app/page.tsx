@@ -43,13 +43,11 @@ export default function HomePage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="http://hbb.afl.rakuten.co.jp/hsb/0eb4bbb3.93b2e556.0eb4bbaa.95151395/"
-            border="0"
             alt="Rakuten"
           />
         </a>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          border="0"
           width="1"
           height="1"
           src="https://www10.a8.net/0.gif?a8mat=3NA6HT+AFOMKY+2HOM+609HT"
