@@ -9,15 +9,15 @@ interface AdSlotProps {
   label?: string;
 }
 
+interface SponsorSlotProps {
+  className?: string;
+  label?: string;
+  children: React.ReactNode;
+}
+
 const ADSENSE_ENABLED = process.env.NEXT_PUBLIC_ADSENSE_ENABLED === 'true';
 const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
-/**
- * A single ad unit, deliberately styled as its own "specimen tag" so it
- * never gets mistaken for game content (AdSense requires clear ad/content
- * separation, and players trust the UI more when ads don't pretend to be
- * something else).
- */
 export function AdSlot({ slotId, className = '', format = 'auto', label = 'Sponsored' }: AdSlotProps) {
   const ref = useRef<HTMLModElement>(null);
   const pushed = useRef(false);
@@ -29,7 +29,7 @@ export function AdSlot({ slotId, className = '', format = 'auto', label = 'Spons
       (window.adsbygoogle = window.adsbygoogle || []).push({});
       pushed.current = true;
     } catch {
-      // AdSense script not loaded yet or blocked — fail silently.
+      // fail silently
     }
   }, []);
 
@@ -53,6 +53,19 @@ export function AdSlot({ slotId, className = '', format = 'auto', label = 'Spons
           Ad space — enable NEXT_PUBLIC_ADSENSE_ENABLED once your account is approved
         </div>
       )}
+    </div>
+  );
+}
+
+export function SponsorSlot({ className = '', label = 'Sponsored', children }: SponsorSlotProps) {
+  return (
+    <div className={`relative border border-dashed border-index dark:border-index-dark p-3 ${className}`}>
+      <span className="stat-line absolute -top-2 left-3 bg-paper dark:bg-graphite px-1 text-ink/60 dark:text-white/50">
+        {label}
+      </span>
+      <div className="flex flex-wrap items-center justify-center gap-4 min-h-[60px]">
+        {children}
+      </div>
     </div>
   );
 }
