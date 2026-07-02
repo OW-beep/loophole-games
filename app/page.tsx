@@ -5,6 +5,21 @@ import { SponsorSlot } from '@/components/AdSlot';
 import { JsonLd } from '@/components/JsonLd';
 import { buildWebsiteJsonLd, buildGameListJsonLd } from '@/lib/structured-data';
 
+const RAKUTEN_HREF = [
+  'https://rpx.a8.net/svt/ejp?a8mat=3NA6HT+AFOMKY+2HOM+609HT&rakuten=y',
+  '&a8ejpredirect=http%3A%2F%2Fhb.afl.rakuten.co.jp%2Fhgc%2F',
+  '0ea62065.34400275.0ea62066.204f04c0%2Fa22050476466_3NA6HT_AFOMKY_2HOM_609HT',
+  '%3Fpc%3Dhttp%253A%252F%252Fwww.rakuten.co.jp%252F',
+  '%26m%3Dhttp%253A%252F%252Fm.rakuten.co.jp%252F',
+].join('');
+
+const RAKUTEN_IMG_SRC = 'http://hbb.afl.rakuten.co.jp/hsb/0eb4bbb3.93b2e556.0eb4bbaa.95151395/';
+const RAKUTEN_PIXEL_SRC = 'https://www10.a8.net/0.gif?a8mat=3NA6HT+AFOMKY+2HOM+609HT';
+
+const LOLIPOP_HREF = 'https://px.a8.net/svt/ejp?a8mat=3TNLL7+D8W8C2+348+631SX';
+const LOLIPOP_IMG_SRC = 'https://www25.a8.net/svt/bgt?aid=231208459801&wid=001&eno=01&mid=s00000000404001022000&mc=1';
+const LOLIPOP_PIXEL_SRC = 'https://www13.a8.net/0.gif?a8mat=3TNLL7+D8W8C2+348+631SX';
+
 export default function HomePage() {
   return (
     <div>
@@ -35,48 +50,20 @@ export default function HomePage() {
 
       <SponsorSlot className="mb-12">
         {/* Rakuten */}
-        
-          href="https://rpx.a8.net/svt/ejp?a8mat=3NA6HT+AFOMKY+2HOM+609HT&rakuten=y&a8ejpredirect=http%3A%2F%2Fhb.afl.rakuten.co.jp%2Fhgc%2F0ea62065.34400275.0ea62066.204f04c0%2Fa22050476466_3NA6HT_AFOMKY_2HOM_609HT%3Fpc%3Dhttp%253A%252F%252Fwww.rakuten.co.jp%252F%26m%3Dhttp%253A%252F%252Fm.rakuten.co.jp%252F"
-          rel="nofollow sponsored"
-          target="_blank"
-        >
+        <a href={RAKUTEN_HREF} rel="nofollow sponsored" target="_blank">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="http://hbb.afl.rakuten.co.jp/hsb/0eb4bbb3.93b2e556.0eb4bbaa.95151395/"
-            alt="Rakuten"
-          />
+          <img src={RAKUTEN_IMG_SRC} alt="Rakuten" />
         </a>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          width="1"
-          height="1"
-          src="https://www10.a8.net/0.gif?a8mat=3NA6HT+AFOMKY+2HOM+609HT"
-          alt=""
-        />
+        <img width={1} height={1} src={RAKUTEN_PIXEL_SRC} alt="" />
 
         {/* Lolipop */}
-        
-          href="https://px.a8.net/svt/ejp?a8mat=3TNLL7+D8W8C2+348+631SX"
-          rel="nofollow sponsored"
-          target="_blank"
-        >
+        <a href={LOLIPOP_HREF} rel="nofollow sponsored" target="_blank">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            border="0"
-            width="468"
-            height="60"
-            alt="Lolipop"
-            src="https://www25.a8.net/svt/bgt?aid=231208459801&wid=001&eno=01&mid=s00000000404001022000&mc=1"
-          />
+          <img width={468} height={60} src={LOLIPOP_IMG_SRC} alt="Lolipop" />
         </a>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          border="0"
-          width="1"
-          height="1"
-          src="https://www13.a8.net/0.gif?a8mat=3TNLL7+D8W8C2+348+631SX"
-          alt=""
-        />
+        <img width={1} height={1} src={LOLIPOP_PIXEL_SRC} alt="" />
       </SponsorSlot>
 
       <section className="max-w-2xl">
