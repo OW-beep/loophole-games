@@ -52,7 +52,7 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
     q: 'Are these games actually original, or are they reskins of games I already know?',
     a: (
       <>
-        Every mechanic was designed specifically for this site. None of the four games started
+        Every mechanic was designed specifically for this site. None of the twelve games started
         from an existing game\u2019s rules with new art on top. If a mechanic reminds you of
         something else, that\u2019s the puzzle genre overlapping with itself, not a template — see
         the &ldquo;About this puzzle&rdquo; section on each game\u2019s page for the specific design idea

@@ -1,12 +1,7 @@
 export type GameSlug =
-  | 'echo-merge'
-  | 'mirror-loop'
-  | 'color-debt'
-  | 'gravity-word'
-  | 'fold'
-  | 'carry-chain'
-  | 'brace-yard'
-  | 'splice';
+  | 'echo-merge' | 'mirror-loop' | 'color-debt' | 'gravity-word'
+  | 'fold' | 'carry-chain' | 'brace-yard' | 'splice'
+  | 'heatmap' | 'signal' | 'overflow' | 'polarity';
 
 export interface GameMeta {
   slug: GameSlug;
@@ -230,6 +225,110 @@ export const GAMES: GameMeta[] = [
       'Scan for the longest stretch where every number in the top strand is already \u2264 8 or every number in the bottom strand is already \u2265 9 — those sections don\u2019t need touching.',
       'A single splice can fix several misplaced numbers at once if you pick the range carefully, rather than splicing one column at a time.',
       'If a splice makes things look worse, it might still be progress — sometimes you have to temporarily group the wrong numbers together before a second splice can separate them cleanly.',
+    ],
+  },
+  {
+    slug: 'heatmap',
+    index: '09',
+    name: 'Heatmap',
+    tagline: 'Spread the heat. Equalize everything.',
+    description:
+      'A grid of temperature tiles. Tap any tile to spread its heat to all four neighbors. Get every tile to the same temperature before you run out of taps.',
+    color: 'heat',
+    avgSolveTime: '2:40',
+    difficulty: 'Medium',
+    howToPlay: [
+      'Each tile shows a temperature from 1 to 9.',
+      'Tap a tile to spread: its value is divided equally among its orthogonal neighbors (fractions round down), and the tile keeps the remainder.',
+      'You win when all tiles show the same value.',
+      'You lose if you run out of taps before equalizing.',
+    ],
+    designNotes: [
+      'Heatmap started from a physical intuition: heat spreads from hot things to cooler neighbors. The puzzle twist is that spreading is irreversible \u2014 once you distribute a tile\u2019s heat, you can\u2019t un-spread it. Choosing which tile to tap first, and in what order, determines whether equalization is even reachable.',
+      'Because spreading always moves value outward, high-value tiles need to be tapped before their neighbors get too warm \u2014 otherwise there\u2019s nowhere for the heat to go.',
+    ],
+    strategyTips: [
+      'Tap the hottest tile first, before its neighbors heat up and reduce the differential available to spread.',
+      'Corner and edge tiles have fewer neighbors, so they accumulate heat faster \u2014 watch them carefully.',
+      'A tile surrounded by already-equal neighbors can\u2019t contribute to further equalization \u2014 don\u2019t waste a tap on it.',
+    ],
+  },
+  {
+    slug: 'signal',
+    index: '10',
+    name: 'Signal',
+    tagline: 'Each cell expects exactly that many resolved neighbors.',
+    description:
+      'Every cell holds a number. Tap a cell to mark it as resolved — but only when exactly that many of its neighbors are already resolved. Resolve every cell to win.',
+    color: 'oneline',
+    avgSolveTime: '3:30',
+    difficulty: 'Hard',
+    howToPlay: [
+      'Each cell shows a value from 0 to 4.',
+      'Tap a cell to resolve it — but only when the number of its already-resolved neighbors exactly equals its value.',
+      'A cell showing 0 can be resolved at any time (it needs no resolved neighbors). A cell showing 3 needs exactly 3 neighbors resolved first.',
+      'Resolve every cell on the board to win.',
+    ],
+    designNotes: [
+      'Signal is a pure logic puzzle: the only information you need is the number on each cell and which of its neighbors are already resolved. There is no randomness in whether a move works — either the count matches and it resolves, or it does not. That makes every tap a deliberate choice rather than a gamble.',
+      'The daily puzzle is constructed by assigning each cell the exact count of resolved neighbors it will have when it gets resolved, so a solution always exists. Finding that order from scratch is the challenge.',
+    ],
+    strategyTips: [
+      'Start with all the 0-value cells — they can always be resolved immediately and often unlock their neighbors.',
+      'After resolving a cell, check all its neighbors: their required count may now be satisfied.',
+      'Corner cells have at most 2 neighbors, edge cells at most 3. A corner cell with value 2 can only be resolved after both its neighbors are resolved — plan that chain early.',
+    ],
+  },
+  {
+    slug: 'overflow',
+    index: '11',
+    name: 'Overflow',
+    tagline: 'Tap to spill. Chain reactions score big.',
+    description:
+      'Each cell holds water up to its capacity. Tap a cell to add one drop \u2014 when it overflows, it spills into all four neighbors, which may overflow in turn. Clear the board by triggering the right chain reactions.',
+    color: 'overflow',
+    avgSolveTime: '3:00',
+    difficulty: 'Medium',
+    howToPlay: [
+      'Each cell shows its current water level out of its capacity (e.g. \u201c2/3\u201d means 2 drops, capacity 3).',
+      'Tap a cell to add one drop. If it reaches capacity, it overflows: all its water spills into orthogonal neighbors, one drop each.',
+      'Overflow can trigger chain reactions if a neighbor was already at capacity.',
+      'A cell that overflows is emptied and removed from the board. Clear every cell to win.',
+    ],
+    designNotes: [
+      'Overflow is built on the chain-reaction genre, but the puzzle version adds variable capacities and starting levels, so not every cell will overflow from a single tap. Figuring out which cells to prime (bring almost to capacity) before triggering a chain is the whole puzzle.',
+      'Chain reactions that clear five or more cells in a sequence are deeply satisfying and make for great share moments.',
+    ],
+    strategyTips: [
+      'Prime the cells adjacent to your intended chain before triggering it \u2014 a cell at capacity-minus-one will join the chain automatically.',
+      'Corner cells have only 2 neighbors, so their overflows are less powerful. Use them as anchors that you prime but don\u2019t trigger until the right moment.',
+      'Work from the outside in: clearing edge cells first opens up more room for inner chains to propagate.',
+    ],
+  },
+  {
+    slug: 'polarity',
+    index: '12',
+    name: 'Polarity',
+    tagline: 'Opposites attract. Like poles block.',
+    description:
+      'A grid of positive and negative magnets. Tap a magnet to slide it: it moves until attracted to an opposite pole or blocked by a same pole. Separate all positives to one side, all negatives to the other.',
+    color: 'polarity',
+    avgSolveTime: '3:20',
+    difficulty: 'Medium',
+    howToPlay: [
+      'Tap a magnet to select it, then tap an arrow to slide it in that direction.',
+      'A magnet slides until it is adjacent to an opposite-pole magnet (attraction stops it), blocked by a same-pole magnet (repulsion), or hits a wall.',
+      'You win when all \u002b magnets occupy the left half of the grid and all \u2212 magnets occupy the right half.',
+      'You have a limited number of slides to reach the goal.',
+    ],
+    designNotes: [
+      'The key insight behind Polarity is that the stopping rule is asymmetric: opposite poles pull you in (stop one cell away), same poles push you away (you can\u2019t enter that cell at all). The same magnet behaves very differently depending on what is already on the board when you slide it.',
+      'The puzzle is constructed so the solution always uses fewer slides than the budget, giving you some room to experiment \u2014 but not much.',
+    ],
+    strategyTips: [
+      'Slide magnets that are already close to their target side first \u2014 they need fewer moves and won\u2019t interfere with the rest of the board.',
+      'Use opposite-pole magnets as anchors: sliding into them stops you in a predictable place you can plan around.',
+      'If a magnet is blocked by a same-pole neighbor, try clearing the blocker first by sliding it away.',
     ],
   },
 ];

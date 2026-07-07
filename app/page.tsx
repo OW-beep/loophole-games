@@ -28,10 +28,10 @@ export default function HomePage() {
 
       <section className="mb-10">
         <p className="stat-line text-ink/50 dark:text-white/40 mb-3">
-          Catalog №01–08 · est. 2026
+          Catalog №01–12 · est. 2026
         </p>
         <h1 className="font-display font-bold text-4xl sm:text-5xl leading-[1.05] mb-4 max-w-2xl">
-          Eight puzzles you haven&rsquo;t played before.
+          Twelve puzzles you haven&rsquo;t played before.
         </h1>
         <p className="text-ink/70 dark:text-white/60 max-w-xl">
           Loophole is a small, growing index of original puzzle mechanics — not reskins of
@@ -70,13 +70,16 @@ export default function HomePage() {
         <h2 className="font-display font-bold text-2xl mb-3">Why these puzzles don&rsquo;t look familiar</h2>
         <p className="text-ink/70 dark:text-white/60 mb-3">
           Every mechanic in this index was built from scratch for Loophole. Echo Merge makes
-          your previous move replay itself against you. Mirror Loop forces three beams to
-          share one rotation budget. Color Debt punishes big matches with literal debt.
-          Gravity Word turns the whole board into a single falling sentence. Fold and Carry
-          Chain ask what happens when combining two numbers has a side effect on a third. Brace
-          Yard turns crate removal into a question of structural support under a tight
-          shipment budget. Splice sorts two strands using nothing but block swaps. None of them
-          are a match-3 or a sliding-tile game wearing a new skin.
+          your previous move replay itself against you. Mirror Loop hides the beam after the
+          first mirror. Color Debt punishes big matches with literal debt. Gravity Word turns
+          the whole board into a single falling sentence. Fold collapses a number strip.
+          Carry Chain bumps the next tile on every merge. Brace Yard makes you earn each
+          shipment with structural support. Splice sorts two strands using only block swaps.
+          Heatmap asks you to score high-value tiles before their support disappears. Signal
+          forces you to resolve cells in exactly the order their neighbors permit. Overflow
+          lets you trigger chain reactions across an entire board. Polarity uses magnetic
+          attraction and repulsion as the movement rule. None of them are a match-3 or a
+          sliding-tile game wearing a new skin.
         </p>
         <p className="text-ink/70 dark:text-white/60">
           New puzzle specimens get added to the catalog over time — bookmark the index and

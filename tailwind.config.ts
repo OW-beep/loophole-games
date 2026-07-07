@@ -46,6 +46,22 @@ const config: Config = {
           DEFAULT: '#C23B8E',
           soft: '#F7E2EF',
         },
+        heat: {
+          DEFAULT: '#E05C1A',
+          soft: '#FCEADE',
+        },
+        oneline: {
+          DEFAULT: '#1A7FE0',
+          soft: '#DEEEFA',
+        },
+        overflow: {
+          DEFAULT: '#17A0A0',
+          soft: '#D9F4F4',
+        },
+        polarity: {
+          DEFAULT: '#7A3DB8',
+          soft: '#EDE0F7',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
