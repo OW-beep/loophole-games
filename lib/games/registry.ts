@@ -1,19 +1,22 @@
 export type GameSlug =
   | 'echo-merge' | 'mirror-loop' | 'color-debt' | 'gravity-word'
   | 'fold' | 'carry-chain' | 'brace-yard' | 'splice'
-  | 'heatmap' | 'signal' | 'overflow' | 'polarity';
+  | 'heatmap' | 'signal' | 'overflow' | 'polarity'
+  | 'shadow' | 'tether' | 'drift' | 'phase';
+
+export type GameCategory = 'puzzle' | 'movement' | 'word';
 
 export interface GameMeta {
   slug: GameSlug;
-  index: string; // catalog number, e.g. "01"
+  index: string;
   name: string;
   tagline: string;
   description: string;
-  color: string; // tailwind color key, matches tailwind.config.ts
+  color: string;
   avgSolveTime: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
+  category: GameCategory;
   howToPlay: string[];
-  /** Longer, page-content paragraphs: the design idea behind the mechanic, then strategy tips. Rendered statically below the board. */
   designNotes: string[];
   strategyTips: string[];
 }
@@ -29,6 +32,7 @@ export const GAMES: GameMeta[] = [
     color: 'echo',
     avgSolveTime: '3:20',
     difficulty: 'Medium',
+    category: 'puzzle',
     howToPlay: [
       'Tap a tile, then tap an arrow to slide it in that direction until it hits a wall or another tile.',
       'Equal tiles merge into one with double the value, just like you’d expect — the twist is what happens next.',
@@ -56,6 +60,7 @@ export const GAMES: GameMeta[] = [
     color: 'mirror',
     avgSolveTime: '3:30',
     difficulty: 'Hard',
+    category: 'puzzle',
     howToPlay: [
       "Each colored emitter fires a beam in a straight line. The beam is visible until it hits the first mirror \u2014 after that, you can't see it.",
       "Tap a mirror to rotate it 90\u00b0. A mirror can face either direction, and rotating it changes where the beam goes after it hits.",
@@ -82,6 +87,7 @@ export const GAMES: GameMeta[] = [
     color: 'debt',
     avgSolveTime: '4:10',
     difficulty: 'Hard',
+    category: 'puzzle',
     howToPlay: [
       'Swap two adjacent tiles to make a line of 3 or more matching colors and clear them.',
       'Every match spawns debt tiles — gray tiles equal to (match size − 2) — that drop in from the top.',
@@ -108,6 +114,7 @@ export const GAMES: GameMeta[] = [
     color: 'gravity',
     avgSolveTime: '3:00',
     difficulty: 'Medium',
+    category: 'word',
     howToPlay: [
       'Tap one of the four arrows to set gravity. Every loose letter slides that direction until it’s blocked.',
       'After the board settles, any row or column that spells a real word (3+ letters) clears automatically and scores points.',
@@ -134,6 +141,7 @@ export const GAMES: GameMeta[] = [
     color: 'fold',
     avgSolveTime: '2:20',
     difficulty: 'Easy',
+    category: 'puzzle',
     howToPlay: [
       'Tap any point between two cells to fold the strip there. The shorter side always folds onto the longer side — that\u2019s just how paper works.',
       'Wherever the fold causes two cells to land on top of each other, their numbers add together into one cell.',
@@ -160,6 +168,7 @@ export const GAMES: GameMeta[] = [
     color: 'carry',
     avgSolveTime: '2:50',
     difficulty: 'Medium',
+    category: 'puzzle',
     howToPlay: [
       'Tap two adjacent numbers to merge them into one tile holding their sum. The row gets one tile shorter.',
       'The merge always bumps the very next tile to the right by +1 — a small "carry" that lands whether you want it or not.',
@@ -186,6 +195,7 @@ export const GAMES: GameMeta[] = [
     color: 'brace',
     avgSolveTime: '3:30',
     difficulty: 'Hard',
+    category: 'puzzle',
     howToPlay: [
       'Each crate shows a weight. Tap a crate to ship it — but only if it\u2019s currently shippable.',
       'A crate is shippable if the weights of its remaining orthogonal neighbors add up to at least its own weight, or if it has no neighbors left at all.',
@@ -212,6 +222,7 @@ export const GAMES: GameMeta[] = [
     color: 'splice',
     avgSolveTime: '3:10',
     difficulty: 'Medium',
+    category: 'puzzle',
     howToPlay: [
       'Drag across a range of columns to select a stretch, then tap to splice it — that exact stretch swaps places between the top strand and the bottom strand.',
       'Every value from 1 to 16 appears exactly once across both strands combined.',
@@ -237,6 +248,7 @@ export const GAMES: GameMeta[] = [
     color: 'heat',
     avgSolveTime: '2:40',
     difficulty: 'Medium',
+    category: 'puzzle',
     howToPlay: [
       'Each tile shows a temperature from 1 to 9.',
       'Tap a tile to spread: its value is divided equally among its orthogonal neighbors (fractions round down), and the tile keeps the remainder.',
@@ -263,6 +275,7 @@ export const GAMES: GameMeta[] = [
     color: 'oneline',
     avgSolveTime: '3:30',
     difficulty: 'Hard',
+    category: 'puzzle',
     howToPlay: [
       'Each cell shows a value from 0 to 4.',
       'Tap a cell to resolve it — but only when the number of its already-resolved neighbors exactly equals its value.',
@@ -289,6 +302,7 @@ export const GAMES: GameMeta[] = [
     color: 'overflow',
     avgSolveTime: '3:00',
     difficulty: 'Medium',
+    category: 'puzzle',
     howToPlay: [
       'Each cell shows its current water level out of its capacity (e.g. \u201c2/3\u201d means 2 drops, capacity 3).',
       'Tap a cell to add one drop. If it reaches capacity, it overflows: all its water spills into orthogonal neighbors, one drop each.',
@@ -315,6 +329,7 @@ export const GAMES: GameMeta[] = [
     color: 'polarity',
     avgSolveTime: '3:20',
     difficulty: 'Medium',
+    category: 'puzzle',
     howToPlay: [
       'Tap a magnet to select it, then tap an arrow to slide it in that direction.',
       'A magnet slides until it is adjacent to an opposite-pole magnet (attraction stops it), blocked by a same-pole magnet (repulsion), or hits a wall.',
@@ -329,6 +344,113 @@ export const GAMES: GameMeta[] = [
       'Slide magnets that are already close to their target side first \u2014 they need fewer moves and won\u2019t interfere with the rest of the board.',
       'Use opposite-pole magnets as anchors: sliding into them stops you in a predictable place you can plan around.',
       'If a magnet is blocked by a same-pole neighbor, try clearing the blocker first by sliding it away.',
+    ],
+  },
+  {
+    slug: 'shadow',
+    index: '13',
+    name: 'Shadow',
+    tagline: 'Your last move haunts you — literally.',
+    description:
+      'Move your character across the grid to reach the goal. After every move, a ghost of you replays your previous step from wherever it ended up. Use your own ghost as a switch, a blocker, or a bridge.',
+    color: 'shadow',
+    avgSolveTime: '3:10',
+    difficulty: 'Medium',
+    category: 'movement',
+    howToPlay: [
+      'Tap an arrow to move your character one step in that direction.',
+      'After your move, a ghost appears at your previous position and takes the same step you just took.',
+      'Stepping onto a switch tile toggles it — the ghost can do this too.',
+      'Reach the goal tile in the move limit. The ghost can help or hinder depending on how you sequence your moves.',
+    ],
+    designNotes: [
+      'Shadow is Echo Merge translated into a character-movement game: instead of a tile replaying a slide, it is your own avatar replaying your last step. The twist is that your ghost occupies real space — it can trigger switches, block enemies, and open paths, but it can also close them.',
+      'Because the ghost always does what you just did, planning two steps ahead means planning for both the move you are about to make and the echo that move will create on the next turn.',
+    ],
+    strategyTips: [
+      'The ghost starts one step behind you in time. If you need a switch triggered after you leave it, step on it yourself — the ghost will re-trigger it on the next turn.',
+      'Moving back and forth rapidly leaves the ghost oscillating in place, which is useful for holding a toggle switch open while you proceed.',
+      'The ghost cannot move off the grid. Use walls to make the ghost stay in a useful position rather than following you into the open.',
+    ],
+  },
+  {
+    slug: 'tether',
+    index: '14',
+    name: 'Tether',
+    tagline: 'Two characters, one direction at a time.',
+    description:
+      'Control two characters connected by a tether. Every tap moves both in the same direction. The tether stretches but keeps them linked — use the tension to solve puzzles neither could solve alone.',
+    color: 'tether',
+    avgSolveTime: '3:40',
+    difficulty: 'Hard',
+    category: 'movement',
+    howToPlay: [
+      'Tap an arrow to move both characters one step in that direction.',
+      'If a character is blocked by a wall, it stays in place while the other continues moving (the tether stretches).',
+      'The tether has a maximum length. If a move would stretch it beyond that, neither character moves.',
+      'Guide both characters to their respective goal tiles simultaneously to win.',
+    ],
+    designNotes: [
+      'Tether emerged from a question: what is the simplest rule that makes two characters meaningfully interdependent without one of them being an obstacle to the other? The answer turned out to be shared input with independent collision — they always try to go the same way, but walls affect them independently.',
+      'Because one character can be pinned against a wall while the other moves freely, the tether becomes a positioning tool: you can use walls to hold one character in place while you maneuver the other into a specific spot.',
+    ],
+    strategyTips: [
+      'Walls are not just obstacles — they are anchors. Pin one character against a wall deliberately to move the other into position.',
+      'Think about where both characters need to end up, then work backward to find a sequence of moves where the walls do the separating work for you.',
+      'The tether length limit is your hardest constraint. When a move would exceed it, treat that as information about the puzzle structure, not just a failure.',
+    ],
+  },
+  {
+    slug: 'drift',
+    index: '15',
+    name: 'Drift',
+    tagline: 'You slide until something stops you.',
+    description:
+      'Your character slides in the chosen direction until hitting a wall or object. Stopping in the right place requires planning the whole sequence of slides. Objects you stop against can themselves be shifted by your arrival.',
+    color: 'drift',
+    avgSolveTime: '2:50',
+    difficulty: 'Medium',
+    category: 'movement',
+    howToPlay: [
+      'Tap an arrow to slide your character in that direction. They keep moving until blocked by a wall or an object.',
+      'Some objects shift when you slide into them — they move one step in the direction you were travelling.',
+      'Reach the goal tile. Use the objects as movable stoppers to land in positions you could not reach with bare walls.',
+    ],
+    designNotes: [
+      'Sliding-until-blocked puzzles are a classic, but adding shiftable objects changes the problem completely. Without them, stopping positions are determined entirely by the fixed walls. With objects you can push, every slide potentially reconfigures the stopping positions available on future slides — turning a positioning puzzle into a planning puzzle.',
+      'The daily puzzle is constructed backward from a valid solution, so every puzzle is guaranteed to be solvable within the given slide budget.',
+    ],
+    strategyTips: [
+      'Work backward: where do you need to be on the final slide? What wall or object would stop you there? Is that object in the right place, or do you need to move it first?',
+      'Shifting an object is often a two-step process: slide into it to move it, then use a different approach to use it as a stopper.',
+      'Every slide commits you to a full traversal of the available space. Short slides are impossible unless there is already something in the way — plan your stoppers before you need them.',
+    ],
+  },
+  {
+    slug: 'phase',
+    index: '16',
+    name: 'Phase',
+    tagline: 'Solid on odd steps. Ghost on even steps.',
+    description:
+      'Your character alternates between solid and ghost phase every step. Solid: you stop at walls. Ghost: you pass through walls but fall through floors. Plan your phase to be solid where you need to stop and ghost where you need to pass through.',
+    color: 'phase',
+    avgSolveTime: '3:20',
+    difficulty: 'Hard',
+    category: 'movement',
+    howToPlay: [
+      'Your character starts in solid phase. Tap a direction to move one step.',
+      'In solid phase: you are blocked by walls and stand on floors normally.',
+      'In ghost phase: you pass through walls freely, but you also fall through any floor tile beneath you (dropping down one row).',
+      'The phase flips automatically after every step. Reach the goal tile in the move limit.',
+    ],
+    designNotes: [
+      'Phase started from a simple question: what if intangibility had a cost that was exactly symmetrical with its benefit? Passing through walls is useful, but falling through floors is dangerous — and both happen in the same phase. That forced trade-off is what makes planning interesting rather than just picking the convenient option.',
+      'Because the phase is tied to step count rather than a button press, the player cannot choose when to be solid. They can only choose how many steps to take and in what direction, which makes the parity of their position part of the puzzle.',
+    ],
+    strategyTips: [
+      'Count your steps. If you need to be solid (step count = odd) to stop at a specific tile, make sure you arrive there on an odd-numbered step.',
+      'Ghost phase falling is only dangerous on floors you do not want to fall through. Use it deliberately to drop to a lower level when that is where you need to go.',
+      'Sometimes taking an extra step in the wrong direction is correct — not to make progress, but to flip your phase before the next critical move.',
     ],
   },
 ];

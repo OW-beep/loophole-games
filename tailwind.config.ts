@@ -62,6 +62,22 @@ const config: Config = {
           DEFAULT: '#7A3DB8',
           soft: '#EDE0F7',
         },
+        shadow: {
+          DEFAULT: '#4A4A6A',
+          soft: '#EAEAF2',
+        },
+        tether: {
+          DEFAULT: '#1A8C5B',
+          soft: '#D9F2E8',
+        },
+        drift: {
+          DEFAULT: '#1E7BC4',
+          soft: '#D9EEFA',
+        },
+        phase: {
+          DEFAULT: '#C4611E',
+          soft: '#FAE8D9',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

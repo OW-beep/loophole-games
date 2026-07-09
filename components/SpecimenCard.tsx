@@ -6,6 +6,7 @@ const STRIPE_CLASS: Record<string, string> = {
   echo: 'bg-echo', mirror: 'bg-mirror', debt: 'bg-debt', gravity: 'bg-gravity',
   fold: 'bg-fold', carry: 'bg-carry', brace: 'bg-brace', splice: 'bg-splice',
   heat: 'bg-heat', oneline: 'bg-oneline', overflow: 'bg-overflow', polarity: 'bg-polarity',
+  shadow: 'bg-shadow', tether: 'bg-tether', drift: 'bg-drift', phase: 'bg-phase',
 };
 
 const SOFT_CLASS: Record<string, string> = {
@@ -21,6 +22,10 @@ const SOFT_CLASS: Record<string, string> = {
   oneline: 'group-hover:bg-oneline-soft dark:group-hover:bg-oneline/10',
   overflow: 'group-hover:bg-overflow-soft dark:group-hover:bg-overflow/10',
   polarity: 'group-hover:bg-polarity-soft dark:group-hover:bg-polarity/10',
+  shadow: 'group-hover:bg-shadow-soft dark:group-hover:bg-shadow/10',
+  tether: 'group-hover:bg-tether-soft dark:group-hover:bg-tether/10',
+  drift: 'group-hover:bg-drift-soft dark:group-hover:bg-drift/10',
+  phase: 'group-hover:bg-phase-soft dark:group-hover:bg-phase/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {

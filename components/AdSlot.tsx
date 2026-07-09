@@ -18,6 +18,9 @@ interface SponsorSlotProps {
 const ADSENSE_ENABLED = process.env.NEXT_PUBLIC_ADSENSE_ENABLED === 'true';
 const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
+/**
+ * AdSense unit — shown only after AdSense is approved and enabled.
+ */
 export function AdSlot({ slotId, className = '', format = 'auto', label = 'Sponsored' }: AdSlotProps) {
   const ref = useRef<HTMLModElement>(null);
   const pushed = useRef(false);
@@ -57,6 +60,11 @@ export function AdSlot({ slotId, className = '', format = 'auto', label = 'Spons
   );
 }
 
+/**
+ * Sponsor slot — for affiliate or direct-deal placements.
+ * Wraps any ad HTML in the same "Sponsored" label frame as AdSlot,
+ * so the visual treatment is consistent and clearly disclosed.
+ */
 export function SponsorSlot({ className = '', label = 'Sponsored', children }: SponsorSlotProps) {
   return (
     <div className={`relative border border-dashed border-index dark:border-index-dark p-3 ${className}`}>
