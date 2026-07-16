@@ -82,6 +82,22 @@ const config: Config = {
           DEFAULT: '#7A3DB8',
           soft: '#F0E6FA',
         },
+        blobble: {
+          DEFAULT: '#2FA7B8',
+          soft: '#DCF3F6',
+        },
+        sprout: {
+          DEFAULT: '#5FA344',
+          soft: '#E7F3DE',
+        },
+        chef: {
+          DEFAULT: '#E2793D',
+          soft: '#FBE7DA',
+        },
+        noodle: {
+          DEFAULT: '#D9A62E',
+          soft: '#FBF0D9',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
@@ -105,10 +121,16 @@ const config: Config = {
           '50%': { transform: 'scale(1.12)' },
           '100%': { transform: 'scale(1)' },
         },
+        'chomp': {
+          '0%': { transform: 'scaleY(1)' },
+          '40%': { transform: 'scaleY(0.55)' },
+          '100%': { transform: 'scaleY(1)' },
+        },
       },
       animation: {
         'punch-pop': 'punch-pop 0.25s ease-out',
         'merge-pulse': 'merge-pulse 0.2s ease-in-out',
+        'chomp': 'chomp 0.18s ease-in-out',
       },
     },
   },

@@ -3,7 +3,7 @@ export type GameSlug =
   | 'fold' | 'carry-chain' | 'brace-yard' | 'splice'
   | 'heatmap' | 'signal' | 'overflow' | 'polarity'
   | 'shadow' | 'tether' | 'drift' | 'phase'
-  | 'boo-rush';
+  | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade';
 
@@ -479,6 +479,114 @@ export const GAMES: GameMeta[] = [
       'Small, frequent taps hold a steadier altitude than a few big ones \u2014 over-flapping sends you rocketing toward the top of the screen.',
       'Look at the next gate\u2019s gap while you\u2019re still approaching the current one. Reacting to the gate you\u2019re already inside is usually too late.',
       'If you keep crashing on the same gate, try arriving at it slightly lower than feels natural \u2014 it\u2019s easier to tap upward through a gap than to fall into one.',
+    ],
+  },
+  {
+    slug: 'blobble',
+    index: '18',
+    name: 'Blobble',
+    tagline: 'Pull back. Let go. Bounce something loose.',
+    description:
+      'Slingshot a squishy blob at a small stack of blocks. Real bounce-off-the-wall physics, a limited number of launches, and one target: clear every block before you run out of shots.',
+    color: 'blobble',
+    avgSolveTime: '1:20',
+    difficulty: 'Medium',
+    category: 'arcade',
+    howToPlay: [
+      'Drag back from the blob and release to launch it, slingshot-style \u2014 the further you pull, the harder it flies.',
+      'The blob bounces off the floor, walls, and any block it doesn\u2019t hit hard enough to break.',
+      'Hit a block fast enough and it breaks and clears. A slow, glancing hit just bounces you off it instead.',
+      'You have a limited number of launches. Clear every block on the board before they run out.',
+    ],
+    designNotes: [
+      'Blobble runs on the same three lines of physics as everything real-time in this index: velocity, gravity, and a bounce. No physics engine \u2014 just position and velocity updated every frame, with a simple speed check deciding whether a hit breaks a block or just deflects off it.',
+      'That speed threshold is the whole design: it turns "aim well" into "aim well AND commit," since a soft, cautious shot that technically hits a block still doesn\u2019t clear it.',
+    ],
+    strategyTips: [
+      'A flatter, faster pull tends to clear blocks near the ground; a steeper arc is better for anything floating higher up.',
+      'Blocks you bounce off (without clearing) don\u2019t move or reset \u2014 you get another free shot at them off the rebound, so a miss isn\u2019t always wasted.',
+      'Save your most confident, hardest-pulled shot for whichever block sits in the most awkward spot \u2014 a glancing hit there is the likeliest one to fail.',
+    ],
+  },
+  {
+    slug: 'sprout',
+    index: '19',
+    name: 'Sprout',
+    tagline: 'Water it at exactly the right moment.',
+    description:
+      'A rotating gauge sweeps around a seed. Tap the instant it passes through the highlighted arc to water it \u2014 miss too often and it wilts before it blooms.',
+    color: 'sprout',
+    avgSolveTime: '0:50',
+    difficulty: 'Easy',
+    category: 'arcade',
+    howToPlay: [
+      'A needle sweeps continuously around the dial. Tap anywhere to water the sprout.',
+      'A tap only counts if the needle is inside the highlighted arc at that instant.',
+      'Every successful tap grows the sprout one stage. The dial speeds up and the target arc narrows as it grows.',
+      'You can miss a few times without losing, but too many misses and the sprout wilts. Reach full bloom to win.',
+    ],
+    designNotes: [
+      'Sprout is the index\u2019s purest timing test \u2014 one dial, one window, no branching decisions. The target arc\u2019s position is different every day (seeded), but its width and the dial\u2019s speed both follow a fixed difficulty curve, so day-to-day variation comes from placement, not from the run suddenly getting unfair.',
+      'Allowing a small miss budget rather than ending the run on the first miss keeps a bad-luck early tap from throwing away an otherwise good run \u2014 the tension builds properly instead of resetting to zero at the first bump.',
+    ],
+    strategyTips: [
+      'Watch a full revolution before your first tap if you can \u2014 the dial\u2019s speed doesn\u2019t change mid-stage, so one clean read of the timing carries you through the rest of it.',
+      'Later stages move faster with a narrower window; aim slightly early rather than late, since human reaction time tends to land taps a beat behind where you intended.',
+      'A miss early in a stage isn\u2019t fatal \u2014 the dial keeps sweeping, so you get another pass at the window on the very next revolution.',
+    ],
+  },
+  {
+    slug: 'wobble-chef',
+    index: '20',
+    name: 'Wobble Chef',
+    tagline: 'Today\u2019s menu, stacked one wobble at a time.',
+    description:
+      'Drop today\u2019s sequence of dishes onto a swaying tower, one at a time. Land off-center and the whole thing topples \u2014 stack the entire menu to win.',
+    color: 'chef',
+    avgSolveTime: '1:00',
+    difficulty: 'Medium',
+    category: 'arcade',
+    howToPlay: [
+      'A dish swings back and forth above the tower. Tap to drop it straight down.',
+      'It falls under gravity and lands on whatever\u2019s currently on top of the tower.',
+      'Land it close enough to center and it joins the tower, which becomes the new base for the next dish. Land too far off and it topples the tower \u2014 game over.',
+      'Every day has a fixed menu of dishes in a fixed order. Stack the whole menu without a single topple to win.',
+    ],
+    designNotes: [
+      'Wobble Chef trades a full stacking-physics simulation for one honest question per drop: was this close enough to the center of what\u2019s already there? That single tolerance check, applied to a real gravity-driven fall, gives the stack a physical feel without needing collision resolution between every dish already placed.',
+      'The tower\u2019s effective center drifts slightly toward wherever you actually land each dish, not just the very first base \u2014 so a couple of slightly off-center placements in a row make the next drop measurably harder, the same way a real stack leans after a few uneven layers.',
+    ],
+    strategyTips: [
+      'Aim for dead center rather than "close enough," especially early \u2014 small offsets compound, since each new layer\u2019s center shifts toward where the last dish actually landed.',
+      'The swing speed is constant for the whole run, so timing your tap is about reading the swing\u2019s rhythm once, not reacting dish-by-dish.',
+      'If you\u2019ve been landing consistently to one side, deliberately aim slightly the other way on your next drop \u2014 you\u2019re correcting the tower\u2019s drift, not just the current dish.',
+    ],
+  },
+  {
+    slug: 'noodle-cat',
+    index: '21',
+    name: 'Noodle Cat',
+    tagline: 'Mash before the bowl gets cold.',
+    description:
+      'Tap as fast as you can to help a very determined cat slurp down a bowl of noodles before the timer runs out \u2014 then the next bowl arrives, a little faster than the last.',
+    color: 'noodle',
+    avgSolveTime: '0:45',
+    difficulty: 'Easy',
+    category: 'arcade',
+    howToPlay: [
+      'Tap repeatedly to slurp noodles from the bowl. Each tap clears a little more of the noodle trail.',
+      'Reach the target number of taps before the timer runs out to finish the bowl.',
+      'Clearing a bowl brings out the next one \u2014 with a higher tap target and less time on the clock.',
+      'Finish every bowl in today\u2019s run to win. Run out of time on any bowl and the run ends there.',
+    ],
+    designNotes: [
+      'Noodle Cat is the index\u2019s one pure reflex test \u2014 no aiming, no timing window, just raw tap speed against a shrinking clock. It exists partly as a palate cleanser next to the more deliberate games elsewhere in the catalog.',
+      'Each bowl\u2019s tap target and time budget are generated from the same daily seed as every other game, so "today\u2019s run" is exactly as hard for everyone who plays it \u2014 there\u2019s a fixed, comparable finish line even in a game that\u2019s otherwise just mashing as fast as you can.',
+    ],
+    strategyTips: [
+      'A steady rhythm beats short frantic bursts \u2014 tapping speed tends to drop off fast right after a burst, right when you need it to hold.',
+      'The time budget shrinks faster than the tap target grows across the run, so treat every later bowl as more urgent than the last, not just "a bit harder."',
+      'If a bowl is close to finished when time is running low, keep tapping at the same pace rather than rushing \u2014 mistimed taps don\u2019t count for less, so panic doesn\u2019t cost you anything, but it doesn\u2019t help either.',
     ],
   },
 ];

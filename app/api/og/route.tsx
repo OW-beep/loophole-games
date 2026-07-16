@@ -10,6 +10,7 @@ const COLOR_HEX: Record<string, string> = {
   heat: '#E05C1A', oneline: '#1A7FE0', overflow: '#17A0A0', polarity: '#7A3DB8',
   shadow: '#4A4A6A', tether: '#1A8C5B', drift: '#1E7BC4', phase: '#C4611E',
   boo: '#7A3DB8',
+  blobble: '#2FA7B8', sprout: '#5FA344', chef: '#E2793D', noodle: '#D9A62E',
 };
 
 export async function GET(req: NextRequest) {

@@ -10,6 +10,7 @@ const TEXT_CLASS: Record<string, string> = {
   heat: 'text-heat', oneline: 'text-oneline', overflow: 'text-overflow', polarity: 'text-polarity',
   shadow: 'text-shadow', tether: 'text-tether', drift: 'text-drift', phase: 'text-phase',
   boo: 'text-boo',
+  blobble: 'text-blobble', sprout: 'text-sprout', chef: 'text-chef', noodle: 'text-noodle',
 };
 
 interface GameHeaderProps {
