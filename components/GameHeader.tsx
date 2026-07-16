@@ -8,6 +8,8 @@ const TEXT_CLASS: Record<string, string> = {
   echo: 'text-echo', mirror: 'text-mirror', debt: 'text-debt', gravity: 'text-gravity',
   fold: 'text-fold', carry: 'text-carry', brace: 'text-brace', splice: 'text-splice',
   heat: 'text-heat', oneline: 'text-oneline', overflow: 'text-overflow', polarity: 'text-polarity',
+  shadow: 'text-shadow', tether: 'text-tether', drift: 'text-drift', phase: 'text-phase',
+  boo: 'text-boo',
 };
 
 interface GameHeaderProps {

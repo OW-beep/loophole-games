@@ -2,9 +2,10 @@ export type GameSlug =
   | 'echo-merge' | 'mirror-loop' | 'color-debt' | 'gravity-word'
   | 'fold' | 'carry-chain' | 'brace-yard' | 'splice'
   | 'heatmap' | 'signal' | 'overflow' | 'polarity'
-  | 'shadow' | 'tether' | 'drift' | 'phase';
+  | 'shadow' | 'tether' | 'drift' | 'phase'
+  | 'boo-rush';
 
-export type GameCategory = 'puzzle' | 'movement' | 'word';
+export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade';
 
 export interface GameMeta {
   slug: GameSlug;
@@ -451,6 +452,33 @@ export const GAMES: GameMeta[] = [
       'Count your steps. If you need to be solid (step count = odd) to stop at a specific tile, make sure you arrive there on an odd-numbered step.',
       'Ghost phase falling is only dangerous on floors you do not want to fall through. Use it deliberately to drop to a lower level when that is where you need to go.',
       'Sometimes taking an extra step in the wrong direction is correct — not to make progress, but to flip your phase before the next critical move.',
+    ],
+  },
+  {
+    slug: 'boo-rush',
+    index: '17',
+    name: 'Boo Rush',
+    tagline: 'One tap. One ghost. A whole course of gates.',
+    description:
+      'Tap to flap and guide a little ghost through a set course of floating gates. No grid, no turns — just timing. Clear every gate to win today\u2019s run.',
+    color: 'boo',
+    avgSolveTime: '1:10',
+    difficulty: 'Medium',
+    category: 'arcade',
+    howToPlay: [
+      'Tap, click, or press Space to make the ghost flap upward. Let go and gravity pulls it back down.',
+      'Fly through the gap in each gate. Touching a gate or the ground ends the run.',
+      'Today\u2019s course is the same for everyone \u2014 the same gate heights in the same order, every time you play it today.',
+      'Clear every gate in the course to win the run. Crash partway and your result shows how many you cleared.',
+    ],
+    designNotes: [
+      'Every other game in this index is turn-based \u2014 you think, then you act, on your own clock. Boo Rush is the one deliberately real-time entry: a single input, continuous physics, and a course rather than a board. The idea was to see how far the "one daily attempt, shareable result" format could stretch beyond puzzles.',
+      'The course is generated from the day\u2019s seed the same way every puzzle in the index is, so "today\u2019s run" is identical for every player \u2014 same gate gaps, same order, same difficulty curve. That keeps it comparable, even though the skill being tested is timing instead of logic.',
+    ],
+    strategyTips: [
+      'Small, frequent taps hold a steadier altitude than a few big ones \u2014 over-flapping sends you rocketing toward the top of the screen.',
+      'Look at the next gate\u2019s gap while you\u2019re still approaching the current one. Reacting to the gate you\u2019re already inside is usually too late.',
+      'If you keep crashing on the same gate, try arriving at it slightly lower than feels natural \u2014 it\u2019s easier to tap upward through a gap than to fall into one.',
     ],
   },
 ];

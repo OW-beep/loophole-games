@@ -78,6 +78,10 @@ const config: Config = {
           DEFAULT: '#C4611E',
           soft: '#FAE8D9',
         },
+        boo: {
+          DEFAULT: '#7A3DB8',
+          soft: '#F0E6FA',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

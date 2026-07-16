@@ -28,10 +28,10 @@ export default function HomePage() {
 
       <section className="mb-10">
         <p className="stat-line text-ink/50 dark:text-white/40 mb-3">
-          Catalog №01–16 · est. 2026
+          Catalog №01–17 · est. 2026
         </p>
         <h1 className="font-display font-bold text-4xl sm:text-5xl leading-[1.05] mb-4 max-w-2xl">
-          Sixteen puzzles you haven&rsquo;t played before.
+          Seventeen games you haven&rsquo;t played before.
         </h1>
         <p className="text-ink/70 dark:text-white/60 max-w-xl">
           Loophole is a small, growing index of original puzzle mechanics — not reskins of
@@ -72,7 +72,9 @@ export default function HomePage() {
           elsewhere: Shadow (your last move haunts you as a ghost), Tether (two characters
           share one direction), Drift (you slide until something stops you), and Phase
           (you alternate between solid and ghost every step). None of them are a match-3
-          or a sliding-tile game wearing a new skin.
+          or a sliding-tile game wearing a new skin. Boo Rush breaks the turn-based mold
+          entirely: one real-time input, a little ghost, and a set course of gates
+          generated from the same daily seed as everything else in the index.
         </p>
         <p className="text-ink/70 dark:text-white/60">
           New puzzle specimens get added to the catalog over time — bookmark the index and
