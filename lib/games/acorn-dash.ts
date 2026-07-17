@@ -14,6 +14,7 @@ export const CANVAS_HEIGHT = 480;
 export const BASKET_Y = CANVAS_HEIGHT - 46;
 export const BASKET_HALF_WIDTH = 24; // narrower than early builds — this is the tightest catch window
 export const ITEM_RADIUS = 12;
+export const BURR_RADIUS_SCALE = 1.45; // burrs read as bigger and genuinely are harder to dodge
 
 export const DROP_COUNT = 34;
 export const ACORN_RATIO = 0.62; // more burrs mixed in than acorns-only difficulty would suggest
@@ -31,6 +32,13 @@ export const DRIFT_FREQ_MAX = 3.0; // rad/s
 
 export const BASKET_KEY_SPEED = 340; // px/s, arrow-key nudging
 export const BASKET_SMOOTHING = 12; // higher = snappier drag-follow
+
+// "Focus" reward: stringing together consecutive catches temporarily widens
+// the catch window, so a hot streak earns a bit of breathing room against
+// the bigger burrs and the sway, rather than just producing a higher number.
+export const FOCUS_COMBO_STEP = 5; // grant focus every N-catch combo
+export const FOCUS_BONUS_WIDTH = 11; // px added to the catch window while focused
+export const FOCUS_DROPS_GRANTED = 3; // how many upcoming drops the bonus covers
 
 const EDGE_MARGIN = 30;
 
@@ -83,14 +91,25 @@ export function hasCrossedLine(prevY: number, nextY: number): boolean {
   return prevY < BASKET_Y && nextY >= BASKET_Y;
 }
 
-export function isOverlapping(itemX: number, basketX: number): boolean {
-  return Math.abs(itemX - basketX) <= BASKET_HALF_WIDTH + ITEM_RADIUS;
+/** Burrs use a larger effective radius than acorns — bigger to look at,
+ * and genuinely more likely to clip the basket if you drift too close. */
+export function radiusFor(item: DropItem): number {
+  return item.type === 'burr' ? ITEM_RADIUS * BURR_RADIUS_SCALE : ITEM_RADIUS;
+}
+
+export function isOverlapping(itemX: number, basketX: number, itemRadius: number, basketHalfWidth: number): boolean {
+  return Math.abs(itemX - basketX) <= basketHalfWidth + itemRadius;
 }
 
 export type CrossingOutcome = 'caught-acorn' | 'caught-golden' | 'caught-burr' | 'missed-acorn' | 'avoided-burr';
 
-export function resolveCrossing(item: DropItem, itemX: number, basketX: number): CrossingOutcome {
-  const caught = isOverlapping(itemX, basketX);
+export function resolveCrossing(
+  item: DropItem,
+  itemX: number,
+  basketX: number,
+  basketHalfWidth: number = BASKET_HALF_WIDTH
+): CrossingOutcome {
+  const caught = isOverlapping(itemX, basketX, radiusFor(item), basketHalfWidth);
   if (item.type === 'acorn') {
     if (!caught) return 'missed-acorn';
     return item.golden ? 'caught-golden' : 'caught-acorn';

@@ -13,9 +13,13 @@ import {
   BASKET_Y,
   BASKET_HALF_WIDTH,
   ITEM_RADIUS,
+  BURR_RADIUS_SCALE,
   SPAWN_Y,
   DROP_COUNT,
   MISS_BUDGET,
+  FOCUS_COMBO_STEP,
+  FOCUS_BONUS_WIDTH,
+  FOCUS_DROPS_GRANTED,
   type DropItem,
 } from '@/lib/games/acorn-dash';
 import { recordResult, getStreak } from '@/lib/storage';
@@ -56,6 +60,7 @@ export function AcornDashBoard({
   const caughtRef = useRef(0);
   const missesRef = useRef(0);
   const comboRef = useRef(0);
+  const focusRemainingRef = useRef(0);
   const bounceRef = useRef(0);
   const flashRef = useRef(0); // brief gold flash on the squirrel after a golden catch
 
@@ -63,6 +68,7 @@ export function AcornDashBoard({
   const [caught, setCaught] = useState(0);
   const [misses, setMisses] = useState(0);
   const [combo, setCombo] = useState(0);
+  const [focused, setFocused] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [streak, setStreak] = useState(0);
 
@@ -78,10 +84,12 @@ export function AcornDashBoard({
     caughtRef.current = 0;
     missesRef.current = 0;
     comboRef.current = 0;
+    focusRemainingRef.current = 0;
     finishedRef.current = false;
     setCaught(0);
     setMisses(0);
     setCombo(0);
+    setFocused(false);
     setShowResult(false);
     statusRef.current = 'ready';
     setStatus('ready');
@@ -202,14 +210,15 @@ export function AcornDashBoard({
     }
 
     function drawBurr(x: number, y: number) {
+      const r = ITEM_RADIUS * BURR_RADIUS_SCALE;
       ctx.fillStyle = '#8B8B8B';
-      const spikes = 10;
+      const spikes = 11;
       ctx.beginPath();
       for (let i = 0; i < spikes; i++) {
         const a1 = (i / spikes) * Math.PI * 2;
         const a2 = ((i + 0.5) / spikes) * Math.PI * 2;
-        const outer = ITEM_RADIUS * 1.35;
-        const inner = ITEM_RADIUS * 0.8;
+        const outer = r * 1.35;
+        const inner = r * 0.78;
         const p1x = x + Math.cos(a1) * inner;
         const p1y = y + Math.sin(a1) * inner;
         const p2x = x + Math.cos(a2) * outer;
@@ -222,14 +231,28 @@ export function AcornDashBoard({
       ctx.fill();
       ctx.fillStyle = '#5B5B5B';
       ctx.beginPath();
-      ctx.arc(x, y, ITEM_RADIUS * 0.6, 0, Math.PI * 2);
+      ctx.arc(x, y, r * 0.55, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#3F3F3F';
+      ctx.beginPath();
+      ctx.arc(x - r * 0.18, y - r * 0.08, 1.6, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.18, y - r * 0.08, 1.6, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    function drawSquirrel(x: number, y: number, squash: number, glow: number) {
+    function drawSquirrel(x: number, y: number, squash: number, glow: number, focused: boolean) {
       const s = 1 - squash * 0.18;
       ctx.save();
       ctx.translate(x, y);
+
+      if (focused) {
+        ctx.strokeStyle = 'rgba(47,167,184,0.55)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(6, -4, 40, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
       ctx.scale(1 / s, s);
 
       if (glow > 0) {
@@ -300,7 +323,7 @@ export function AcornDashBoard({
         else drawBurr(x, itemYRef.current);
       }
 
-      drawSquirrel(basketXRef.current, BASKET_Y + 6, Math.max(0, bounceRef.current), flashRef.current);
+      drawSquirrel(basketXRef.current, BASKET_Y + 6, Math.max(0, bounceRef.current), flashRef.current, focusRemainingRef.current > 0);
     }
 
     function frame(ts: number) {
@@ -331,7 +354,14 @@ export function AcornDashBoard({
 
           if (hasCrossedLine(prevY, nextY)) {
             const x = currentX(item, itemElapsedRef.current);
-            const outcome = resolveCrossing(item, x, basketXRef.current);
+            const effectiveHalfWidth =
+              BASKET_HALF_WIDTH + (focusRemainingRef.current > 0 ? FOCUS_BONUS_WIDTH : 0);
+            const outcome = resolveCrossing(item, x, basketXRef.current, effectiveHalfWidth);
+
+            if (focusRemainingRef.current > 0) {
+              focusRemainingRef.current -= 1;
+              setFocused(focusRemainingRef.current > 0);
+            }
 
             if (outcome === 'caught-acorn' || outcome === 'caught-golden') {
               caughtRef.current += 1;
@@ -343,6 +373,10 @@ export function AcornDashBoard({
                 missesRef.current = Math.max(0, missesRef.current - 1);
                 setMisses(missesRef.current);
                 flashRef.current = 1;
+              }
+              if (comboRef.current > 0 && comboRef.current % FOCUS_COMBO_STEP === 0) {
+                focusRemainingRef.current += FOCUS_DROPS_GRANTED;
+                setFocused(true);
               }
             } else if (outcome === 'caught-burr' || outcome === 'missed-acorn') {
               missesRef.current += 1;
@@ -404,6 +438,11 @@ export function AcornDashBoard({
             combo ×{combo}
           </div>
         )}
+        {focused && status === 'playing' && (
+          <div className="absolute top-2 left-2 stat-line bg-blobble text-white px-2 py-1 rounded-tag pointer-events-none">
+            focus: wider catch
+          </div>
+        )}
       </div>
 
       <div className="stat-line text-ink/50 dark:text-white/40 text-center mb-3">
@@ -411,7 +450,8 @@ export function AcornDashBoard({
         {combo >= 3 ? ` · combo \u00d7${combo}` : ''}
       </div>
       <div className="stat-line text-ink/40 dark:text-white/30 text-center mb-3">
-        gold acorns forgive a miss · burrs sway as they fall, so watch the drift
+        gold acorns forgive a miss · burrs are bigger and sway as they fall · a {FOCUS_COMBO_STEP}-catch streak
+        widens your catch window for a few drops
       </div>
 
       <ResultModal
