@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   createHarvest,
   countAcorns,
+  currentX,
   hasCrossedLine,
   resolveCrossing,
   stepBasket,
@@ -24,7 +25,7 @@ import { GAMES } from '@/lib/games/registry';
 
 type Status = 'ready' | 'playing' | 'won' | 'lost';
 
-const RESPAWN_PAUSE_MS = 220;
+const RESPAWN_PAUSE_MS = 200;
 
 export function AcornDashBoard({
   seed,
@@ -46,6 +47,7 @@ export function AcornDashBoard({
   const totalAcornsRef = useRef<number>(countAcorns(harvestRef.current));
   const indexRef = useRef(0);
   const itemYRef = useRef(SPAWN_Y);
+  const itemElapsedRef = useRef(0);
   const pauseRef = useRef(0);
   const basketXRef = useRef(CANVAS_WIDTH / 2);
   const targetXRef = useRef(CANVAS_WIDTH / 2);
@@ -53,10 +55,14 @@ export function AcornDashBoard({
   const keysRef = useRef({ left: false, right: false });
   const caughtRef = useRef(0);
   const missesRef = useRef(0);
+  const comboRef = useRef(0);
   const bounceRef = useRef(0);
+  const flashRef = useRef(0); // brief gold flash on the squirrel after a golden catch
 
   const [status, setStatus] = useState<Status>('ready');
   const [caught, setCaught] = useState(0);
+  const [misses, setMisses] = useState(0);
+  const [combo, setCombo] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [streak, setStreak] = useState(0);
 
@@ -65,13 +71,17 @@ export function AcornDashBoard({
     totalAcornsRef.current = countAcorns(harvestRef.current);
     indexRef.current = 0;
     itemYRef.current = SPAWN_Y;
+    itemElapsedRef.current = 0;
     pauseRef.current = 0;
     basketXRef.current = CANVAS_WIDTH / 2;
     targetXRef.current = CANVAS_WIDTH / 2;
     caughtRef.current = 0;
     missesRef.current = 0;
+    comboRef.current = 0;
     finishedRef.current = false;
     setCaught(0);
+    setMisses(0);
+    setCombo(0);
     setShowResult(false);
     statusRef.current = 'ready';
     setStatus('ready');
@@ -156,6 +166,8 @@ export function AcornDashBoard({
     canvas.height = CANVAS_HEIGHT * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+    const BASKET_KEY_SPEED_LOCAL = 340;
+
     function finish(won: boolean) {
       if (finishedRef.current) return;
       finishedRef.current = true;
@@ -172,15 +184,21 @@ export function AcornDashBoard({
       setShowResult(true);
     }
 
-    function drawAcorn(x: number, y: number) {
-      ctx.fillStyle = '#B5651D';
+    function drawAcorn(x: number, y: number, golden: boolean) {
+      ctx.fillStyle = golden ? '#E8A93A' : '#B5651D';
       ctx.beginPath();
       ctx.ellipse(x, y + 2, ITEM_RADIUS * 0.85, ITEM_RADIUS, 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#7A4A1E';
+      ctx.fillStyle = golden ? '#B9781C' : '#7A4A1E';
       ctx.beginPath();
       ctx.ellipse(x, y - ITEM_RADIUS * 0.55, ITEM_RADIUS * 0.95, ITEM_RADIUS * 0.5, 0, 0, Math.PI * 2);
       ctx.fill();
+      if (golden) {
+        ctx.fillStyle = 'rgba(255,255,255,0.75)';
+        ctx.beginPath();
+        ctx.ellipse(x - 3, y + 2, 2.2, 3.2, -0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
     function drawBurr(x: number, y: number) {
@@ -208,11 +226,18 @@ export function AcornDashBoard({
       ctx.fill();
     }
 
-    function drawSquirrel(x: number, y: number, squash: number) {
+    function drawSquirrel(x: number, y: number, squash: number, glow: number) {
       const s = 1 - squash * 0.18;
       ctx.save();
       ctx.translate(x, y);
       ctx.scale(1 / s, s);
+
+      if (glow > 0) {
+        ctx.fillStyle = `rgba(232,169,58,${0.35 * glow})`;
+        ctx.beginPath();
+        ctx.arc(6, -4, 42, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       // tail
       ctx.fillStyle = '#C17A3D';
@@ -270,14 +295,13 @@ export function AcornDashBoard({
 
       if (statusRef.current === 'playing' && pauseRef.current <= 0 && indexRef.current < DROP_COUNT) {
         const item = harvestRef.current[indexRef.current];
-        if (item.type === 'acorn') drawAcorn(item.x, itemYRef.current);
-        else drawBurr(item.x, itemYRef.current);
+        const x = currentX(item, itemElapsedRef.current);
+        if (item.type === 'acorn') drawAcorn(x, itemYRef.current, item.golden);
+        else drawBurr(x, itemYRef.current);
       }
 
-      drawSquirrel(basketXRef.current, BASKET_Y + 6, Math.max(0, bounceRef.current));
+      drawSquirrel(basketXRef.current, BASKET_Y + 6, Math.max(0, bounceRef.current), flashRef.current);
     }
-
-    const BASKET_KEY_SPEED_LOCAL = 340;
 
     function frame(ts: number) {
       if (!lastTsRef.current) lastTsRef.current = ts;
@@ -285,6 +309,7 @@ export function AcornDashBoard({
       lastTsRef.current = ts;
 
       bounceRef.current = Math.max(0, bounceRef.current - dt * 3);
+      flashRef.current = Math.max(0, flashRef.current - dt * 1.6);
 
       if (statusRef.current === 'playing') {
         if (draggingRef.current) {
@@ -299,22 +324,36 @@ export function AcornDashBoard({
           pauseRef.current -= dt * 1000;
         } else if (indexRef.current < DROP_COUNT) {
           const item = harvestRef.current[indexRef.current];
+          itemElapsedRef.current += dt;
           const prevY = itemYRef.current;
           const nextY = prevY + item.speed * dt;
           itemYRef.current = nextY;
 
           if (hasCrossedLine(prevY, nextY)) {
-            const outcome = resolveCrossing(item, basketXRef.current);
-            if (outcome === 'caught-acorn') {
+            const x = currentX(item, itemElapsedRef.current);
+            const outcome = resolveCrossing(item, x, basketXRef.current);
+
+            if (outcome === 'caught-acorn' || outcome === 'caught-golden') {
               caughtRef.current += 1;
               setCaught(caughtRef.current);
+              comboRef.current += 1;
+              setCombo(comboRef.current);
               bounceRef.current = 1;
+              if (outcome === 'caught-golden') {
+                missesRef.current = Math.max(0, missesRef.current - 1);
+                setMisses(missesRef.current);
+                flashRef.current = 1;
+              }
             } else if (outcome === 'caught-burr' || outcome === 'missed-acorn') {
               missesRef.current += 1;
+              setMisses(missesRef.current);
+              comboRef.current = 0;
+              setCombo(0);
             }
 
             indexRef.current += 1;
             itemYRef.current = SPAWN_Y;
+            itemElapsedRef.current = 0;
             pauseRef.current = RESPAWN_PAUSE_MS;
 
             if (missesRef.current > MISS_BUDGET) {
@@ -360,10 +399,19 @@ export function AcornDashBoard({
             <p className="stat-line text-white bg-graphite/80 px-3 py-2">Drag to move, catch the acorns</p>
           </div>
         )}
+        {combo >= 3 && status === 'playing' && (
+          <div className="absolute top-2 right-2 stat-line bg-acorn text-white px-2 py-1 rounded-tag pointer-events-none">
+            combo ×{combo}
+          </div>
+        )}
       </div>
 
       <div className="stat-line text-ink/50 dark:text-white/40 text-center mb-3">
-        drag / arrow keys to move · caught {caught}/{totalAcornsRef.current} · misses {missesRef.current}/{MISS_BUDGET}
+        drag / arrow keys to move · caught {caught}/{totalAcornsRef.current} · misses {misses}/{MISS_BUDGET}
+        {combo >= 3 ? ` · combo \u00d7${combo}` : ''}
+      </div>
+      <div className="stat-line text-ink/40 dark:text-white/30 text-center mb-3">
+        gold acorns forgive a miss · burrs sway as they fall, so watch the drift
       </div>
 
       <ResultModal
