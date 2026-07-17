@@ -30,10 +30,10 @@ export default function HomePage() {
 
       <section className="mb-10">
         <p className="stat-line text-ink/50 dark:text-white/40 mb-3">
-          Catalog №01–21 · est. 2026
+          Catalog №01–22 · est. 2026
         </p>
         <h1 className="font-display font-bold text-4xl sm:text-5xl leading-[1.05] mb-4 max-w-2xl">
-          Twenty-one games you haven&rsquo;t played before.
+          Twenty-two games you haven&rsquo;t played before.
         </h1>
         <p className="text-ink/70 dark:text-white/60 max-w-xl">
           Loophole is a small, growing index of original puzzle mechanics — not reskins of

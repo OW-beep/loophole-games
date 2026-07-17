@@ -11,6 +11,7 @@ const COLOR_HEX: Record<string, string> = {
   shadow: '#4A4A6A', tether: '#1A8C5B', drift: '#1E7BC4', phase: '#C4611E',
   boo: '#7A3DB8',
   blobble: '#2FA7B8', sprout: '#5FA344', chef: '#E2793D', noodle: '#D9A62E',
+  acorn: '#B5651D',
 };
 
 export async function GET(req: NextRequest) {

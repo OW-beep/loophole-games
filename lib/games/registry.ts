@@ -3,7 +3,7 @@ export type GameSlug =
   | 'fold' | 'carry-chain' | 'brace-yard' | 'splice'
   | 'heatmap' | 'signal' | 'overflow' | 'polarity'
   | 'shadow' | 'tether' | 'drift' | 'phase'
-  | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat';
+  | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat' | 'acorn-dash';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade';
 
@@ -587,6 +587,33 @@ export const GAMES: GameMeta[] = [
       'A steady rhythm beats short frantic bursts \u2014 tapping speed tends to drop off fast right after a burst, right when you need it to hold.',
       'The time budget shrinks faster than the tap target grows across the run, so treat every later bowl as more urgent than the last, not just "a bit harder."',
       'If a bowl is close to finished when time is running low, keep tapping at the same pace rather than rushing \u2014 mistimed taps don\u2019t count for less, so panic doesn\u2019t cost you anything, but it doesn\u2019t help either.',
+    ],
+  },
+  {
+    slug: 'acorn-dash',
+    index: '22',
+    name: 'Acorn Dash',
+    tagline: 'Drag to catch. Dodge the spiky ones.',
+    description:
+      'Guide a squirrel back and forth to catch today\u2019s falling acorns and dodge the spiky burrs mixed in. A few misses are forgiven \u2014 catch the full harvest to win.',
+    color: 'acorn',
+    avgSolveTime: '1:10',
+    difficulty: 'Easy',
+    category: 'arcade',
+    howToPlay: [
+      'Drag left and right (or use the arrow keys) to move the squirrel along the bottom of the screen.',
+      'Acorns are good \u2014 catch every one you can. Spiky burrs are bad \u2014 just let them fall past you.',
+      'Missing an acorn or catching a burr both count as a miss. You can afford a few misses across the run, but not too many.',
+      'Today\u2019s harvest is a fixed sequence of drops, the same for everyone. Catch every acorn in it to win.',
+    ],
+    designNotes: [
+      'Acorn Dash is the one continuous-movement entry in the index \u2014 every other real-time game here is a single button press (flap, tap, drop) at the right moment, but this one asks for constant left-right tracking instead, the same muscle a classic catch game exercises.',
+      'The good and bad items share the same falling pattern on purpose. The only way to tell them apart is a glance, which is what keeps a simple catching game from feeling like it plays itself once you\u2019ve seen a few drops.',
+    ],
+    strategyTips: [
+      'Drift toward the middle of the screen between drops rather than chasing the last one\u2019s exact spot \u2014 it shortens the distance to whatever comes next, good or bad.',
+      'A burr you don\u2019t catch costs you nothing. When in doubt about which item is falling, hang back rather than lunge; a missed acorn only costs one miss, but so does an accidentally caught burr.',
+      'The fall speed creeps up as the run goes on, so the timing that worked on the first few drops will feel rushed by the end \u2014 start tracking each drop a little earlier than instinct suggests.',
     ],
   },
 ];

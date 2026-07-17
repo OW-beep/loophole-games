@@ -115,6 +115,11 @@ const config: Config = {
           DEFAULT: '#6C4CC4',
           soft: '#EAE3FA',
         },
+        // 22nd game color
+        acorn: {
+          DEFAULT: '#B5651D',
+          soft: '#F5E3CD',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

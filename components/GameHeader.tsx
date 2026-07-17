@@ -11,6 +11,7 @@ const TEXT_CLASS: Record<string, string> = {
   shadow: 'text-shadow', tether: 'text-tether', drift: 'text-drift', phase: 'text-phase',
   boo: 'text-boo',
   blobble: 'text-blobble', sprout: 'text-sprout', chef: 'text-chef', noodle: 'text-noodle',
+  acorn: 'text-acorn',
 };
 
 interface GameHeaderProps {
