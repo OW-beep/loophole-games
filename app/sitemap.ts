@@ -1,10 +1,11 @@
 import type { MetadataRoute } from 'next';
 import { GAMES } from '@/lib/games/registry';
+import { BLOG_POSTS } from '@/lib/blog/registry';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://loophole.games';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages = ['', '/about', '/faq', '/privacy', '/terms'].map((path) => ({
+  const staticPages = ['', '/about', '/faq', '/privacy', '/terms', '/blog'].map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: new Date(),
     changeFrequency: path === '' ? ('daily' as const) : ('monthly' as const),
@@ -18,5 +19,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  return [...staticPages, ...gamePages];
+  const blogPages = BLOG_POSTS.map((p) => ({
+    url: `${SITE_URL}/blog/${p.slug}`,
+    lastModified: new Date(p.publishDate),
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...gamePages, ...blogPages];
 }
+

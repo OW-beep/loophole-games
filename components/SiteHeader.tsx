@@ -14,6 +14,9 @@ export function SiteHeader() {
           </span>
         </Link>
         <nav className="flex items-center gap-4">
+          <Link href="/blog" className="stat-line hover:underline hidden sm:inline">
+            Blog
+          </Link>
           <Link href="/about" className="stat-line hover:underline hidden sm:inline">
             About
           </Link>

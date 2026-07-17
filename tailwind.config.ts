@@ -98,6 +98,23 @@ const config: Config = {
           DEFAULT: '#D9A62E',
           soft: '#FBF0D9',
         },
+        // blog category colors
+        trend: {
+          DEFAULT: '#2563EB',
+          soft: '#DEE9FD',
+        },
+        biz: {
+          DEFAULT: '#0D8A6B',
+          soft: '#DBF3EC',
+        },
+        culture: {
+          DEFAULT: '#C2417A',
+          soft: '#F8E3EE',
+        },
+        insight: {
+          DEFAULT: '#6C4CC4',
+          soft: '#EAE3FA',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
