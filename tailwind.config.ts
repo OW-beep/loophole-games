@@ -120,6 +120,11 @@ const config: Config = {
           DEFAULT: '#B5651D',
           soft: '#F5E3CD',
         },
+        // 23rd game color
+        cloud: {
+          DEFAULT: '#5B9BD1',
+          soft: '#E4F0FA',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

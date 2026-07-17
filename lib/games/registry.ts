@@ -3,7 +3,7 @@ export type GameSlug =
   | 'fold' | 'carry-chain' | 'brace-yard' | 'splice'
   | 'heatmap' | 'signal' | 'overflow' | 'polarity'
   | 'shadow' | 'tether' | 'drift' | 'phase'
-  | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat' | 'acorn-dash';
+  | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat' | 'acorn-dash' | 'cloud-hop';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade';
 
@@ -620,6 +620,36 @@ export const GAMES: GameMeta[] = [
       'Prioritize gold acorns when you see one coming \u2014 the miss they forgive is worth more than the drop itself, especially once the later, faster drops start.',
       'A five-catch streak earns a few drops of a wider catch window \u2014 worth protecting a combo for on its own, not just for the score.',
       'The fall speed and sway both ramp up as the run goes on, so the read-and-react timing that worked on the first few drops will feel rushed by the end \u2014 start tracking each drop earlier than instinct suggests.',
+    ],
+  },
+  {
+    slug: 'cloud-hop',
+    index: '23',
+    name: 'Cloud Hop',
+    tagline: 'Bounces on its own. You just have to steer.',
+    description:
+      'A bunny bounces automatically from cloud to cloud, higher and higher \u2014 drag to steer it onto each next landing before gravity brings it back down. Climb today\u2019s full run of clouds to win.',
+    color: 'cloud',
+    avgSolveTime: '1:30',
+    difficulty: 'Medium',
+    category: 'arcade',
+    howToPlay: [
+      'The bunny bounces on its own \u2014 there\u2019s no jump button. Drag left and right (or use the arrow keys) to line it up with the next cloud before it falls back down.',
+      'Drifting clouds sway side to side, so aim for where one will be, not where it is right now.',
+      'Landing on a rainbow cloud gives the very next bounce extra height \u2014 handy for an unusually large gap right after.',
+      'Going off one edge of the screen brings the bunny back in from the other side.',
+      'Miss a landing and the bunny falls out of view \u2014 the run ends there. Reach the top of today\u2019s fixed run of clouds to win.',
+    ],
+    designNotes: [
+      'Cloud Hop deliberately has no jump input at all \u2014 gravity and a fixed bounce velocity handle the vertical motion completely, so the only thing left for the player to control is horizontal position. That constraint is the whole game: steering, not timing.',
+      'Every gap between clouds is generated to stay within the bunny\u2019s actual maximum jump height, so a landing is always physically reachable \u2014 the difficulty ramp comes from gaps using more and more of that maximum as the run goes on, not from ever asking for something the physics can\u2019t deliver.',
+      'The camera only tracks the highest point reached, never the bunny\u2019s current height \u2014 which is what allows a fall to actually carry it down and off the bottom of the screen instead of the view following it back down and softening the miss.',
+    ],
+    strategyTips: [
+      'Start steering toward a drifting cloud\u2019s landing spot well before you reach its height \u2014 reacting only once you\u2019re level with it is usually too late.',
+      'A rainbow cloud\u2019s bonus only applies to the very next bounce, so line up your following landing before you take it, not after.',
+      'The screen wraps left-to-right, so a cloud sitting near one edge is often easier to reach by drifting off the opposite side than by chasing it directly.',
+      'Gaps get closer to the bunny\u2019s absolute maximum jump height later in the run, so a landing that felt like it had room to spare early on won\u2019t necessarily feel that way by the end.',
     ],
   },
 ];
