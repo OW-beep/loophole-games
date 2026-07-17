@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { BLOG_POSTS, getPost } from '@/lib/blog/registry';
 import { POST_COMPONENTS } from '@/lib/blog/post-components';
 import { ArticleLayout } from '@/components/blog/ArticleLayout';
+import { RisingAdBanner } from '@/components/RisingAdBanner';
 import { JsonLd } from '@/components/JsonLd';
 import { buildBlogPostingJsonLd } from '@/lib/blog/structured-data';
 
@@ -40,6 +41,7 @@ export default async function BlogPostPage({
   return (
     <>
       <JsonLd data={buildBlogPostingJsonLd(post)} />
+      <RisingAdBanner />
       <ArticleLayout post={post}>
         <Content />
       </ArticleLayout>

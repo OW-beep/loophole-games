@@ -8,6 +8,8 @@ export interface BlogPost {
   category: BlogCategory;
   publishDate: string; // ISO yyyy-mm-dd
   readTime: string;
+  /** Exactly two game slugs from lib/games/registry, shown as "play this next" links. */
+  relatedGames: [string, string];
 }
 
 export const CATEGORY_LABEL: Record<BlogCategory, string> = {
@@ -27,6 +29,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'culture',
     publishDate: '2026-05-18',
     readTime: '6 min read',
+    relatedGames: ['echo-merge', 'mirror-loop'],
   },
   {
     slug: 'cloud-gaming-reality-check',
@@ -37,6 +40,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'biz',
     publishDate: '2026-05-27',
     readTime: '7 min read',
+    relatedGames: ['boo-rush', 'drift'],
   },
   {
     slug: 'economics-of-free-to-play',
@@ -47,6 +51,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'biz',
     publishDate: '2026-06-03',
     readTime: '7 min read',
+    relatedGames: ['color-debt', 'overflow'],
   },
   {
     slug: 'indie-games-boom-and-bust',
@@ -57,6 +62,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'biz',
     publishDate: '2026-06-10',
     readTime: '7 min read',
+    relatedGames: ['sprout', 'noodle-cat'],
   },
   {
     slug: 'return-of-couch-co-op',
@@ -67,6 +73,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'culture',
     publishDate: '2026-06-17',
     readTime: '5 min read',
+    relatedGames: ['tether', 'wobble-chef'],
   },
   {
     slug: 'ai-in-game-development',
@@ -77,6 +84,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'trend',
     publishDate: '2026-06-24',
     readTime: '6 min read',
+    relatedGames: ['phase', 'carry-chain'],
   },
   {
     slug: 'browser-game-renaissance',
@@ -87,6 +95,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'trend',
     publishDate: '2026-07-01',
     readTime: '5 min read',
+    relatedGames: ['boo-rush', 'blobble'],
   },
   {
     slug: 'retro-revival-pixel-art',
@@ -97,6 +106,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'culture',
     publishDate: '2026-07-06',
     readTime: '5 min read',
+    relatedGames: ['noodle-cat', 'sprout'],
   },
   {
     slug: 'speedrunning-goes-mainstream',
@@ -107,6 +117,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'culture',
     publishDate: '2026-07-10',
     readTime: '5 min read',
+    relatedGames: ['drift', 'boo-rush'],
   },
   {
     slug: 'psychology-of-one-more-try',
@@ -117,6 +128,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'insight',
     publishDate: '2026-07-14',
     readTime: '6 min read',
+    relatedGames: ['mirror-loop', 'blobble'],
   },
 ];
 

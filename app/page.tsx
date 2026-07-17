@@ -2,6 +2,7 @@ import { GAMES } from '@/lib/games/registry';
 import { GameCatalog } from '@/components/GameCatalog';
 import { DailyBanner } from '@/components/DailyBanner';
 import { SponsorSlot } from '@/components/AdSlot';
+import { RisingAdBanner } from '@/components/RisingAdBanner';
 import { JsonLd } from '@/components/JsonLd';
 import { buildWebsiteJsonLd, buildGameListJsonLd } from '@/lib/structured-data';
 
@@ -25,6 +26,7 @@ export default function HomePage() {
     <div>
       <JsonLd data={buildWebsiteJsonLd()} />
       <JsonLd data={buildGameListJsonLd()} />
+      <RisingAdBanner />
 
       <section className="mb-10">
         <p className="stat-line text-ink/50 dark:text-white/40 mb-3">

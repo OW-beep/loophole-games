@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { GameMeta } from '@/lib/games/registry';
 import { StreakBadge } from './StreakBadge';
 
-const STRIPE_CLASS: Record<string, string> = {
+export const STRIPE_CLASS: Record<string, string> = {
   echo: 'bg-echo', mirror: 'bg-mirror', debt: 'bg-debt', gravity: 'bg-gravity',
   fold: 'bg-fold', carry: 'bg-carry', brace: 'bg-brace', splice: 'bg-splice',
   heat: 'bg-heat', oneline: 'bg-oneline', overflow: 'bg-overflow', polarity: 'bg-polarity',
@@ -11,7 +11,7 @@ const STRIPE_CLASS: Record<string, string> = {
   blobble: 'bg-blobble', sprout: 'bg-sprout', chef: 'bg-chef', noodle: 'bg-noodle',
 };
 
-const SOFT_CLASS: Record<string, string> = {
+export const SOFT_CLASS: Record<string, string> = {
   echo: 'group-hover:bg-echo-soft dark:group-hover:bg-echo/10',
   mirror: 'group-hover:bg-mirror-soft dark:group-hover:bg-mirror/10',
   debt: 'group-hover:bg-debt-soft dark:group-hover:bg-debt/10',

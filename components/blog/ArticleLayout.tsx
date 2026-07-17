@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import type { BlogPost } from '@/lib/blog/registry';
 import { CATEGORY_LABEL, getAllPosts } from '@/lib/blog/registry';
+import { RelatedGames } from './RelatedGames';
 
 const STRIPE_CLASS: Record<string, string> = {
   trend: 'bg-trend',
@@ -55,6 +56,8 @@ export function ArticleLayout({ post, children }: { post: BlogPost; children: Re
       >
         {children}
       </div>
+
+      <RelatedGames slugs={post.relatedGames} />
 
       <div className="mt-14 pt-8 border-t border-index dark:border-index-dark">
         <p className="stat-line text-ink/40 dark:text-white/30 mb-4">More from the blog</p>
