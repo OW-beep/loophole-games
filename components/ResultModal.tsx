@@ -111,7 +111,7 @@ export function ResultModal({
 
         <button
           onClick={handleShare}
-          className="stat-line w-full border-2 border-graphite dark:border-white/80 px-3 py-2.5 mb-2 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
+          className="stat-line w-full border-2 border-graphite dark:border-white/80 px-3 py-2.5 mb-4 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
         >
           {shareState === 'idle' && 'Share result'}
           {shareState === 'shared' && 'Shared ✓'}
@@ -119,31 +119,34 @@ export function ResultModal({
           {shareState === 'failed' && "Couldn't share — try again"}
         </button>
 
+        {/* Affiliate banner — 150×125, centered, clearly labelled as an ad */}
+        <div className="relative border border-index dark:border-index-dark mb-4">
+          <div className="stat-line flex items-center gap-1.5 px-2 py-1 border-b border-index dark:border-index-dark text-ink/50 dark:text-white/40">
+            <span className="border border-ink/30 dark:border-white/30 px-1 rounded-sm">PR</span>
+            <span>広告 / Advertisement</span>
+          </div>
+          <div className="p-2 flex justify-center">
+            <a href={banner.href} rel="nofollow sponsored noopener" target="_blank">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={banner.img}
+                width={150}
+                height={125}
+                alt={banner.label}
+                style={{ display: 'block' }}
+              />
+            </a>
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img width={1} height={1} src={banner.pixel} alt="" />
+        </div>
+
         <button
           onClick={onClose}
           className="stat-line w-full px-3 py-2.5 mb-4 text-ink/60 dark:text-white/50 hover:underline"
         >
           Close
         </button>
-
-        {/* Affiliate banner — 150×125, centered, clearly labelled */}
-        <div className="relative border border-dashed border-index dark:border-index-dark p-2 mb-4 flex justify-center">
-          <span className="stat-line absolute -top-2 left-3 bg-panel dark:bg-panel-dark px-1 text-ink/40 dark:text-white/30 text-[10px]">
-            Sponsored
-          </span>
-          <a href={banner.href} rel="nofollow sponsored" target="_blank">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={banner.img}
-              width={150}
-              height={125}
-              alt={banner.label}
-              style={{ display: 'block' }}
-            />
-          </a>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img width={1} height={1} src={banner.pixel} alt="" />
-        </div>
 
         {otherGames.length > 0 && (
           <div className="border-t border-index dark:border-index-dark pt-4">

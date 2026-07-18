@@ -130,6 +130,61 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: '6 min read',
     relatedGames: ['mirror-loop', 'blobble'],
   },
+  {
+    slug: 'best-wordle-alternatives-2026',
+    title: '15 Best Wordle Alternatives to Play in 2026',
+    tagline: 'Multi-board word games, knowledge guessers, unlimited-guess puzzles \u2014 and a few that drop letters entirely.',
+    description:
+      'Looking for games like Wordle? A grounded guide to the best Wordle alternatives in 2026, organized by what they actually change about the formula \u2014 not just a list of names.',
+    category: 'culture',
+    publishDate: '2026-07-15',
+    readTime: '7 min read',
+    relatedGames: ['echo-merge', 'mirror-loop'],
+  },
+  {
+    slug: 'free-online-games-no-download',
+    title: 'The Best Free Online Games You Can Play With Zero Downloads',
+    tagline: 'No install, no account, no 40GB update \u2014 just a link and a game.',
+    description:
+      'A practical guide to genuinely no-download browser games in 2026: what makes one actually good, and where to find puzzle and arcade games that open instantly.',
+    category: 'trend',
+    publishDate: '2026-07-16',
+    readTime: '5 min read',
+    relatedGames: ['boo-rush', 'cloud-hop'],
+  },
+  {
+    slug: 'do-brain-games-really-work',
+    title: 'Do Brain Training Games Actually Work? What the Research Really Says',
+    tagline: 'The honest version: real evidence for getting better at the game you\u2019re playing, much weaker evidence for anything beyond it.',
+    description:
+      'A grounded look at the actual research behind brain training and puzzle games \u2014 near transfer versus far transfer, the Lumosity FTC case, and what a daily puzzle habit can realistically do for you.',
+    category: 'insight',
+    publishDate: '2026-07-17',
+    readTime: '6 min read',
+    relatedGames: ['color-debt', 'overflow'],
+  },
+  {
+    slug: 'best-games-for-work-break',
+    title: 'The Best Games for a 5-Minute Work or Study Break',
+    tagline: 'Short enough to finish before your coffee cools, and no login wall between you and playing.',
+    description:
+      'What actually makes a game good for a short break \u2014 and a practical list of free, no-download games that fit into five minutes without dragging you back for forty-five.',
+    category: 'culture',
+    publishDate: '2026-07-17',
+    readTime: '5 min read',
+    relatedGames: ['sprout', 'noodle-cat'],
+  },
+  {
+    slug: 'can-games-improve-reaction-time',
+    title: 'Can Games Actually Improve Your Reaction Time?',
+    tagline: 'Unlike most brain-training claims, this is one of the few where the research holds up reasonably well.',
+    description:
+      'What research on action video games and visual attention actually shows about reaction time training, and which kinds of games are most likely to genuinely sharpen it.',
+    category: 'insight',
+    publishDate: '2026-07-18',
+    readTime: '6 min read',
+    relatedGames: ['acorn-dash', 'cloud-hop'],
+  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {
