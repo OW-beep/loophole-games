@@ -13,6 +13,7 @@ const COLOR_HEX: Record<string, string> = {
   blobble: '#2FA7B8', sprout: '#5FA344', chef: '#E2793D', noodle: '#D9A62E',
   acorn: '#B5651D',
   cloud: '#5B9BD1',
+  peek: '#E8677E',
 };
 
 export async function GET(req: NextRequest) {

@@ -3,7 +3,7 @@ export type GameSlug =
   | 'fold' | 'carry-chain' | 'brace-yard' | 'splice'
   | 'heatmap' | 'signal' | 'overflow' | 'polarity'
   | 'shadow' | 'tether' | 'drift' | 'phase'
-  | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat' | 'acorn-dash' | 'cloud-hop';
+  | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat' | 'acorn-dash' | 'cloud-hop' | 'twin-peek';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade';
 
@@ -650,6 +650,34 @@ export const GAMES: GameMeta[] = [
       'A rainbow cloud\u2019s bonus only applies to the very next bounce, so line up your following landing before you take it, not after.',
       'The screen wraps left-to-right, so a cloud sitting near one edge is often easier to reach by drifting off the opposite side than by chasing it directly.',
       'Gaps get closer to the bunny\u2019s absolute maximum jump height later in the run, so a landing that felt like it had room to spare early on won\u2019t necessarily feel that way by the end.',
+    ],
+  },
+  {
+    slug: 'twin-peek',
+    index: '24',
+    name: 'Twin Peek',
+    tagline: 'Flip two. Remember where the others were.',
+    description:
+      'A classic memory-match grid starring the whole arcade cast \u2014 flip two cards at a time to find every pair before you run out of attempts. Today\u2019s layout is the same for everyone.',
+    color: 'peek',
+    avgSolveTime: '1:20',
+    difficulty: 'Medium',
+    category: 'puzzle',
+    howToPlay: [
+      'Tap any face-down card to flip it, then tap a second one. If they match, both stay face-up. If not, they flip back down.',
+      'Each pair of flips counts as one attempt. Find every matching pair before you run out of attempts to win.',
+      'Match three pairs in a row without a miss and you\u2019ll earn a couple of extra attempts \u2014 a reward for remembering well, not just a bigger score.',
+      'Today\u2019s card layout is shuffled from the daily seed, the same arrangement for every player.',
+    ],
+    designNotes: [
+      'Twin Peek is the one turn-based, no-physics entry among the site\u2019s newer arcade-style additions \u2014 there\u2019s no timer, no gravity, no drag. Just a grid, a memory, and a budget of attempts, which made it the natural pick for a genuinely different type of game to add.',
+      'The eight symbols are small portraits of the other games\u2019 mascots \u2014 the Boo Rush ghost, the Blobble blob, the Acorn Dash squirrel, the Cloud Hop bunny, and a few others \u2014 plus the site\u2019s own mark rounding out the eighth pair. It\u2019s a quiet "whole cast" cameo rather than a new visual theme.',
+      'The combo-bonus attempts exist for the same reason golden acorns and focus streaks exist elsewhere in the catalog: a strict, unforgiving budget rewards a good run with a little real margin, instead of just tallying a higher score for the same fixed difficulty.',
+    ],
+    strategyTips: [
+      'Use your first several flips to build a mental map of the whole board rather than chasing an immediate match \u2014 attempts spent purely scouting often pay for themselves later.',
+      'When you flip a card that doesn\u2019t match anything you\u2019ve seen yet, its position is still useful information \u2014 you now know what it isn\u2019t, even before you know what it is.',
+      'Protect a combo once you have one going: on a hot streak, a safer, more certain match is worth more than a risky guess at an uncertain one, since a miss resets the streak entirely.',
     ],
   },
 ];

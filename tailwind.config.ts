@@ -125,6 +125,11 @@ const config: Config = {
           DEFAULT: '#5B9BD1',
           soft: '#E4F0FA',
         },
+        // 24th game color
+        peek: {
+          DEFAULT: '#E8677E',
+          soft: '#FCE3E8',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

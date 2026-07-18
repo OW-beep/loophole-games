@@ -13,6 +13,7 @@ const TEXT_CLASS: Record<string, string> = {
   blobble: 'text-blobble', sprout: 'text-sprout', chef: 'text-chef', noodle: 'text-noodle',
   acorn: 'text-acorn',
   cloud: 'text-cloud',
+  peek: 'text-peek',
 };
 
 interface GameHeaderProps {

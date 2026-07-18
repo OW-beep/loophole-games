@@ -11,6 +11,7 @@ export const STRIPE_CLASS: Record<string, string> = {
   blobble: 'bg-blobble', sprout: 'bg-sprout', chef: 'bg-chef', noodle: 'bg-noodle',
   acorn: 'bg-acorn',
   cloud: 'bg-cloud',
+  peek: 'bg-peek',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -37,6 +38,7 @@ export const SOFT_CLASS: Record<string, string> = {
   noodle: 'group-hover:bg-noodle-soft dark:group-hover:bg-noodle/10',
   acorn: 'group-hover:bg-acorn-soft dark:group-hover:bg-acorn/10',
   cloud: 'group-hover:bg-cloud-soft dark:group-hover:bg-cloud/10',
+  peek: 'group-hover:bg-peek-soft dark:group-hover:bg-peek/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {
