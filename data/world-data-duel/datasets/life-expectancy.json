@@ -1,0 +1,14 @@
+{
+  "datasetId": "life_expectancy_2026",
+  "title": "Life Expectancy",
+  "year": "2026 est.",
+  "source": "UN World Population Prospects",
+  "unit": "yrs",
+  "higherIsBetter": true,
+  "values": {
+    "JP": 85.15, "BR": 76.37, "ID": 71.58, "VN": 75.05,
+    "ET": 68.15, "CO": 78.27, "US": 79.76, "CN": 79.02,
+    "IN": 72.72, "NO": 83.76, "KE": 64.19, "CH": 84.37,
+    "AU": 84.34, "EG": 72.16, "MX": 75.63, "NL": 82.61
+  }
+}

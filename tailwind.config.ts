@@ -130,6 +130,11 @@ const config: Config = {
           DEFAULT: '#E8677E',
           soft: '#FCE3E8',
         },
+        // 25th game color
+        duel: {
+          DEFAULT: '#B8862E',
+          soft: '#F7ECD8',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

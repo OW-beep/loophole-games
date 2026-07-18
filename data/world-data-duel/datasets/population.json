@@ -1,0 +1,14 @@
+{
+  "datasetId": "population_2022",
+  "title": "Population",
+  "year": "2022",
+  "source": "World Bank / UN population estimates",
+  "unit": "people",
+  "higherIsBetter": true,
+  "values": {
+    "JP": 125125000, "BR": 215313000, "ID": 275501000, "VN": 98187000,
+    "ET": 123380000, "CO": 51874000, "US": 333288000, "CN": 1412175000,
+    "IN": 1417173000, "NO": 5434000, "KE": 54027000, "CH": 8740000,
+    "AU": 26000000, "EG": 110990000, "MX": 127504000, "NL": 17700000
+  }
+}

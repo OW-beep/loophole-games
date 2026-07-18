@@ -1,0 +1,69 @@
+[
+  {
+    "id": "population",
+    "title": "Population",
+    "category": "Population",
+    "dataset": "population_2022",
+    "rule": "higher",
+    "facts": [
+      "India passed China to become the world's most populous country around 2023.",
+      "More than half the world's population lives in Asia."
+    ]
+  },
+  {
+    "id": "gdp_nominal",
+    "title": "GDP (Nominal)",
+    "category": "Economy",
+    "dataset": "gdp_2024",
+    "rule": "higher",
+    "facts": [
+      "The world's GDP is heavily concentrated in a small number of countries.",
+      "Nominal GDP measures economic size, not how wealthy individual citizens are."
+    ]
+  },
+  {
+    "id": "coffee_production",
+    "title": "Coffee Production",
+    "category": "Agriculture",
+    "dataset": "coffee_2023",
+    "rule": "higher",
+    "facts": [
+      "Brazil alone accounts for roughly a third of the world's coffee production.",
+      "Vietnam is the world's largest producer of robusta beans.",
+      "Ethiopia is widely considered the birthplace of coffee."
+    ]
+  },
+  {
+    "id": "forest_area",
+    "title": "Forest Area (% of land)",
+    "category": "Nature",
+    "dataset": "forest_2020",
+    "rule": "higher",
+    "facts": [
+      "Tropical rainforests play an outsized role in global carbon absorption.",
+      "Forest cover varies enormously with a country's climate and terrain."
+    ]
+  },
+  {
+    "id": "life_expectancy",
+    "title": "Life Expectancy",
+    "category": "Society",
+    "dataset": "life_expectancy_2026",
+    "rule": "higher",
+    "facts": [
+      "Life expectancy is shaped by healthcare access, nutrition, and public health systems.",
+      "Japan has one of the highest life expectancies in the world."
+    ]
+  },
+  {
+    "id": "olympic_medals",
+    "title": "Olympic Medals (All-time)",
+    "category": "Sports",
+    "dataset": "olympic_medals_2026",
+    "rule": "higher",
+    "facts": [
+      "The USA holds the most all-time Olympic medals of any nation.",
+      "Medal counts are influenced by population size, wealth, and number of Games attended."
+    ]
+  }
+]

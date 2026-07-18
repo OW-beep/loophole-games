@@ -3,7 +3,8 @@ export type GameSlug =
   | 'fold' | 'carry-chain' | 'brace-yard' | 'splice'
   | 'heatmap' | 'signal' | 'overflow' | 'polarity'
   | 'shadow' | 'tether' | 'drift' | 'phase'
-  | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat' | 'acorn-dash' | 'cloud-hop' | 'twin-peek';
+  | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat' | 'acorn-dash' | 'cloud-hop' | 'twin-peek'
+  | 'world-data-duel';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade';
 
@@ -678,6 +679,36 @@ export const GAMES: GameMeta[] = [
       'Use your first several flips to build a mental map of the whole board rather than chasing an immediate match \u2014 attempts spent purely scouting often pay for themselves later.',
       'When you flip a card that doesn\u2019t match anything you\u2019ve seen yet, its position is still useful information \u2014 you now know what it isn\u2019t, even before you know what it is.',
       'Protect a combo once you have one going: on a hot streak, a safer, more certain match is worth more than a risky guess at an uncertain one, since a miss resets the streak entirely.',
+    ],
+  },
+  {
+    slug: 'world-data-duel',
+    index: '25',
+    name: 'World Data Duel',
+    tagline: 'Know the World. Play the World.',
+    description:
+      'A reasoning card duel built on real world statistics. Read the flags and tags on your hand, guess which country wins each round\u2019s question \u2014 population, GDP, coffee production, and more \u2014 and spend your cards wisely across the match.',
+    color: 'duel',
+    avgSolveTime: '4:00',
+    difficulty: 'Medium',
+    category: 'puzzle',
+    howToPlay: [
+      'Pay the entry fee to start a Standard League match. You and the CPU are each dealt 5 country cards.',
+      'Each round shows a question \u2014 e.g. "Population" or "Coffee Production." Pick one card from your hand to compete with.',
+      'The country with the higher (or, for some questions, lower) real-world value wins the round.',
+      'Each card can only be played once per match, so save your strongest cards for the questions you expect, not just the first round.',
+      'Win rounds to earn Coins; a full 5-0 match pays an extra Perfect Clear bonus. Winning a round with a country you haven\u2019t won with before unlocks it in your Discovery log.',
+    ],
+    designNotes: [
+      'World Data Duel isn\u2019t really a numbers-memorization game \u2014 it\u2019s a tag-reading game. Seeing "Amazon / Coffee / Football" on Brazil is enough to make a confident guess on a coffee question without ever having seen the production figures, and that inference is the actual gameplay.',
+      'The CPU is dealt one of a few personalities each match \u2014 an Economist that leans hard on its strongest economic cards, a Farmer that does the same for agricultural questions, an Explorer that favors its most distinctive-tagged card regardless of the question, and a Balanced opponent with no particular lean. Reading which personality you\u2019re up against becomes part of the read.',
+      'All figures are sourced, dated statistics (World Bank, IMF, FAOSTAT/ICO, UN, IOC) rather than invented numbers \u2014 every round names its data year so a surprising result is something you can go verify, not just take on faith.',
+    ],
+    strategyTips: [
+      'Read tags before you commit \u2014 a country flagged "Coffee" or "Amazon" is telling you something long before the numbers are revealed.',
+      'Don\u2019t spend your most obviously-strong card on the first question you see \u2014 with only 5 cards for 5 rounds, an early guess can leave you without an answer for a later one.',
+      'A tie still costs you nothing, so when you\u2019re unsure, a safe mid-tier card is often better than gambling your best card on a guess.',
+      'Watch how the CPU plays its first couple of rounds \u2014 a strong economic pick early is a good sign you\u2019re facing the Economist personality, and you can plan the rest of the match around that read.',
     ],
   },
 ];

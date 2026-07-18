@@ -1,0 +1,14 @@
+{
+  "datasetId": "forest_2020",
+  "title": "Forest Area (% of land)",
+  "year": "2020",
+  "source": "World Bank / FAO",
+  "unit": "%",
+  "higherIsBetter": true,
+  "values": {
+    "JP": 68.41, "BR": 59.42, "ID": 49.07, "VN": 47.23,
+    "ET": 15.11, "CO": 53.31, "US": 33.87, "CN": 23.34,
+    "IN": 24.27, "NO": 33.36, "KE": 6.34, "CH": 32.12,
+    "AU": 17.42, "EG": 0.05, "MX": 33.79, "NL": 10.97
+  }
+}

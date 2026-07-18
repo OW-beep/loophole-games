@@ -12,6 +12,7 @@ export const STRIPE_CLASS: Record<string, string> = {
   acorn: 'bg-acorn',
   cloud: 'bg-cloud',
   peek: 'bg-peek',
+  duel: 'bg-duel',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -39,6 +40,7 @@ export const SOFT_CLASS: Record<string, string> = {
   acorn: 'group-hover:bg-acorn-soft dark:group-hover:bg-acorn/10',
   cloud: 'group-hover:bg-cloud-soft dark:group-hover:bg-cloud/10',
   peek: 'group-hover:bg-peek-soft dark:group-hover:bg-peek/10',
+  duel: 'group-hover:bg-duel-soft dark:group-hover:bg-duel/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {

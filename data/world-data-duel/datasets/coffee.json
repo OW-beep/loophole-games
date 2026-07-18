@@ -1,0 +1,14 @@
+{
+  "datasetId": "coffee_2023",
+  "title": "Coffee Production",
+  "year": "~2023",
+  "source": "FAOSTAT / International Coffee Organization",
+  "unit": "t",
+  "higherIsBetter": true,
+  "values": {
+    "JP": 0, "BR": 2993780, "ID": 765415, "VN": 1845033,
+    "ET": 456000, "CO": 560340, "US": 0, "CN": 15000,
+    "IN": 334000, "NO": 0, "KE": 45000, "CH": 0,
+    "AU": 0, "EG": 0, "MX": 234000, "NL": 0
+  }
+}

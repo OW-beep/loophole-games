@@ -1,0 +1,14 @@
+{
+  "datasetId": "olympic_medals_2026",
+  "title": "Olympic Medals (All-time)",
+  "year": "through 2026",
+  "source": "IOC combined Summer + Winter medal table",
+  "unit": "medals",
+  "higherIsBetter": true,
+  "values": {
+    "JP": 642, "BR": 171, "ID": 40, "VN": 5,
+    "ET": 62, "CO": 38, "US": 3128, "CN": 819,
+    "IN": 41, "NO": 618, "KE": 124, "CH": 405,
+    "AU": 625, "EG": 41, "MX": 77, "NL": 523
+  }
+}
