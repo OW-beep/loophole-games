@@ -15,6 +15,8 @@ import coffeeDs from '@/data/world-data-duel/datasets/coffee.json';
 import forestDs from '@/data/world-data-duel/datasets/forest.json';
 import lifeExpectancyDs from '@/data/world-data-duel/datasets/life-expectancy.json';
 import olympicMedalsDs from '@/data/world-data-duel/datasets/olympic-medals.json';
+import coconutDs from '@/data/world-data-duel/datasets/coconut.json';
+import teaDs from '@/data/world-data-duel/datasets/tea.json';
 
 export interface Country {
   code: string;
@@ -51,6 +53,8 @@ const DATASETS: Record<string, Dataset> = {
   forest_2020: forestDs as Dataset,
   life_expectancy_2026: lifeExpectancyDs as Dataset,
   olympic_medals_2026: olympicMedalsDs as Dataset,
+  coconut_2022: coconutDs as Dataset,
+  tea_2022: teaDs as Dataset,
 };
 
 export const COUNTRIES: Country[] = countriesRaw as Country[];
@@ -62,7 +66,10 @@ export function getDataset(id: string): Dataset {
   return ds;
 }
 
-export function statFor(countryCode: string, question: QuestionDef): number {
+export function getQuestionSource(question: QuestionDef): { year: string; source: string } {
+  const ds = getDataset(question.dataset);
+  return { year: ds.year, source: ds.source };
+}
   const ds = getDataset(question.dataset);
   return ds.values[countryCode] ?? 0;
 }

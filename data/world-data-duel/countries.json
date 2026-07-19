@@ -1,7 +1,7 @@
 [
   { "code": "JP", "name": "Japan", "flag": "🇯🇵", "tags": ["Technology", "Seafood", "Island"] },
   { "code": "BR", "name": "Brazil", "flag": "🇧🇷", "tags": ["Amazon", "Coffee", "Football"] },
-  { "code": "ID", "name": "Indonesia", "flag": "🇮🇩", "tags": ["Tropical", "Archipelago", "Coffee"] },
+  { "code": "ID", "name": "Indonesia", "flag": "🇮🇩", "tags": ["Tropical", "Archipelago", "Coffee", "Coconut"] },
   { "code": "VN", "name": "Vietnam", "flag": "🇻🇳", "tags": ["Coffee", "Rice", "Manufacturing"] },
   { "code": "ET", "name": "Ethiopia", "flag": "🇪🇹", "tags": ["Coffee Origin", "Highlands"] },
   { "code": "CO", "name": "Colombia", "flag": "🇨🇴", "tags": ["Coffee", "Andes", "Biodiversity"] },

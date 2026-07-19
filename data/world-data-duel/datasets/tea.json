@@ -1,0 +1,14 @@
+{
+  "datasetId": "tea_2022",
+  "title": "Tea Production",
+  "year": "~2022–2023",
+  "source": "FAO / industry estimates (made tea)",
+  "unit": "t",
+  "higherIsBetter": true,
+  "values": {
+    "JP": 0, "BR": 0, "ID": 0, "VN": 260000,
+    "ET": 0, "CO": 0, "US": 0, "CN": 3340000,
+    "IN": 1370000, "NO": 0, "KE": 570000, "CH": 0,
+    "AU": 0, "EG": 0, "MX": 0, "NL": 0
+  }
+}

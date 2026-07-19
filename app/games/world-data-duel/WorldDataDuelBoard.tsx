@@ -9,6 +9,7 @@ import {
   resolveRound,
   perfectClearBonus,
   formatStat,
+  getQuestionSource,
   loadCoinBalance,
   saveCoinBalance,
   recordDiscovery,
@@ -19,6 +20,22 @@ import {
 } from '@/lib/games/world-data-duel';
 
 type Screen = 'title' | 'match' | 'result';
+
+// Self-contained dark palette from the original prototype. Deliberately not
+// wired into the site's shared paper/graphite theme tokens — this game
+// keeps its own look regardless of the site's light/dark toggle.
+const C = {
+  bg: '#0b0e14',
+  bgRaised: '#12161f',
+  bgCard: '#171c26',
+  line: '#262c38',
+  text: '#e9e7e1',
+  textDim: '#8b93a3',
+  amber: '#f2b84b',
+  teal: '#4fd1c5',
+  rose: '#e2725b',
+  win: '#6fcf97',
+};
 
 export function WorldDataDuelBoard() {
   const [coins, setCoins] = useState<number>(() => loadCoinBalance());
@@ -38,6 +55,8 @@ export function WorldDataDuelBoard() {
 
   function handleStartMatch() {
     const effectiveCoins = coins < RULES.entryFee ? RULES.startingCoins : coins;
+    // No fixed seed — the country deal and question order are freshly
+    // randomized (via Math.random) every single match.
     const m = startMatch(effectiveCoins);
     persistCoins(m.coinBalance);
     setMatch(m);
@@ -97,17 +116,26 @@ export function WorldDataDuelBoard() {
   }
 
   return (
-    <div>
+    <div
+      className="rounded-2xl p-5 sm:p-7"
+      style={{ background: C.bg, color: C.text, border: `1px solid ${C.line}` }}
+    >
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <Link href="/" className="stat-line text-ink/40 dark:text-white/30 hover:underline">
+          <Link href="/" className="text-[11px] font-mono tracking-wider hover:underline" style={{ color: C.textDim }}>
             ← Index
           </Link>
-          <h1 className="font-display font-bold text-3xl mt-1 text-duel">World Data Duel</h1>
-          <p className="stat-line text-ink/50 dark:text-white/40">Know the World. Play the World.</p>
+          <h1 className="font-display font-bold text-3xl mt-1" style={{ color: C.amber }}>
+            World Data Duel
+          </h1>
+          <p className="text-xs italic mt-0.5" style={{ color: C.textDim }}>
+            Know the World. Play the World.
+          </p>
         </div>
         <div className="text-right shrink-0">
-          <p className="stat-line text-ink/40 dark:text-white/30">Coins</p>
+          <p className="text-[11px] font-mono tracking-wider" style={{ color: C.textDim }}>
+            COINS
+          </p>
           <p className="font-mono text-2xl font-medium tabular-nums leading-none">◎ {coins}</p>
         </div>
       </div>
@@ -139,41 +167,75 @@ export function WorldDataDuelBoard() {
   );
 }
 
+function Panel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl p-5 sm:p-6" style={{ background: C.bgRaised, border: `1px solid ${C.line}` }}>
+      {children}
+    </div>
+  );
+}
+
+function PrimaryButton({
+  children,
+  onClick,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="w-full font-semibold rounded-lg py-3 text-sm active:scale-[0.98] transition disabled:opacity-30"
+      style={{ background: C.amber, color: '#1a1305' }}
+    >
+      {children}
+    </button>
+  );
+}
+
 function TitleScreen({ onStart }: { onStart: () => void }) {
   return (
-    <div className="specimen-card bg-panel dark:bg-panel-dark p-6 pl-8">
-      <span className="punch-hole" aria-hidden />
-      <p className="text-sm text-ink/70 dark:text-white/60 leading-relaxed mb-5">
+    <Panel>
+      <p className="text-sm leading-relaxed mb-5" style={{ color: C.textDim }}>
         Pay the entry fee, get dealt {RULES.handSize} country cards, and answer {RULES.roundsPerMatch} real-world
-        questions against the CPU. Higher stat wins the round — but each card only fights once.
+        questions against the CPU — a different random deal and question set every match. Higher stat wins the
+        round, but each card only fights once.
       </p>
 
-      <dl className="stat-line grid grid-cols-4 gap-3 mb-6 text-ink/60 dark:text-white/50">
+      <div className="grid grid-cols-4 gap-3 mb-6 text-center font-mono text-[11px]" style={{ color: C.textDim }}>
         <div>
-          <dt>Entry</dt>
-          <dd className="font-mono text-base text-ink dark:text-white">{RULES.entryFee}</dd>
+          <p>ENTRY</p>
+          <p className="text-base" style={{ color: C.text }}>
+            {RULES.entryFee}
+          </p>
         </div>
         <div>
-          <dt>Win</dt>
-          <dd className="font-mono text-base text-ink dark:text-white">+{RULES.winReward}</dd>
+          <p>WIN</p>
+          <p className="text-base" style={{ color: C.text }}>
+            +{RULES.winReward}
+          </p>
         </div>
         <div>
-          <dt>Tie</dt>
-          <dd className="font-mono text-base text-ink dark:text-white">{RULES.tieReward}</dd>
+          <p>TIE</p>
+          <p className="text-base" style={{ color: C.text }}>
+            {RULES.tieReward}
+          </p>
         </div>
         <div>
-          <dt>Loss</dt>
-          <dd className="font-mono text-base text-ink dark:text-white">{RULES.loseReward}</dd>
+          <p>LOSS</p>
+          <p className="text-base" style={{ color: C.text }}>
+            {RULES.loseReward}
+          </p>
         </div>
-      </dl>
+      </div>
 
-      <button
-        onClick={onStart}
-        className="stat-line w-full border-2 border-graphite dark:border-white/80 px-3 py-3 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
-      >
+      <PrimaryButton onClick={onStart}>
         Start match — {RULES.leagueName} ({RULES.entryFee} Coins)
-      </button>
-    </div>
+      </PrimaryButton>
+    </Panel>
   );
 }
 
@@ -197,14 +259,16 @@ function MatchScreen({
   onNext: () => void;
 }) {
   const question = match.questionOrder[match.round];
+  const { year, source } = getQuestionSource(question);
 
   return (
-    <div className="specimen-card bg-panel dark:bg-panel-dark p-6 pl-8">
-      <span className="punch-hole" aria-hidden />
-
-      <div className="flex justify-between items-baseline stat-line text-ink/50 dark:text-white/40 mb-2">
+    <Panel>
+      <div
+        className="flex justify-between items-baseline font-mono text-[11px] mb-2"
+        style={{ color: C.textDim }}
+      >
         <span>
-          Round {match.round + 1} / {RULES.roundsPerMatch}
+          ROUND {match.round + 1} / {RULES.roundsPerMatch}
         </span>
         <span>vs. {match.cpuPersonality} CPU</span>
       </div>
@@ -212,28 +276,32 @@ function MatchScreen({
       <div className="flex gap-1 mb-5">
         {Array.from({ length: RULES.roundsPerMatch }).map((_, i) => {
           const outcome = match.log[i];
-          const cls = !outcome
-            ? 'bg-index dark:bg-index-dark'
-            : outcome.result === 'win'
-              ? 'bg-tether'
-              : outcome.result === 'lose'
-                ? 'bg-debt'
-                : 'bg-index dark:bg-index-dark';
-          return <div key={i} className={`h-1.5 flex-1 rounded-sm ${cls}`} />;
+          const color = !outcome ? C.line : outcome.result === 'win' ? C.win : outcome.result === 'lose' ? C.rose : C.textDim;
+          return <div key={i} className="h-1.5 flex-1 rounded" style={{ background: color }} />;
         })}
       </div>
 
-      <div className="border-2 border-graphite dark:border-white/80 rounded-tag p-5 text-center mb-5 bg-duel-soft dark:bg-duel/10">
-        <p className="stat-line text-duel mb-1">Question {match.round + 1}</p>
+      <div
+        className="rounded-xl p-5 text-center mb-5"
+        style={{ background: C.bgCard, border: `1px solid ${C.line}` }}
+      >
+        <p className="font-mono text-[11px] tracking-widest uppercase mb-1" style={{ color: C.amber }}>
+          Question {match.round + 1}
+        </p>
         <h2 className="font-display font-bold text-2xl">{question.title}</h2>
-        <p className="text-xs text-ink/50 dark:text-white/40 mt-1">
+        <p className="text-xs mt-1" style={{ color: C.textDim }}>
           {question.rule === 'higher' ? 'Higher value wins' : 'Lower value wins'} · {question.category}
+        </p>
+        <p className="text-[11px] font-mono mt-2" style={{ color: C.teal }}>
+          {year} · {source}
         </p>
       </div>
 
       {!revealed ? (
         <>
-          <p className="stat-line text-ink/40 dark:text-white/30 mb-2">Your hand — pick one card</p>
+          <p className="font-mono text-[11px] tracking-wide mb-2" style={{ color: C.textDim }}>
+            YOUR HAND — pick one card
+          </p>
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-5">
             {match.playerHand.map((c, idx) => {
               const used = usedPlayer.has(idx);
@@ -243,31 +311,26 @@ function MatchScreen({
                   key={c.code}
                   disabled={used}
                   onClick={() => onSelect(idx)}
-                  className={[
-                    'border-2 rounded-tag p-2 text-center transition-colors',
-                    used
-                      ? 'opacity-25 border-index dark:border-index-dark cursor-default'
-                      : selected
-                        ? 'border-duel bg-duel-soft dark:bg-duel/10'
-                        : 'border-graphite dark:border-white/60 hover:bg-duel-soft dark:hover:bg-duel/10',
-                  ].join(' ')}
+                  className="rounded-lg p-2 text-center transition"
+                  style={{
+                    background: C.bgCard,
+                    border: `1px solid ${selected ? C.amber : C.line}`,
+                    opacity: used ? 0.25 : 1,
+                    cursor: used ? 'default' : 'pointer',
+                  }}
                 >
                   <div className="text-2xl leading-none mb-1">{c.flag}</div>
                   <div className="text-[11px] font-semibold">{c.name}</div>
-                  <div className="text-[9px] text-ink/50 dark:text-white/40 mt-0.5 leading-tight">
+                  <div className="text-[9px] mt-0.5 leading-tight" style={{ color: C.textDim }}>
                     {c.tags.join(' · ')}
                   </div>
                 </button>
               );
             })}
           </div>
-          <button
-            disabled={selectedIdx === null}
-            onClick={onPlay}
-            className="stat-line w-full border-2 border-graphite dark:border-white/80 px-3 py-3 disabled:opacity-30 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
-          >
+          <PrimaryButton onClick={onPlay} disabled={selectedIdx === null}>
             Play this card
-          </button>
+          </PrimaryButton>
         </>
       ) : (
         <RevealPanel
@@ -278,7 +341,7 @@ function MatchScreen({
           onNext={onNext}
         />
       )}
-    </div>
+    </Panel>
   );
 }
 
@@ -295,44 +358,43 @@ function RevealPanel({
   isLastRound: boolean;
   onNext: () => void;
 }) {
+  const { year, source } = getQuestionSource(question);
   const fact = outcome.question.facts[Math.floor(Math.random() * outcome.question.facts.length)];
+  const resultColor = outcome.result === 'win' ? C.win : outcome.result === 'lose' ? C.rose : C.textDim;
 
   return (
     <div>
       <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center mb-4">
-        <ResultCard label="You" country={outcome.playerCountry} value={formatStat(outcome.playerValue, question)} winner={outcome.result === 'win'} />
-        <span className="font-display font-bold text-ink/40 dark:text-white/30">VS</span>
+        <ResultCard label="YOU" country={outcome.playerCountry} value={formatStat(outcome.playerValue, question)} winner={outcome.result === 'win'} />
+        <span className="font-display font-bold" style={{ color: C.textDim }}>
+          VS
+        </span>
         <ResultCard label="CPU" country={outcome.cpuCountry} value={formatStat(outcome.cpuValue, question)} winner={outcome.result === 'lose'} />
       </div>
 
-      <p
-        className={[
-          'stat-line text-center mb-4',
-          outcome.result === 'win' ? 'text-tether' : outcome.result === 'lose' ? 'text-debt' : 'text-ink/50 dark:text-white/40',
-        ].join(' ')}
-      >
-        {outcome.result === 'win' && `Win — +${RULES.winReward} Coins`}
-        {outcome.result === 'tie' && `Tie — ${RULES.tieReward} Coins`}
-        {outcome.result === 'lose' && `Loss — ${RULES.loseReward} Coins`}
+      <p className="text-center font-mono text-sm mb-4" style={{ color: resultColor }}>
+        {outcome.result === 'win' && `WIN — +${RULES.winReward} Coins`}
+        {outcome.result === 'tie' && `TIE — ${RULES.tieReward} Coins`}
+        {outcome.result === 'lose' && `LOSE — ${RULES.loseReward} Coins`}
       </p>
 
       {newDiscovery && (
-        <p className="stat-line text-center text-duel mb-4">New discovery unlocked — {newDiscovery}</p>
+        <p className="text-center font-mono text-sm mb-4" style={{ color: C.amber }}>
+          New discovery unlocked — {newDiscovery}
+        </p>
       )}
 
-      <div className="border-l-2 border-duel bg-duel-soft dark:bg-duel/10 rounded-tag p-4 text-[13.5px] leading-relaxed mb-5">
-        <p className="stat-line text-duel mb-1.5">
-          Did you know? ({outcome.question.category}, data source & year on file)
+      <div
+        className="rounded-lg p-4 text-[13.5px] leading-relaxed mb-5"
+        style={{ background: C.bgCard, border: `1px solid ${C.line}`, borderLeft: `3px solid ${C.teal}` }}
+      >
+        <p className="font-mono text-[11px] tracking-wide mb-1.5" style={{ color: C.teal }}>
+          DID YOU KNOW? ({year} · {source})
         </p>
         {fact}
       </div>
 
-      <button
-        onClick={onNext}
-        className="stat-line w-full border-2 border-graphite dark:border-white/80 px-3 py-3 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
-      >
-        {isLastRound ? 'See result' : 'Next round'}
-      </button>
+      <PrimaryButton onClick={onNext}>{isLastRound ? 'See result' : 'Next round'}</PrimaryButton>
     </div>
   );
 }
@@ -350,15 +412,17 @@ function ResultCard({
 }) {
   return (
     <div
-      className={[
-        'border-2 rounded-tag p-4 text-center',
-        winner ? 'border-tether' : 'border-graphite dark:border-white/60',
-      ].join(' ')}
+      className="rounded-xl p-4 text-center"
+      style={{ background: C.bgCard, border: `1px solid ${winner ? C.win : C.line}` }}
     >
-      <p className="stat-line text-ink/40 dark:text-white/30 mb-2">{label}</p>
+      <p className="font-mono text-[10px] tracking-wide uppercase mb-2" style={{ color: C.textDim }}>
+        {label}
+      </p>
       <div className="text-4xl">{country.flag}</div>
       <p className="text-sm font-semibold mt-1.5">{country.name}</p>
-      <p className="font-mono text-xl text-duel font-semibold mt-1.5">{value}</p>
+      <p className="font-mono text-xl font-semibold mt-1.5" style={{ color: C.amber }}>
+        {value}
+      </p>
     </div>
   );
 }
@@ -376,21 +440,24 @@ function ResultScreen({
 }) {
   const delta = match.matchCoinDelta;
   return (
-    <div className="specimen-card bg-panel dark:bg-panel-dark p-6 pl-8">
-      <span className="punch-hole" aria-hidden />
-      <p className="stat-line text-ink/40 dark:text-white/30 mb-3">Match result</p>
+    <Panel>
+      <p className="font-mono text-[11px] tracking-wide mb-3" style={{ color: C.textDim }}>
+        MATCH RESULT
+      </p>
 
       <div className="mb-4">
         {match.log.map((r, i) => (
-          <div key={i} className="flex justify-between items-center py-2 border-b border-index dark:border-index-dark last:border-0 text-[13px]">
-            <span className="text-ink/60 dark:text-white/50">
+          <div
+            key={i}
+            className="flex justify-between items-center py-2 text-[13px]"
+            style={{ borderBottom: i < match.log.length - 1 ? `1px solid ${C.line}` : 'none' }}
+          >
+            <span style={{ color: C.textDim }}>
               R{i + 1} · {r.question.title}
             </span>
             <span
-              className={[
-                'stat-line px-2 py-0.5 rounded-tag',
-                r.result === 'win' ? 'text-tether' : r.result === 'lose' ? 'text-debt' : 'text-ink/50 dark:text-white/40',
-              ].join(' ')}
+              className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded"
+              style={{ color: r.result === 'win' ? C.win : r.result === 'lose' ? C.rose : C.textDim }}
             >
               {r.result.toUpperCase()}
             </span>
@@ -399,31 +466,37 @@ function ResultScreen({
       </div>
 
       {bonus > 0 && (
-        <p className="stat-line text-center text-duel mb-2">Perfect Clear bonus — +{bonus} Coins</p>
+        <p className="text-center font-mono text-sm mb-2" style={{ color: C.amber }}>
+          Perfect Clear bonus — +{bonus} Coins
+        </p>
       )}
 
       <div className="text-center py-4">
-        <p className={`font-display font-bold text-4xl ${delta >= 0 ? 'text-tether' : 'text-debt'}`}>
+        <p className="font-display font-bold text-4xl" style={{ color: delta >= 0 ? C.win : C.rose }}>
           {delta >= 0 ? '+' : ''}
           {delta}
         </p>
-        <p className="stat-line text-ink/40 dark:text-white/30">Coins this match</p>
+        <p className="font-mono text-xs" style={{ color: C.textDim }}>
+          Coins this match
+        </p>
       </div>
 
       <div className="flex gap-2.5">
         <button
           onClick={onTitle}
-          className="stat-line flex-1 border-2 border-graphite dark:border-white/80 px-3 py-3 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
+          className="flex-1 rounded-lg py-3 text-sm font-semibold transition"
+          style={{ border: `1px solid ${C.line}`, color: C.text }}
         >
           Back to title
         </button>
         <button
           onClick={onPlayAgain}
-          className="stat-line flex-1 border-2 border-duel px-3 py-3 text-duel hover:bg-duel hover:text-paper transition-colors"
+          className="flex-1 rounded-lg py-3 text-sm font-semibold transition"
+          style={{ border: `1px solid ${C.amber}`, color: C.amber }}
         >
           Play again
         </button>
       </div>
-    </div>
+    </Panel>
   );
 }

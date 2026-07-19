@@ -65,5 +65,27 @@
       "The USA holds the most all-time Olympic medals of any nation.",
       "Medal counts are influenced by population size, wealth, and number of Games attended."
     ]
+  },
+  {
+    "id": "coconut_production",
+    "title": "Coconut Production",
+    "category": "Agriculture",
+    "dataset": "coconut_2022",
+    "rule": "higher",
+    "facts": [
+      "Indonesia alone accounts for roughly a quarter of the world's coconut production.",
+      "Indonesia, the Philippines, and India together produce around 70% of the world's coconuts."
+    ]
+  },
+  {
+    "id": "tea_production",
+    "title": "Tea Production",
+    "category": "Agriculture",
+    "dataset": "tea_2022",
+    "rule": "higher",
+    "facts": [
+      "China accounts for roughly half of the world's tea production.",
+      "Kenya is one of the world's largest tea exporters despite a much smaller population than China or India."
+    ]
   }
 ]

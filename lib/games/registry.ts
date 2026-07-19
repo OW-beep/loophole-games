@@ -6,7 +6,7 @@ export type GameSlug =
   | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat' | 'acorn-dash' | 'cloud-hop' | 'twin-peek'
   | 'world-data-duel';
 
-export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade';
+export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards';
 
 export interface GameMeta {
   slug: GameSlug;
@@ -691,7 +691,7 @@ export const GAMES: GameMeta[] = [
     color: 'duel',
     avgSolveTime: '4:00',
     difficulty: 'Medium',
-    category: 'puzzle',
+    category: 'cards',
     howToPlay: [
       'Pay the entry fee to start a Standard League match. You and the CPU are each dealt 5 country cards.',
       'Each round shows a question \u2014 e.g. "Population" or "Coffee Production." Pick one card from your hand to compete with.',
