@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { GAMES } from '@/lib/games/registry';
 import { STRIPE_CLASS, SOFT_CLASS } from '@/components/SpecimenCard';
 
-export function RelatedGames({ slugs }: { slugs: [string, string] }) {
+export function RelatedGames({ slugs }: { slugs: string[] }) {
   const games = slugs.map((slug) => GAMES.find((g) => g.slug === slug)).filter(Boolean);
   if (games.length === 0) return null;
 

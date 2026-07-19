@@ -7,6 +7,7 @@ const STRIPE_CLASS: Record<string, string> = {
   biz: 'bg-biz',
   culture: 'bg-culture',
   insight: 'bg-insight',
+  data: 'bg-duel',
 };
 
 const SOFT_CLASS: Record<string, string> = {
@@ -14,6 +15,7 @@ const SOFT_CLASS: Record<string, string> = {
   biz: 'group-hover:bg-biz-soft dark:group-hover:bg-biz/10',
   culture: 'group-hover:bg-culture-soft dark:group-hover:bg-culture/10',
   insight: 'group-hover:bg-insight-soft dark:group-hover:bg-insight/10',
+  data: 'group-hover:bg-duel-soft dark:group-hover:bg-duel/10',
 };
 
 function formatDate(iso: string): string {

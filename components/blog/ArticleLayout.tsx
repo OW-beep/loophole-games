@@ -9,6 +9,7 @@ const STRIPE_CLASS: Record<string, string> = {
   biz: 'bg-biz',
   culture: 'bg-culture',
   insight: 'bg-insight',
+  data: 'bg-duel',
 };
 
 function formatDate(iso: string): string {

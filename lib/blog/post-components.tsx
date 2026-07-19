@@ -14,6 +14,9 @@ import FreeOnlineGamesNoDownload from '@/components/blog/posts/free-online-games
 import DoBrainGamesReallyWork from '@/components/blog/posts/do-brain-games-really-work';
 import BestGamesForWorkBreak from '@/components/blog/posts/best-games-for-work-break';
 import CanGamesImproveReactionTime from '@/components/blog/posts/can-games-improve-reaction-time';
+import WorldDataDuelRealDataBehindTheGame from '@/components/blog/posts/world-data-duel-real-data-behind-the-game';
+import CountriesThatProduceTheMostCoffee from '@/components/blog/posts/countries-that-produce-the-most-coffee';
+import CountriesWithTheMostActiveVolcanoes from '@/components/blog/posts/countries-with-the-most-active-volcanoes';
 
 export const POST_COMPONENTS: Record<string, ComponentType> = {
   'why-daily-games-took-over': WhyDailyGamesTookOver,
@@ -31,4 +34,7 @@ export const POST_COMPONENTS: Record<string, ComponentType> = {
   'do-brain-games-really-work': DoBrainGamesReallyWork,
   'best-games-for-work-break': BestGamesForWorkBreak,
   'can-games-improve-reaction-time': CanGamesImproveReactionTime,
+  'world-data-duel-real-data-behind-the-game': WorldDataDuelRealDataBehindTheGame,
+  'countries-that-produce-the-most-coffee': CountriesThatProduceTheMostCoffee,
+  'countries-with-the-most-active-volcanoes': CountriesWithTheMostActiveVolcanoes,
 };

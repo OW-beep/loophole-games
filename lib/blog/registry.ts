@@ -1,4 +1,4 @@
-export type BlogCategory = 'trend' | 'biz' | 'culture' | 'insight';
+export type BlogCategory = 'trend' | 'biz' | 'culture' | 'insight' | 'data';
 
 export interface BlogPost {
   slug: string;
@@ -8,8 +8,8 @@ export interface BlogPost {
   category: BlogCategory;
   publishDate: string; // ISO yyyy-mm-dd
   readTime: string;
-  /** Exactly two game slugs from lib/games/registry, shown as "play this next" links. */
-  relatedGames: [string, string];
+  /** One or more game slugs from lib/games/registry, shown as "play this next" links. */
+  relatedGames: string[];
 }
 
 export const CATEGORY_LABEL: Record<BlogCategory, string> = {
@@ -17,6 +17,7 @@ export const CATEGORY_LABEL: Record<BlogCategory, string> = {
   biz: 'Business',
   culture: 'Culture',
   insight: 'Psychology',
+  data: 'Data & Trivia',
 };
 
 export const BLOG_POSTS: BlogPost[] = [
@@ -184,6 +185,42 @@ export const BLOG_POSTS: BlogPost[] = [
     publishDate: '2026-07-18',
     readTime: '6 min read',
     relatedGames: ['acorn-dash', 'cloud-hop'],
+  },
+  {
+    slug: 'world-data-duel-real-data-behind-the-game',
+    title: 'We Built a Card Game Out of Real World Bank and FAO Data — Here\u2019s How',
+    tagline:
+      'No invented numbers, no placeholder stats \u2014 every card in World Data Duel is backed by a dated, sourced figure you can go verify yourself.',
+    description:
+      'Behind the scenes of World Data Duel: how we picked which real-world statistics to turn into a card game, where the data actually comes from, and why we show the year and source on every single round.',
+    category: 'data',
+    publishDate: '2026-07-19',
+    readTime: '6 min read',
+    relatedGames: ['world-data-duel'],
+  },
+  {
+    slug: 'countries-that-produce-the-most-coffee',
+    title: 'Which Country Actually Produces the Most Coffee? The Real Rankings',
+    tagline:
+      'Brazil\u2019s lead is bigger than most people guess, and the country in second place surprises almost everyone.',
+    description:
+      'A plain look at global coffee production rankings by country, using FAOSTAT and ICO data \u2014 including why Vietnam, not Colombia, is the world\u2019s number two producer.',
+    category: 'data',
+    publishDate: '2026-07-20',
+    readTime: '5 min read',
+    relatedGames: ['world-data-duel'],
+  },
+  {
+    slug: 'countries-with-the-most-active-volcanoes',
+    title: 'The Countries With the Most Active Volcanoes on Earth',
+    tagline:
+      'The United States quietly tops this list \u2014 not for the volcano you\u2019re thinking of, but because of one long chain of islands.',
+    description:
+      'Which countries have the most volcanoes active in the last 12,000 years, according to the Smithsonian Global Volcanism Program, and why small countries like Iceland punch so far above their size.',
+    category: 'data',
+    publishDate: '2026-07-21',
+    readTime: '5 min read',
+    relatedGames: ['world-data-duel'],
   },
 ];
 

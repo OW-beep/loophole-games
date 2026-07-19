@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { GAMES } from '@/lib/games/registry';
 import { GameCatalog } from '@/components/GameCatalog';
 import { DailyBanner } from '@/components/DailyBanner';
@@ -27,6 +28,51 @@ export default function HomePage() {
       <JsonLd data={buildWebsiteJsonLd()} />
       <JsonLd data={buildGameListJsonLd()} />
       <RisingAdBanner />
+
+      <section
+        className="rounded-2xl p-6 sm:p-8 mb-10"
+        style={{ background: '#0b0e14', color: '#e9e7e1', border: '1px solid #262c38' }}
+      >
+        <p className="font-mono text-[11px] tracking-widest uppercase mb-3" style={{ color: '#f2b84b' }}>
+          Featured · №25
+        </p>
+        <h2 className="font-display font-bold text-3xl sm:text-4xl leading-tight mb-3">
+          World Data Duel
+        </h2>
+        <p className="text-base sm:text-lg leading-relaxed mb-5 max-w-xl" style={{ color: '#8b93a3' }}>
+          A reasoning card duel built on real, sourced world statistics — not trivia you memorize,
+          but tags you read. Guess which country wins each round on population, GDP, coffee and
+          coconut production, active volcanoes, oil output, and more, then watch the real numbers
+          (with year and source) get revealed.
+        </p>
+        <div className="grid grid-cols-3 gap-3 mb-6 max-w-md font-mono text-[11px]" style={{ color: '#8b93a3' }}>
+          <div>
+            <p className="text-2xl font-semibold" style={{ color: '#e9e7e1' }}>
+              24
+            </p>
+            <p>countries</p>
+          </div>
+          <div>
+            <p className="text-2xl font-semibold" style={{ color: '#e9e7e1' }}>
+              10
+            </p>
+            <p>real-world topics</p>
+          </div>
+          <div>
+            <p className="text-2xl font-semibold" style={{ color: '#e9e7e1' }}>
+              ◎
+            </p>
+            <p>Coins &amp; leaderboard</p>
+          </div>
+        </div>
+        <Link
+          href="/games/world-data-duel"
+          className="inline-block font-semibold rounded-lg px-5 py-3 text-sm transition"
+          style={{ background: '#f2b84b', color: '#1a1305' }}
+        >
+          Play World Data Duel →
+        </Link>
+      </section>
 
       <section className="mb-10">
         <p className="stat-line text-ink/50 dark:text-white/40 mb-3">
