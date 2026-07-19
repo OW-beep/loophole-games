@@ -18,8 +18,17 @@ import {
   type Country,
   type QuestionDef,
 } from '@/lib/games/world-data-duel';
+import {
+  getNickname,
+  saveNickname,
+  submitScore,
+  fetchLeaderboard,
+  type LeaderboardEntry,
+} from '@/lib/leaderboard-client';
 
-type Screen = 'title' | 'match' | 'result';
+const GAME_SLUG = 'world-data-duel';
+
+type Screen = 'title' | 'match' | 'result' | 'leaderboard';
 
 // Self-contained dark palette from the original prototype. Deliberately not
 // wired into the site's shared paper/graphite theme tokens — this game
@@ -47,6 +56,22 @@ export function WorldDataDuelBoard() {
   const [revealed, setRevealed] = useState<RoundOutcome | null>(null);
   const [newDiscovery, setNewDiscovery] = useState<string | null>(null);
   const [bonus, setBonus] = useState(0);
+  const [nickname, setNickname] = useState<string>(() => getNickname());
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNickname(name);
+  }
+
+  async function handleShowLeaderboard() {
+    setScreen('leaderboard');
+    setLeaderboardLoading(true);
+    const entries = await fetchLeaderboard(GAME_SLUG);
+    setLeaderboard(entries);
+    setLeaderboardLoading(false);
+  }
 
   function persistCoins(next: number) {
     setCoins(next);
@@ -100,11 +125,15 @@ export function WorldDataDuelBoard() {
     if (!match) return;
     if (match.round + 1 >= RULES.roundsPerMatch) {
       const b = perfectClearBonus(match.log);
+      let finalCoins = coins;
       if (b > 0) {
-        const nextCoins = coins + b;
-        persistCoins(nextCoins);
+        finalCoins = coins + b;
+        persistCoins(finalCoins);
         setBonus(b);
-        setMatch({ ...match, coinBalance: nextCoins, matchCoinDelta: match.matchCoinDelta + b });
+        setMatch({ ...match, coinBalance: finalCoins, matchCoinDelta: match.matchCoinDelta + b });
+      }
+      if (nickname) {
+        submitScore(GAME_SLUG, nickname, finalCoins);
       }
       setScreen('result');
       return;
@@ -140,7 +169,14 @@ export function WorldDataDuelBoard() {
         </div>
       </div>
 
-      {screen === 'title' && <TitleScreen onStart={handleStartMatch} />}
+      {screen === 'title' && (
+        <TitleScreen
+          onStart={handleStartMatch}
+          nickname={nickname}
+          onSaveNickname={handleSaveNickname}
+          onShowLeaderboard={handleShowLeaderboard}
+        />
+      )}
 
       {screen === 'match' && match && (
         <MatchScreen
@@ -159,8 +195,19 @@ export function WorldDataDuelBoard() {
         <ResultScreen
           match={match}
           bonus={bonus}
+          nickname={nickname}
           onPlayAgain={handleStartMatch}
           onTitle={() => setScreen('title')}
+          onShowLeaderboard={handleShowLeaderboard}
+        />
+      )}
+
+      {screen === 'leaderboard' && (
+        <LeaderboardScreen
+          entries={leaderboard}
+          loading={leaderboardLoading}
+          nickname={nickname}
+          onBack={() => setScreen('title')}
         />
       )}
     </div>
@@ -196,7 +243,19 @@ function PrimaryButton({
   );
 }
 
-function TitleScreen({ onStart }: { onStart: () => void }) {
+function TitleScreen({
+  onStart,
+  nickname,
+  onSaveNickname,
+  onShowLeaderboard,
+}: {
+  onStart: () => void;
+  nickname: string;
+  onSaveNickname: (name: string) => void;
+  onShowLeaderboard: () => void;
+}) {
+  const [draftName, setDraftName] = useState(nickname);
+
   return (
     <Panel>
       <p className="text-sm leading-relaxed mb-5" style={{ color: C.textDim }}>
@@ -232,9 +291,47 @@ function TitleScreen({ onStart }: { onStart: () => void }) {
         </div>
       </div>
 
-      <PrimaryButton onClick={onStart}>
-        Start match — {RULES.leagueName} ({RULES.entryFee} Coins)
-      </PrimaryButton>
+      <div className="mb-5">
+        <p className="font-mono text-[11px] tracking-wide mb-1.5" style={{ color: C.textDim }}>
+          NICKNAME (for the Coins leaderboard)
+        </p>
+        <div className="flex gap-2">
+          <input
+            value={draftName}
+            onChange={(e) => setDraftName(e.target.value)}
+            onBlur={() => draftName.trim() && onSaveNickname(draftName)}
+            maxLength={20}
+            placeholder="e.g. GeoTrader"
+            className="flex-1 rounded-md px-3 py-2 text-sm outline-none"
+            style={{ background: C.bgCard, border: `1px solid ${C.line}`, color: C.text }}
+          />
+          <button
+            onClick={() => draftName.trim() && onSaveNickname(draftName)}
+            className="px-3 rounded-md text-xs font-semibold"
+            style={{ border: `1px solid ${C.line}`, color: C.text }}
+          >
+            Save
+          </button>
+        </div>
+        {!nickname && (
+          <p className="text-[11px] mt-1.5" style={{ color: C.textDim }}>
+            Optional — you can still play without one, you just won't appear on the leaderboard.
+          </p>
+        )}
+      </div>
+
+      <div className="flex gap-2.5">
+        <PrimaryButton onClick={onStart}>
+          Start match — {RULES.leagueName} ({RULES.entryFee} Coins)
+        </PrimaryButton>
+      </div>
+      <button
+        onClick={onShowLeaderboard}
+        className="w-full mt-2.5 rounded-lg py-2.5 text-sm font-semibold transition"
+        style={{ border: `1px solid ${C.line}`, color: C.textDim }}
+      >
+        🏆 View Coins Leaderboard
+      </button>
     </Panel>
   );
 }
@@ -430,11 +527,15 @@ function ResultScreen({
   bonus,
   onPlayAgain,
   onTitle,
+  nickname,
+  onShowLeaderboard,
 }: {
   match: MatchState;
   bonus: number;
   onPlayAgain: () => void;
   onTitle: () => void;
+  nickname: string;
+  onShowLeaderboard: () => void;
 }) {
   const delta = match.matchCoinDelta;
   return (
@@ -477,9 +578,14 @@ function ResultScreen({
         <p className="font-mono text-xs" style={{ color: C.textDim }}>
           Coins this match
         </p>
+        <p className="font-mono text-[11px] mt-1" style={{ color: C.textDim }}>
+          {nickname
+            ? `Submitted to the leaderboard as ${nickname} — balance ${match.coinBalance}`
+            : 'Add a nickname on the title screen to appear on the leaderboard'}
+        </p>
       </div>
 
-      <div className="flex gap-2.5">
+      <div className="flex gap-2.5 mb-2.5">
         <button
           onClick={onTitle}
           className="flex-1 rounded-lg py-3 text-sm font-semibold transition"
@@ -495,6 +601,80 @@ function ResultScreen({
           Play again
         </button>
       </div>
+      <button
+        onClick={onShowLeaderboard}
+        className="w-full rounded-lg py-2.5 text-sm font-semibold transition"
+        style={{ border: `1px solid ${C.line}`, color: C.textDim }}
+      >
+        🏆 View Coins Leaderboard
+      </button>
+    </Panel>
+  );
+}
+
+function LeaderboardScreen({
+  entries,
+  loading,
+  nickname,
+  onBack,
+}: {
+  entries: LeaderboardEntry[];
+  loading: boolean;
+  nickname: string;
+  onBack: () => void;
+}) {
+  return (
+    <Panel>
+      <p className="font-mono text-[11px] tracking-wide mb-3" style={{ color: C.textDim }}>
+        🏆 COINS LEADERBOARD — TOP {entries.length || 20}
+      </p>
+
+      {loading && (
+        <p className="text-sm" style={{ color: C.textDim }}>
+          Loading…
+        </p>
+      )}
+
+      {!loading && entries.length === 0 && (
+        <p className="text-sm mb-5" style={{ color: C.textDim }}>
+          No scores yet — be the first to finish a match with a nickname set.
+        </p>
+      )}
+
+      {!loading && entries.length > 0 && (
+        <div className="mb-5">
+          {entries.map((e, i) => {
+            const isYou = nickname && e.name === nickname;
+            return (
+              <div
+                key={`${e.name}-${i}`}
+                className="flex justify-between items-center py-2 text-[13px]"
+                style={{
+                  borderBottom: i < entries.length - 1 ? `1px solid ${C.line}` : 'none',
+                  color: isYou ? C.amber : C.text,
+                }}
+              >
+                <span className="font-mono" style={{ color: C.textDim, width: 28 }}>
+                  #{i + 1}
+                </span>
+                <span className="flex-1">
+                  {e.name}
+                  {isYou ? ' (you)' : ''}
+                </span>
+                <span className="font-mono font-semibold">◎ {e.score}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <button
+        onClick={onBack}
+        className="w-full rounded-lg py-3 text-sm font-semibold transition"
+        style={{ border: `1px solid ${C.line}`, color: C.text }}
+      >
+        Back to title
+      </button>
     </Panel>
   );
 }
