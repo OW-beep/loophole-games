@@ -59,7 +59,7 @@
     "id": "olympic_medals",
     "title": "Olympic Medals (All-time)",
     "category": "Sports",
-    "dataset": "olympic_medals_2026",
+    "dataset": "olympic_medals_2024",
     "rule": "higher",
     "facts": [
       "The USA holds the most all-time Olympic medals of any nation.",
@@ -86,6 +86,28 @@
     "facts": [
       "China accounts for roughly half of the world's tea production.",
       "Kenya is one of the world's largest tea exporters despite a much smaller population than China or India."
+    ]
+  },
+  {
+    "id": "oil_production",
+    "title": "Oil Production",
+    "category": "Energy",
+    "dataset": "oil_2024",
+    "rule": "higher",
+    "facts": [
+      "The United States has been the world's largest crude oil producer for several years running.",
+      "Saudi Arabia can adjust its oil output significantly to influence global prices as the leader of OPEC+."
+    ]
+  },
+  {
+    "id": "active_volcanoes",
+    "title": "Active Volcanoes",
+    "category": "Disaster",
+    "dataset": "volcanoes_2026",
+    "rule": "higher",
+    "facts": [
+      "Indonesia, the United States, Japan, and Chile have the most volcanoes active during the last 12,000 years.",
+      "Iceland sits directly on the Mid-Atlantic Ridge, giving it an unusually high volcano count for its small size."
     ]
   }
 ]

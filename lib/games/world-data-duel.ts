@@ -17,6 +17,8 @@ import lifeExpectancyDs from '@/data/world-data-duel/datasets/life-expectancy.js
 import olympicMedalsDs from '@/data/world-data-duel/datasets/olympic-medals.json';
 import coconutDs from '@/data/world-data-duel/datasets/coconut.json';
 import teaDs from '@/data/world-data-duel/datasets/tea.json';
+import oilDs from '@/data/world-data-duel/datasets/oil.json';
+import volcanoesDs from '@/data/world-data-duel/datasets/volcanoes.json';
 
 export interface Country {
   code: string;
@@ -52,9 +54,11 @@ const DATASETS: Record<string, Dataset> = {
   coffee_2023: coffeeDs as Dataset,
   forest_2020: forestDs as Dataset,
   life_expectancy_2026: lifeExpectancyDs as Dataset,
-  olympic_medals_2026: olympicMedalsDs as Dataset,
+  olympic_medals_2024: olympicMedalsDs as Dataset,
   coconut_2022: coconutDs as Dataset,
   tea_2022: teaDs as Dataset,
+  oil_2024: oilDs as Dataset,
+  volcanoes_2026: volcanoesDs as Dataset,
 };
 
 export const COUNTRIES: Country[] = countriesRaw as Country[];
@@ -70,6 +74,8 @@ export function getQuestionSource(question: QuestionDef): { year: string; source
   const ds = getDataset(question.dataset);
   return { year: ds.year, source: ds.source };
 }
+
+export function statFor(countryCode: string, question: QuestionDef): number {
   const ds = getDataset(question.dataset);
   return ds.values[countryCode] ?? 0;
 }
@@ -81,6 +87,8 @@ export function formatStat(value: number, question: QuestionDef): string {
   }
   if (ds.unit === '%') return `${value}%`;
   if (ds.unit === 'yrs') return `${value} yrs`;
+  if (ds.unit === 'kb/d') return `${value.toLocaleString()} kb/d`;
+  if (ds.unit === 'count') return `${value}`;
   // default: compact large numbers (population, coffee tonnage, medal counts)
   if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
@@ -93,7 +101,7 @@ export function formatStat(value: number, question: QuestionDef): string {
 // ---------------------------------------------------------------------
 export const RULES = {
   roundsPerMatch: 5,
-  handSize: 5,
+  handSize: 10,
   entryFee: 10,
   winReward: 5,
   tieReward: 0,

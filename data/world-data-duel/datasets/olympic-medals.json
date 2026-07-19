@@ -1,14 +1,16 @@
 {
-  "datasetId": "olympic_medals_2026",
+  "datasetId": "olympic_medals_2024",
   "title": "Olympic Medals (All-time)",
-  "year": "through 2026",
-  "source": "IOC combined Summer + Winter medal table",
+  "year": "through 2024 (Paris)",
+  "source": "IOC Summer Olympics all-time medal table",
   "unit": "medals",
   "higherIsBetter": true,
   "values": {
-    "JP": 642, "BR": 171, "ID": 40, "VN": 5,
-    "ET": 62, "CO": 38, "US": 3128, "CN": 819,
-    "IN": 41, "NO": 618, "KE": 124, "CH": 405,
-    "AU": 625, "EG": 41, "MX": 77, "NL": 523
+    "JP": 542, "BR": 170, "ID": 40, "VN": 5,
+    "ET": 62, "CO": 38, "US": 2765, "CN": 727,
+    "IN": 41, "NO": 171, "KE": 124, "CH": 214,
+    "AU": 600, "EG": 41, "MX": 77, "NL": 356,
+    "PH": 18, "IS": 4, "CL": 15, "SA": 4,
+    "TR": 111, "NZ": 157, "DE": 688, "NG": 27
   }
 }

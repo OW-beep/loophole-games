@@ -1,0 +1,16 @@
+{
+  "datasetId": "volcanoes_2026",
+  "title": "Active Volcanoes",
+  "year": "2026",
+  "source": "Smithsonian Global Volcanism Program (Holocene volcano count)",
+  "unit": "count",
+  "higherIsBetter": true,
+  "values": {
+    "JP": 120, "BR": 0, "ID": 107, "VN": 2,
+    "ET": 50, "CO": 14, "US": 165, "CN": 10,
+    "IN": 2, "NO": 2, "KE": 21, "CH": 0,
+    "AU": 4, "EG": 0, "MX": 35, "NL": 2,
+    "PH": 23, "IS": 35, "CL": 90, "SA": 8,
+    "TR": 7, "NZ": 23, "DE": 1, "NG": 0
+  }
+}

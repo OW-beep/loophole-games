@@ -14,5 +14,13 @@
   { "code": "AU", "name": "Australia", "flag": "🇦🇺", "tags": ["Outback", "Wildlife", "Mining"] },
   { "code": "EG", "name": "Egypt", "flag": "🇪🇬", "tags": ["Desert", "Nile", "Ancient"] },
   { "code": "MX", "name": "Mexico", "flag": "🇲🇽", "tags": ["Aztec", "Coffee", "Corn"] },
-  { "code": "NL", "name": "Netherlands", "flag": "🇳🇱", "tags": ["Windmills", "Tulips", "Trade"] }
+  { "code": "NL", "name": "Netherlands", "flag": "🇳🇱", "tags": ["Windmills", "Tulips", "Trade"] },
+  { "code": "PH", "name": "Philippines", "flag": "🇵🇭", "tags": ["Typhoons", "Islands", "Coconut"] },
+  { "code": "IS", "name": "Iceland", "flag": "🇮🇸", "tags": ["Volcanoes", "Geothermal", "Glaciers"] },
+  { "code": "CL", "name": "Chile", "flag": "🇨🇱", "tags": ["Andes", "Earthquakes", "Copper"] },
+  { "code": "SA", "name": "Saudi Arabia", "flag": "🇸🇦", "tags": ["Oil", "Desert", "Mecca"] },
+  { "code": "TR", "name": "Turkey", "flag": "🇹🇷", "tags": ["Earthquakes", "Tea", "Bridge of Continents"] },
+  { "code": "NZ", "name": "New Zealand", "flag": "🇳🇿", "tags": ["Earthquakes", "Sheep", "Fjords"] },
+  { "code": "DE", "name": "Germany", "flag": "🇩🇪", "tags": ["Renewable Energy", "Engineering", "Beer"] },
+  { "code": "NG", "name": "Nigeria", "flag": "🇳🇬", "tags": ["Oil", "Population", "Afrobeats"] }
 ]

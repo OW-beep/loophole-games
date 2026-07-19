@@ -300,9 +300,9 @@ function MatchScreen({
       {!revealed ? (
         <>
           <p className="font-mono text-[11px] tracking-wide mb-2" style={{ color: C.textDim }}>
-            YOUR HAND — pick one card
+            YOUR HAND ({match.playerHand.length - usedPlayer.size} left) — pick one card · hover for tags
           </p>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-5">
+          <div className="grid grid-cols-5 gap-1.5 mb-5">
             {match.playerHand.map((c, idx) => {
               const used = usedPlayer.has(idx);
               const selected = selectedIdx === idx;
@@ -311,7 +311,8 @@ function MatchScreen({
                   key={c.code}
                   disabled={used}
                   onClick={() => onSelect(idx)}
-                  className="rounded-lg p-2 text-center transition"
+                  title={c.tags.join(' · ')}
+                  className="rounded-md p-1.5 text-center transition"
                   style={{
                     background: C.bgCard,
                     border: `1px solid ${selected ? C.amber : C.line}`,
@@ -319,11 +320,8 @@ function MatchScreen({
                     cursor: used ? 'default' : 'pointer',
                   }}
                 >
-                  <div className="text-2xl leading-none mb-1">{c.flag}</div>
-                  <div className="text-[11px] font-semibold">{c.name}</div>
-                  <div className="text-[9px] mt-0.5 leading-tight" style={{ color: C.textDim }}>
-                    {c.tags.join(' · ')}
-                  </div>
+                  <div className="text-3xl leading-none mb-1">{c.flag}</div>
+                  <div className="text-[9px] font-semibold truncate">{c.name}</div>
                 </button>
               );
             })}

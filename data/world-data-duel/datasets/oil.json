@@ -1,0 +1,16 @@
+{
+  "datasetId": "oil_2024",
+  "title": "Oil Production",
+  "year": "~2023–2024",
+  "source": "U.S. EIA (crude oil + condensate + NGLs, approx.)",
+  "unit": "kb/d",
+  "higherIsBetter": true,
+  "values": {
+    "JP": 0, "BR": 3400, "ID": 700, "VN": 170,
+    "ET": 0, "CO": 780, "US": 20000, "CN": 4900,
+    "IN": 700, "NO": 1800, "KE": 0, "CH": 0,
+    "AU": 400, "EG": 570, "MX": 1900, "NL": 30,
+    "PH": 20, "IS": 0, "CL": 10, "SA": 11000,
+    "TR": 65, "NZ": 30, "DE": 45, "NG": 1300
+  }
+}
