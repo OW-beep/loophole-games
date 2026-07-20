@@ -109,5 +109,115 @@
       "Indonesia, the United States, Japan, and Chile have the most volcanoes active during the last 12,000 years.",
       "Iceland sits directly on the Mid-Atlantic Ridge, giving it an unusually high volcano count for its small size."
     ]
+  },
+  {
+    "id": "rice_production",
+    "title": "Rice Production",
+    "category": "Agriculture",
+    "dataset": "rice_2022",
+    "rule": "higher",
+    "facts": [
+      "India and China together grow more rice than the rest of the world combined.",
+      "Rice requires a warm, humid climate, which is why production is overwhelmingly concentrated in Asia."
+    ]
+  },
+  {
+    "id": "cocoa_production",
+    "title": "Cocoa Production",
+    "category": "Agriculture",
+    "dataset": "cocoa_2024",
+    "rule": "higher",
+    "facts": [
+      "Ivory Coast alone produces more than a third of the world's cocoa, though it isn't in this roster.",
+      "Indonesia is the largest cocoa producer outside West Africa."
+    ]
+  },
+  {
+    "id": "fish_production",
+    "title": "Fish & Seafood Production",
+    "category": "Fisheries",
+    "dataset": "fish_2022",
+    "rule": "higher",
+    "facts": [
+      "China produces more fish and seafood than the next several largest producers combined.",
+      "Norway's aquaculture industry, mostly farmed salmon, punches far above its population size."
+    ]
+  },
+  {
+    "id": "sheep_population",
+    "title": "Sheep Population",
+    "category": "Agriculture",
+    "dataset": "sheep_2022",
+    "rule": "higher",
+    "facts": [
+      "China has more sheep than any other country, at roughly twice the number of second-place India.",
+      "Iceland has more sheep than people, despite not cracking the global top ranks by raw count."
+    ]
+  },
+  {
+    "id": "gold_production",
+    "title": "Gold Production",
+    "category": "Energy",
+    "dataset": "gold_2023",
+    "rule": "higher",
+    "facts": [
+      "China has been the world's largest gold-mining country for years running.",
+      "Australia holds some of the largest known gold reserves on Earth in addition to its high production."
+    ]
+  },
+  {
+    "id": "natural_gas_production",
+    "title": "Natural Gas Production",
+    "category": "Energy",
+    "dataset": "natural_gas_2023",
+    "rule": "higher",
+    "facts": [
+      "The United States produces more natural gas than any other country by a wide margin.",
+      "Norway became one of Europe's most important gas suppliers after other supply routes were disrupted."
+    ]
+  },
+  {
+    "id": "renewable_energy_share",
+    "title": "Renewable Energy Share",
+    "category": "Energy",
+    "dataset": "renewable_energy_pct",
+    "rule": "higher",
+    "facts": [
+      "Norway generates the overwhelming majority of its electricity from hydropower.",
+      "Countries with a lot of traditional biomass use for cooking and heating can show a surprisingly high renewable share on paper."
+    ]
+  },
+  {
+    "id": "co2_per_capita",
+    "title": "CO2 Emissions per Capita",
+    "category": "Disaster",
+    "dataset": "co2_per_capita_2022",
+    "rule": "lower",
+    "facts": [
+      "Per-capita emissions and total national emissions tell very different stories \u2014 a small, wealthy oil producer can outrank a much larger country.",
+      "Ethiopia's per-capita emissions are among the lowest in the world."
+    ]
+  },
+  {
+    "id": "internet_users",
+    "title": "Internet Users",
+    "category": "Society",
+    "dataset": "internet_users_pct",
+    "rule": "higher",
+    "facts": [
+      "Several small, wealthy countries report internet usage rates near-universal across their population.",
+      "Internet access gaps remain largest in lower-income countries, even where mobile phone ownership is common."
+    ]
+  },
+  {
+    "id": "tourist_arrivals",
+    "title": "International Tourist Arrivals",
+    "category": "Economy",
+    "dataset": "tourist_arrivals_2024",
+    "rule": "higher",
+    "facts": [
+      "France was the first country ever to surpass 100 million annual international tourist arrivals.",
+      "Turkey draws more international visitors each year than countries with far larger populations."
+    ]
   }
 ]

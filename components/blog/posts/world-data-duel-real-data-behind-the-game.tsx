@@ -40,20 +40,21 @@ export default function WorldDataDuelRealDataBehindTheGame() {
       <h2>Where the numbers actually come from</h2>
       <p>
         We deliberately stuck to a short list of primary sources rather than scraping trivia sites:
-        the World Bank&rsquo;s open data catalog for population, GDP, and forest cover; FAOSTAT and
-        the International Coffee Organization for agricultural production; the UN&rsquo;s World
-        Population Prospects for life expectancy; the U.S. Energy Information Administration for
-        oil production; and the Smithsonian Institution&rsquo;s Global Volcanism Program for how
-        many volcanoes have been active in each country over the last 12,000 years. If a number
-        seemed interesting but we couldn&rsquo;t trace it to one of these, it didn&rsquo;t make the
-        cut.
+        the World Bank&rsquo;s open data catalog for population, GDP, forest cover, internet usage,
+        and renewable energy share; FAOSTAT and the International Coffee Organization for
+        agricultural production (coffee, coconut, tea, rice, cocoa, sheep); the UN&rsquo;s World
+        Population Prospects for life expectancy and UNWTO for tourist arrivals; the U.S. Energy
+        Information Administration for oil and natural gas production; the USGS for gold
+        production; and the Smithsonian Institution&rsquo;s Global Volcanism Program for how many
+        volcanoes have been active in each country over the last 12,000 years. If a number seemed
+        interesting but we couldn&rsquo;t trace it to one of these, it didn&rsquo;t make the cut.
       </p>
 
       <StatGrid
         stats={[
           { value: '24', label: 'countries currently in the roster' },
-          { value: '10', label: 'real-world topics, from GDP to active volcanoes' },
-          { value: '6', label: 'primary sources behind every figure' },
+          { value: '20', label: 'real-world topics, from GDP to active volcanoes' },
+          { value: '10', label: 'primary sources behind every figure' },
         ]}
       />
 

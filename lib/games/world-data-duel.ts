@@ -19,6 +19,16 @@ import coconutDs from '@/data/world-data-duel/datasets/coconut.json';
 import teaDs from '@/data/world-data-duel/datasets/tea.json';
 import oilDs from '@/data/world-data-duel/datasets/oil.json';
 import volcanoesDs from '@/data/world-data-duel/datasets/volcanoes.json';
+import riceDs from '@/data/world-data-duel/datasets/rice.json';
+import cocoaDs from '@/data/world-data-duel/datasets/cocoa.json';
+import fishDs from '@/data/world-data-duel/datasets/fish.json';
+import sheepDs from '@/data/world-data-duel/datasets/sheep.json';
+import goldDs from '@/data/world-data-duel/datasets/gold.json';
+import naturalGasDs from '@/data/world-data-duel/datasets/natural-gas.json';
+import renewableEnergyDs from '@/data/world-data-duel/datasets/renewable-energy.json';
+import co2PerCapitaDs from '@/data/world-data-duel/datasets/co2-per-capita.json';
+import internetUsersDs from '@/data/world-data-duel/datasets/internet-users.json';
+import touristArrivalsDs from '@/data/world-data-duel/datasets/tourist-arrivals.json';
 
 export interface Country {
   code: string;
@@ -59,6 +69,16 @@ const DATASETS: Record<string, Dataset> = {
   tea_2022: teaDs as Dataset,
   oil_2024: oilDs as Dataset,
   volcanoes_2026: volcanoesDs as Dataset,
+  rice_2022: riceDs as Dataset,
+  cocoa_2024: cocoaDs as Dataset,
+  fish_2022: fishDs as Dataset,
+  sheep_2022: sheepDs as Dataset,
+  gold_2023: goldDs as Dataset,
+  natural_gas_2023: naturalGasDs as Dataset,
+  renewable_energy_pct: renewableEnergyDs as Dataset,
+  co2_per_capita_2022: co2PerCapitaDs as Dataset,
+  internet_users_pct: internetUsersDs as Dataset,
+  tourist_arrivals_2024: touristArrivalsDs as Dataset,
 };
 
 export const COUNTRIES: Country[] = countriesRaw as Country[];
@@ -89,7 +109,16 @@ export function formatStat(value: number, question: QuestionDef): string {
   if (ds.unit === 'yrs') return `${value} yrs`;
   if (ds.unit === 'kb/d') return `${value.toLocaleString()} kb/d`;
   if (ds.unit === 'count') return `${value}`;
-  // default: compact large numbers (population, coffee tonnage, medal counts)
+  if (ds.unit === 't') return `${fmtCompactValue(value)} t`;
+  if (ds.unit === 'head') return `${fmtCompactValue(value)}`;
+  if (ds.unit === 'bcm') return `${value} bcm`;
+  if (ds.unit === 'tCO2') return `${value} t CO\u2082`;
+  if (ds.unit === 'Mvisitors') return `${value}M visitors`;
+  // default: compact large numbers (population, medal counts)
+  return fmtCompactValue(value);
+}
+
+function fmtCompactValue(value: number): string {
   if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
   if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`;
