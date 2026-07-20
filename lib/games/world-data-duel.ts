@@ -29,6 +29,16 @@ import renewableEnergyDs from '@/data/world-data-duel/datasets/renewable-energy.
 import co2PerCapitaDs from '@/data/world-data-duel/datasets/co2-per-capita.json';
 import internetUsersDs from '@/data/world-data-duel/datasets/internet-users.json';
 import touristArrivalsDs from '@/data/world-data-duel/datasets/tourist-arrivals.json';
+import copperDs from '@/data/world-data-duel/datasets/copper.json';
+import happinessDs from '@/data/world-data-duel/datasets/happiness.json';
+import billionairesDs from '@/data/world-data-duel/datasets/billionaires.json';
+import militarySpendingDs from '@/data/world-data-duel/datasets/military-spending.json';
+import wineDs from '@/data/world-data-duel/datasets/wine.json';
+import wheatDs from '@/data/world-data-duel/datasets/wheat.json';
+import bananaDs from '@/data/world-data-duel/datasets/banana.json';
+import woolDs from '@/data/world-data-duel/datasets/wool.json';
+import unescoSitesDs from '@/data/world-data-duel/datasets/unesco-sites.json';
+import coastlineDs from '@/data/world-data-duel/datasets/coastline.json';
 
 export interface Country {
   code: string;
@@ -79,6 +89,16 @@ const DATASETS: Record<string, Dataset> = {
   co2_per_capita_2022: co2PerCapitaDs as Dataset,
   internet_users_pct: internetUsersDs as Dataset,
   tourist_arrivals_2024: touristArrivalsDs as Dataset,
+  copper_2023: copperDs as Dataset,
+  happiness_2026: happinessDs as Dataset,
+  billionaires_2026: billionairesDs as Dataset,
+  military_spending_2023: militarySpendingDs as Dataset,
+  wine_2023: wineDs as Dataset,
+  wheat_2022: wheatDs as Dataset,
+  banana_2022: bananaDs as Dataset,
+  wool_2022: woolDs as Dataset,
+  unesco_2025: unescoSitesDs as Dataset,
+  coastline_cia: coastlineDs as Dataset,
 };
 
 export const COUNTRIES: Country[] = countriesRaw as Country[];
@@ -103,7 +123,9 @@ export function statFor(countryCode: string, question: QuestionDef): number {
 export function formatStat(value: number, question: QuestionDef): string {
   const ds = getDataset(question.dataset);
   if (ds.unit === '$B') {
-    return value >= 1000 ? `$${(value / 1000).toFixed(2)}T` : `$${value.toFixed(0)}B`;
+    if (value >= 1000) return `$${(value / 1000).toFixed(2)}T`;
+    if (value < 10) return `$${value.toFixed(1)}B`;
+    return `$${value.toFixed(0)}B`;
   }
   if (ds.unit === '%') return `${value}%`;
   if (ds.unit === 'yrs') return `${value} yrs`;
@@ -114,6 +136,9 @@ export function formatStat(value: number, question: QuestionDef): string {
   if (ds.unit === 'bcm') return `${value} bcm`;
   if (ds.unit === 'tCO2') return `${value} t CO\u2082`;
   if (ds.unit === 'Mvisitors') return `${value}M visitors`;
+  if (ds.unit === 'score') return value.toFixed(2);
+  if (ds.unit === 'MhL') return `${value}M hL`;
+  if (ds.unit === 'km') return `${value.toLocaleString()} km`;
   // default: compact large numbers (population, medal counts)
   return fmtCompactValue(value);
 }

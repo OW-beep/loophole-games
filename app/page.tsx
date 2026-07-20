@@ -54,7 +54,7 @@ export default function HomePage() {
           </div>
           <div>
             <p className="text-2xl font-semibold" style={{ color: '#e9e7e1' }}>
-              20
+              30
             </p>
             <p>real-world topics</p>
           </div>

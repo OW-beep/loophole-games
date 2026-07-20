@@ -53,8 +53,8 @@ export default function WorldDataDuelRealDataBehindTheGame() {
       <StatGrid
         stats={[
           { value: '24', label: 'countries currently in the roster' },
-          { value: '20', label: 'real-world topics, from GDP to active volcanoes' },
-          { value: '10', label: 'primary sources behind every figure' },
+          { value: '30', label: 'real-world topics, from GDP to active volcanoes' },
+          { value: '14', label: 'primary sources behind every figure' },
         ]}
       />
 

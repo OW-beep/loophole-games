@@ -219,5 +219,115 @@
       "France was the first country ever to surpass 100 million annual international tourist arrivals.",
       "Turkey draws more international visitors each year than countries with far larger populations."
     ]
+  },
+  {
+    "id": "copper_production",
+    "title": "Copper Production",
+    "category": "Nature",
+    "dataset": "copper_2023",
+    "rule": "higher",
+    "facts": [
+      "Chile alone produces roughly a quarter of the world's copper.",
+      "Chile is home to the two largest copper mines on Earth, Escondida and Collahuasi."
+    ]
+  },
+  {
+    "id": "happiness_score",
+    "title": "World Happiness Score",
+    "category": "Society",
+    "dataset": "happiness_2026",
+    "rule": "higher",
+    "facts": [
+      "Nordic countries have dominated the top of the World Happiness Report for over a decade.",
+      "The ranking is based on self-reported life evaluation surveys, not income or GDP alone."
+    ]
+  },
+  {
+    "id": "billionaire_count",
+    "title": "Number of Billionaires",
+    "category": "Economy",
+    "dataset": "billionaires_2026",
+    "rule": "higher",
+    "facts": [
+      "The United States and China together are home to nearly half of the world's billionaires.",
+      "Billionaire counts can shift quickly year to year with stock market swings."
+    ]
+  },
+  {
+    "id": "military_spending",
+    "title": "Military Expenditure",
+    "category": "Economy",
+    "dataset": "military_spending_2023",
+    "rule": "higher",
+    "facts": [
+      "The United States spends more on its military than the next several highest-spending countries combined.",
+      "Military spending doesn't always track population size \u2014 several oil-producing nations spend heavily relative to their size."
+    ]
+  },
+  {
+    "id": "wine_production",
+    "title": "Wine Production",
+    "category": "Agriculture",
+    "dataset": "wine_2023",
+    "rule": "higher",
+    "facts": [
+      "Chile and Australia are both major wine producers despite being far from Europe's traditional wine regions.",
+      "The United States is one of the largest wine producers outside of Europe, led by California."
+    ]
+  },
+  {
+    "id": "wheat_production",
+    "title": "Wheat Production",
+    "category": "Agriculture",
+    "dataset": "wheat_2022",
+    "rule": "higher",
+    "facts": [
+      "China and India together grow roughly a third of the world's wheat.",
+      "Turkey's wheat harvest is large enough to rank among the world's top ten producers."
+    ]
+  },
+  {
+    "id": "banana_production",
+    "title": "Banana Production",
+    "category": "Agriculture",
+    "dataset": "banana_2022",
+    "rule": "higher",
+    "facts": [
+      "India grows more bananas than any other country, though most are consumed domestically rather than exported.",
+      "The Philippines is one of the world's largest banana exporters."
+    ]
+  },
+  {
+    "id": "wool_production",
+    "title": "Wool Production",
+    "category": "Agriculture",
+    "dataset": "wool_2022",
+    "rule": "higher",
+    "facts": [
+      "Australia produces more wool than any other country, tied closely to its enormous sheep flock.",
+      "China's wool output is boosted by one of the largest sheep populations on Earth."
+    ]
+  },
+  {
+    "id": "unesco_sites",
+    "title": "UNESCO World Heritage Sites",
+    "category": "Culture",
+    "dataset": "unesco_2025",
+    "rule": "higher",
+    "facts": [
+      "China and Germany rank among the countries with the most UNESCO World Heritage Sites.",
+      "A country's site count doesn't always track its population \u2014 smaller nations with deep histories can rank surprisingly high."
+    ]
+  },
+  {
+    "id": "coastline_length",
+    "title": "Coastline Length",
+    "category": "Nature",
+    "dataset": "coastline_cia",
+    "rule": "higher",
+    "facts": [
+      "Indonesia's roughly 17,000 islands give it one of the longest coastlines on Earth.",
+      "Some countries in this game, like Ethiopia and Switzerland, are landlocked and have no coastline at all."
+    ]
   }
 ]
