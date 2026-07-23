@@ -16,6 +16,7 @@ const TEXT_CLASS: Record<string, string> = {
   peek: 'text-peek',
   duel: 'text-duel',
   pigment: 'text-pigment',
+  waypoint: 'text-waypoint',
 };
 
 interface GameHeaderProps {

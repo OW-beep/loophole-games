@@ -5,7 +5,8 @@ export type GameSlug =
   | 'shadow' | 'tether' | 'drift' | 'phase'
   | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat' | 'acorn-dash' | 'cloud-hop' | 'twin-peek'
   | 'world-data-duel'
-  | 'pigment';
+  | 'pigment'
+  | 'waypoint';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards';
 
@@ -740,6 +741,36 @@ export const GAMES: GameMeta[] = [
       'White and black shift lightness without changing hue much \u2014 useful for nudging a close mix without overcorrecting.',
       'If a mix stalls below a high match percentage no matter what you add, clear it (it\u2019s free) and try a completely different starting ratio rather than tapping on top of a bad base.',
       'Budget your taps knowing all three targets share one pool \u2014 a target you nail in three taps banks taps for a trickier one later.',
+    ],
+  },
+  {
+    slug: 'waypoint',
+    index: '27',
+    name: 'Waypoint',
+    tagline: 'Every step in order. No step wasted.',
+    description:
+      'A handful of numbers are fixed on a 5\u00d75 grid. Trace the single path connecting 1 through 25, one adjacent cell at a time, using the fixed numbers to deduce the route between them before you run out of guesses.',
+    color: 'waypoint',
+    avgSolveTime: '4:30',
+    difficulty: 'Hard',
+    category: 'puzzle',
+    howToPlay: [
+      'The grid has a handful of numbers already placed. Number 1 and the final number are always shown; a few more are fixed in between.',
+      'Tap the cell orthogonally adjacent to your current highest number to guess where the next number goes.',
+      'A correct guess locks that number in place and becomes your new current cell. A wrong guess costs one of your limited guesses but doesn\u2019t place anything.',
+      'The path must pass through every fixed number at exactly the right step \u2014 use that to rule out dead-end directions before you tap.',
+      'Fill all 25 cells before your guesses run out to win.',
+    ],
+    designNotes: [
+      'Waypoint is a Hidato-style path puzzle: a single line snakes through every cell of the grid exactly once, and the pre-placed numbers are the only anchors telling you where that line has to pass. Everything else is deduction from adjacency and cell-counting, not guesswork.',
+      'Wrong guesses don\u2019t corrupt the board \u2014 they just cost you one of a limited pool of attempts, so tapping a plausible-looking neighbor to test a theory is a reasonable move, not a punishing mistake, as long as you\u2019re not doing it blindly.',
+      'Every path is generated fresh each day from a random walk across the grid, then a subset of steps gets revealed as fixed clues \u2014 so the puzzle is different daily but always guaranteed solvable.',
+    ],
+    strategyTips: [
+      'Count backward from the next fixed number: if there are exactly 3 blank cells between your current position and a clue three steps ahead, any branch that can\u2019t reach that clue in exactly 3 steps is wrong, even if it looks adjacent and reasonable.',
+      'Corners and edges have fewer neighbors than open cells \u2014 when a corner is still empty, work out how it must connect before it becomes your only remaining option.',
+      'If two neighboring cells both look plausible, look one step further down each branch rather than guessing \u2014 one of them usually leads toward a dead pocket of cells with no way back out.',
+      'Save your guesses for real forks in the path. If there\u2019s only one open neighbor, that\u2019s not a guess \u2014 it\u2019s the only move, so tap it with confidence.',
     ],
   },
 ];

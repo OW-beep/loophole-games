@@ -140,6 +140,11 @@ const config: Config = {
           DEFAULT: '#B8419C',
           soft: '#F5E3F0',
         },
+        // 27th game color
+        waypoint: {
+          DEFAULT: '#3B7A57',
+          soft: '#DCEEE3',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
