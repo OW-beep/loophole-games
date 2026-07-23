@@ -145,6 +145,11 @@ const config: Config = {
           DEFAULT: '#3B7A57',
           soft: '#DCEEE3',
         },
+        // 28th game color
+        cairn: {
+          DEFAULT: '#8B6F4E',
+          soft: '#EFE7DA',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

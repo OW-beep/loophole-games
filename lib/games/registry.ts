@@ -6,7 +6,8 @@ export type GameSlug =
   | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat' | 'acorn-dash' | 'cloud-hop' | 'twin-peek'
   | 'world-data-duel'
   | 'pigment'
-  | 'waypoint';
+  | 'waypoint'
+  | 'cairn';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards';
 
@@ -771,6 +772,36 @@ export const GAMES: GameMeta[] = [
       'Corners and edges have fewer neighbors than open cells \u2014 when a corner is still empty, work out how it must connect before it becomes your only remaining option.',
       'If two neighboring cells both look plausible, look one step further down each branch rather than guessing \u2014 one of them usually leads toward a dead pocket of cells with no way back out.',
       'Save your guesses for real forks in the path. If there\u2019s only one open neighbor, that\u2019s not a guess \u2014 it\u2019s the only move, so tap it with confidence.',
+    ],
+  },
+  {
+    slug: 'cairn',
+    index: '28',
+    name: 'Cairn',
+    tagline: 'Pair to ten. Clear the cairn.',
+    description:
+      'A pyramid of 15 cards, stacked like stones. Pair exposed cards that add up to ten to clear them, working your way up from the base, before your draws from the reserve run out.',
+    color: 'cairn',
+    avgSolveTime: '4:00',
+    difficulty: 'Medium',
+    category: 'cards',
+    howToPlay: [
+      'Fifteen cards (values 1\u20139) are stacked in a 5-row pyramid. Only cards not covered by any remaining card below them are exposed and tappable \u2014 the bottom row starts fully exposed.',
+      'Tap two exposed cards whose values add up to 10 to clear them both. Clearing cards can expose new cards in the row above.',
+      'You can also pair an exposed pyramid card with the current waste card (the top card from the reserve pile).',
+      'Tap "Draw" to reveal the next reserve card into the waste slot. Pairing is free; only drawing costs one of your limited draws.',
+      'Clear all 15 pyramid cards before your draws run out to win.',
+    ],
+    designNotes: [
+      'Cairn is a scaled-down take on classic pyramid solitaire \u2014 15 cards instead of 28, a fixed target sum instead of face-card special cases, and no redeals, so a full run stays inside a few focused minutes.',
+      'Like the traditional game it\u2019s based on, not every deal is guaranteed solvable \u2014 that unpredictability is part of the genre rather than a bug we\u2019re trying to eliminate.',
+      'Drawing costs a move, but every valid pair you clear is free, which is meant to reward reading the pyramid carefully before reaching for a new reserve card.',
+    ],
+    strategyTips: [
+      'Prioritize pairs that unlock a new exposed card over pairs that don\u2019t \u2014 clearing two bottom-row cards that both cover the same higher card exposes something new; clearing two cards that don\u2019t share a covered parent doesn\u2019t.',
+      'Before drawing, scan the whole exposed row for every possible pair, not just the first one you notice \u2014 clearing more before you draw keeps your draw budget for later, harder stretches.',
+      'The waste card is only useful once \u2014 if it doesn\u2019t pair with anything currently exposed, drawing past it is often better than holding out for a match that may not come.',
+      'Cards that sum to 10 with themselves (two 5s) are easy to overlook \u2014 keep an eye out whenever multiple 5s are exposed at once.',
     ],
   },
 ];

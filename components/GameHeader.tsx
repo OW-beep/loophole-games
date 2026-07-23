@@ -17,6 +17,7 @@ const TEXT_CLASS: Record<string, string> = {
   duel: 'text-duel',
   pigment: 'text-pigment',
   waypoint: 'text-waypoint',
+  cairn: 'text-cairn',
 };
 
 interface GameHeaderProps {

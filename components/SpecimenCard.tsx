@@ -15,6 +15,7 @@ export const STRIPE_CLASS: Record<string, string> = {
   duel: 'bg-duel',
   pigment: 'bg-pigment',
   waypoint: 'bg-waypoint',
+  cairn: 'bg-cairn',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -45,6 +46,7 @@ export const SOFT_CLASS: Record<string, string> = {
   duel: 'group-hover:bg-duel-soft dark:group-hover:bg-duel/10',
   pigment: 'group-hover:bg-pigment-soft dark:group-hover:bg-pigment/10',
   waypoint: 'group-hover:bg-waypoint-soft dark:group-hover:bg-waypoint/10',
+  cairn: 'group-hover:bg-cairn-soft dark:group-hover:bg-cairn/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {
