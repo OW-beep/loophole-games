@@ -222,6 +222,42 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: '5 min read',
     relatedGames: ['world-data-duel'],
   },
+  {
+    slug: 'pigment-color-mixing-strategy',
+    title: 'How to Beat Pigment: Color Mixing Tricks That Actually Work',
+    tagline:
+      'You never see the recipe behind the target color \u2014 the match meter is the only clue you get, and it\u2019s enough.',
+    description:
+      'Strategy tips for Pigment, Loophole\u2019s daily color-mixing puzzle: how the match percentage works, why order doesn\u2019t matter but ratio does, and how to stop wasting taps on the wrong base color.',
+    category: 'trend',
+    publishDate: '2026-07-22',
+    readTime: '4 min read',
+    relatedGames: ['pigment'],
+  },
+  {
+    slug: 'psychology-of-the-daily-streak',
+    title: 'Why a Little Flame Icon Gets You Out of Bed to Solve a Puzzle',
+    tagline:
+      'Streaks aren\u2019t a UI decoration \u2014 they\u2019re one of the most effective habit hooks ever added to software, for better and worse.',
+    description:
+      'A look at why daily-streak mechanics in puzzle games are so effective at building habits, what "loss aversion" has to do with it, and how to keep a streak healthy instead of stressful.',
+    category: 'insight',
+    publishDate: '2026-07-23',
+    readTime: '6 min read',
+    relatedGames: ['polarity', 'twin-peek'],
+  },
+  {
+    slug: 'countries-with-no-coastline',
+    title: 'The Countries With No Coastline at All',
+    tagline:
+      'Being landlocked shapes everything from trade routes to cuisine \u2014 and one country is surrounded entirely by a single neighbor.',
+    description:
+      'A look at the world\u2019s landlocked countries, why having no coastline is such a lasting economic disadvantage, and which nations have made it work anyway.',
+    category: 'data',
+    publishDate: '2026-07-24',
+    readTime: '5 min read',
+    relatedGames: ['world-data-duel'],
+  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

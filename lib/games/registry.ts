@@ -4,7 +4,8 @@ export type GameSlug =
   | 'heatmap' | 'signal' | 'overflow' | 'polarity'
   | 'shadow' | 'tether' | 'drift' | 'phase'
   | 'boo-rush' | 'blobble' | 'sprout' | 'wobble-chef' | 'noodle-cat' | 'acorn-dash' | 'cloud-hop' | 'twin-peek'
-  | 'world-data-duel';
+  | 'world-data-duel'
+  | 'pigment';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards';
 
@@ -709,6 +710,36 @@ export const GAMES: GameMeta[] = [
       'Don\u2019t spend your most obviously-strong card on the first question you see \u2014 with only 5 cards for 5 rounds, an early guess can leave you without an answer for a later one.',
       'A tie still costs you nothing, so when you\u2019re unsure, a safe mid-tier card is often better than gambling your best card on a guess.',
       'Watch how the CPU plays its first couple of rounds \u2014 a strong economic pick early is a good sign you\u2019re facing the Economist personality, and you can plan the rest of the match around that read.',
+    ],
+  },
+  {
+    slug: 'pigment',
+    index: '26',
+    name: 'Pigment',
+    tagline: 'Mix by feel. Match by eye.',
+    description:
+      'Tap Red, Yellow, Blue, White, and Black to mix three target colors from scratch, no color codes shown \u2014 just a live match percentage guiding you closer with every tap.',
+    color: 'pigment',
+    avgSolveTime: '3:30',
+    difficulty: 'Medium',
+    category: 'puzzle',
+    howToPlay: [
+      'Each day shows a target color swatch. Tap ink colors (Red, Yellow, Blue, White, Black) to add them to your mixing well.',
+      'Your well\u2019s color is the average of everything you\u2019ve tapped into it, shown live next to the target.',
+      'A match meter shows how close your mix is to the target. Once it\u2019s close enough, "Bottle it" locks it in and moves you to the next target.',
+      'Clearing the well to start over is free. Only adding ink costs a tap, and you share one tap budget across all three targets.',
+      'Bottle all three targets before your taps run out to win.',
+    ],
+    designNotes: [
+      'Pigment deliberately never shows the numeric recipe behind a target color \u2014 you\u2019re reasoning about hue and saturation the way you would mixing actual paint, with the match percentage standing in for "does this look right yet?"',
+      'Because the well tracks a running average, order doesn\u2019t matter but ratio does: three parts red to one part white lands in a very different place than one part red to three parts white, even though both are "mostly red and white."',
+      'Clearing the well for free (versus in games where undo costs a move) was a deliberate choice \u2014 the fun here is in the mixing experimentation, not in punishing a wrong guess.',
+    ],
+    strategyTips: [
+      'Start with two or three taps of the color the target most obviously leans toward, then use the match meter to fine-tune rather than guessing a full recipe up front.',
+      'White and black shift lightness without changing hue much \u2014 useful for nudging a close mix without overcorrecting.',
+      'If a mix stalls below a high match percentage no matter what you add, clear it (it\u2019s free) and try a completely different starting ratio rather than tapping on top of a bad base.',
+      'Budget your taps knowing all three targets share one pool \u2014 a target you nail in three taps banks taps for a trickier one later.',
     ],
   },
 ];

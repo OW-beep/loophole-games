@@ -15,6 +15,7 @@ const TEXT_CLASS: Record<string, string> = {
   cloud: 'text-cloud',
   peek: 'text-peek',
   duel: 'text-duel',
+  pigment: 'text-pigment',
 };
 
 interface GameHeaderProps {

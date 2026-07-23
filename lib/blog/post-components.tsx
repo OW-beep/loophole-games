@@ -17,6 +17,9 @@ import CanGamesImproveReactionTime from '@/components/blog/posts/can-games-impro
 import WorldDataDuelRealDataBehindTheGame from '@/components/blog/posts/world-data-duel-real-data-behind-the-game';
 import CountriesThatProduceTheMostCoffee from '@/components/blog/posts/countries-that-produce-the-most-coffee';
 import CountriesWithTheMostActiveVolcanoes from '@/components/blog/posts/countries-with-the-most-active-volcanoes';
+import PigmentColorMixingStrategy from '@/components/blog/posts/pigment-color-mixing-strategy';
+import PsychologyOfTheDailyStreak from '@/components/blog/posts/psychology-of-the-daily-streak';
+import CountriesWithNoCoastline from '@/components/blog/posts/countries-with-no-coastline';
 
 export const POST_COMPONENTS: Record<string, ComponentType> = {
   'why-daily-games-took-over': WhyDailyGamesTookOver,
@@ -37,4 +40,7 @@ export const POST_COMPONENTS: Record<string, ComponentType> = {
   'world-data-duel-real-data-behind-the-game': WorldDataDuelRealDataBehindTheGame,
   'countries-that-produce-the-most-coffee': CountriesThatProduceTheMostCoffee,
   'countries-with-the-most-active-volcanoes': CountriesWithTheMostActiveVolcanoes,
+  'pigment-color-mixing-strategy': PigmentColorMixingStrategy,
+  'psychology-of-the-daily-streak': PsychologyOfTheDailyStreak,
+  'countries-with-no-coastline': CountriesWithNoCoastline,
 };

@@ -13,6 +13,7 @@ export const STRIPE_CLASS: Record<string, string> = {
   cloud: 'bg-cloud',
   peek: 'bg-peek',
   duel: 'bg-duel',
+  pigment: 'bg-pigment',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -41,6 +42,7 @@ export const SOFT_CLASS: Record<string, string> = {
   cloud: 'group-hover:bg-cloud-soft dark:group-hover:bg-cloud/10',
   peek: 'group-hover:bg-peek-soft dark:group-hover:bg-peek/10',
   duel: 'group-hover:bg-duel-soft dark:group-hover:bg-duel/10',
+  pigment: 'group-hover:bg-pigment-soft dark:group-hover:bg-pigment/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {

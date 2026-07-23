@@ -135,6 +135,11 @@ const config: Config = {
           DEFAULT: '#B8862E',
           soft: '#F7ECD8',
         },
+        // 26th game color
+        pigment: {
+          DEFAULT: '#B8419C',
+          soft: '#F5E3F0',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
