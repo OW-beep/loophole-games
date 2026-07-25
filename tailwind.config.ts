@@ -150,6 +150,11 @@ const config: Config = {
           DEFAULT: '#8B6F4E',
           soft: '#EFE7DA',
         },
+        // 29th game color
+        decant: {
+          DEFAULT: '#2D7DA8',
+          soft: '#DCEBF3',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

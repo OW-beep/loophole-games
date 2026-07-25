@@ -18,6 +18,7 @@ const TEXT_CLASS: Record<string, string> = {
   pigment: 'text-pigment',
   waypoint: 'text-waypoint',
   cairn: 'text-cairn',
+  decant: 'text-decant',
 };
 
 interface GameHeaderProps {
