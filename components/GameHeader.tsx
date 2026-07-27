@@ -23,6 +23,7 @@ const TEXT_CLASS: Record<string, string> = {
   clearway: 'text-clearway',
   overdraw: 'text-overdraw',
   burrow: 'text-burrow',
+  vantage: 'text-vantage',
 };
 
 interface GameHeaderProps {

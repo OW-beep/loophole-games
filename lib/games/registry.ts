@@ -12,7 +12,8 @@ export type GameSlug =
   | 'cipher'
   | 'clearway'
   | 'overdraw'
-  | 'burrow';
+  | 'burrow'
+  | 'vantage';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards';
 
@@ -952,6 +953,35 @@ export const GAMES: GameMeta[] = [
       'Hazard tiles are never on the correct route, so if a path you\u2019re tracing runs through one, that branch is a dead end regardless of anything else.',
       'Head toward the key first no matter how the door looks from where you start \u2014 reaching the door early doesn\u2019t count for anything without it.',
       'If you hit a dead end, backtrack immediately rather than searching further down it \u2014 in a perfect maze, a dead end never quietly connects back around.',
+    ],
+  },
+  {
+    slug: 'vantage',
+    index: '34',
+    name: 'Vantage',
+    tagline: 'Turn it over. Count what\u2019s hiding.',
+    description:
+      'A freely rotatable 3D voxel structure, cubes hidden behind others until you turn it. Guess how many cubes it\u2019s made of \u2014 each guess tells you higher or lower.',
+    color: 'vantage',
+    avgSolveTime: '3:00',
+    difficulty: 'Medium',
+    category: 'puzzle',
+    howToPlay: [
+      'A 3D shape made of unit cubes sits in the middle of the screen. Drag to rotate it and scroll or pinch to zoom.',
+      'Some cubes are always hidden behind others from any single angle \u2014 you\u2019ll need to actually rotate the shape to see them.',
+      'Type a guess for the total number of cubes and submit it.',
+      'Each guess tells you whether the real count is higher or lower. Find the exact number before you run out of guesses.',
+    ],
+    designNotes: [
+      'This is the one 3D game in the catalog \u2014 a real, rotatable WebGL scene rather than an isometric illusion, because the whole puzzle depends on cubes genuinely being hidden behind each other until you turn the shape.',
+      'The shape is grown daily from a single seed cube, always staying one connected object rather than floating fragments, so it always reads as one coherent thing to inspect rather than a scattered pile.',
+      'Guesses give higher/lower feedback rather than nothing at all, since guessing a hidden 3D count completely blind would be pure luck \u2014 the feedback turns it into a real search problem layered on top of the spatial reasoning.',
+    ],
+    strategyTips: [
+      'Rotate to at least three distinct angles before your first guess \u2014 a shape that looks small head-on often reveals a whole extra layer of cubes from the side or underneath.',
+      'Look at the shape from directly above and directly below \u2014 those two angles catch cubes that side-on rotation alone can miss.',
+      'Use your first guess as an estimate, not a real answer \u2014 the higher/lower feedback is far more reliable than eyeballing a hidden structure, so let it guide your second guess.',
+      'Once you have a higher/lower result, narrow toward the midpoint of the remaining possible range rather than adjusting by just one or two \u2014 you have a limited number of guesses to work with.',
     ],
   },
 ];

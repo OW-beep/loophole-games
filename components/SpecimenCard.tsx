@@ -21,6 +21,7 @@ export const STRIPE_CLASS: Record<string, string> = {
   clearway: 'bg-clearway',
   overdraw: 'bg-overdraw',
   burrow: 'bg-burrow',
+  vantage: 'bg-vantage',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -57,6 +58,7 @@ export const SOFT_CLASS: Record<string, string> = {
   clearway: 'group-hover:bg-clearway-soft dark:group-hover:bg-clearway/10',
   overdraw: 'group-hover:bg-overdraw-soft dark:group-hover:bg-overdraw/10',
   burrow: 'group-hover:bg-burrow-soft dark:group-hover:bg-burrow/10',
+  vantage: 'group-hover:bg-vantage-soft dark:group-hover:bg-vantage/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {

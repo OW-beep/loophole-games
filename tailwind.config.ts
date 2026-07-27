@@ -175,6 +175,11 @@ const config: Config = {
           DEFAULT: '#A8763F',
           soft: '#F0E4D3',
         },
+        // 34th game color
+        vantage: {
+          DEFAULT: '#4A5FC1',
+          soft: '#E3E6F7',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
