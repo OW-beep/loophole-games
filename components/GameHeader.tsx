@@ -19,6 +19,10 @@ const TEXT_CLASS: Record<string, string> = {
   waypoint: 'text-waypoint',
   cairn: 'text-cairn',
   decant: 'text-decant',
+  cipher: 'text-cipher',
+  clearway: 'text-clearway',
+  overdraw: 'text-overdraw',
+  burrow: 'text-burrow',
 };
 
 interface GameHeaderProps {

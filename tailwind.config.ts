@@ -155,6 +155,26 @@ const config: Config = {
           DEFAULT: '#2D7DA8',
           soft: '#DCEBF3',
         },
+        // 30th game color
+        cipher: {
+          DEFAULT: '#5B4B8A',
+          soft: '#E6E1F2',
+        },
+        // 31st game color
+        clearway: {
+          DEFAULT: '#C6432E',
+          soft: '#F7DFDA',
+        },
+        // 32nd game color
+        overdraw: {
+          DEFAULT: '#C4831F',
+          soft: '#F7E9D2',
+        },
+        // 33rd game color
+        burrow: {
+          DEFAULT: '#A8763F',
+          soft: '#F0E4D3',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

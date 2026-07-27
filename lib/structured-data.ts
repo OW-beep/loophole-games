@@ -8,8 +8,7 @@ export function buildWebsiteJsonLd() {
     '@type': 'WebSite',
     name: 'Loophole',
     url: SITE_URL,
-    description:
-      'Four original daily puzzle games: Echo Merge, Mirror Loop, Color Debt, and Gravity Word. Free to play, no download.',
+    description: `${GAMES.length} original daily puzzle, word, movement, and card games. Free to play, no download, no account required.`,
   };
 }
 

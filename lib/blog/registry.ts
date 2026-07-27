@@ -264,6 +264,12 @@ export function getPost(slug: string): BlogPost | undefined {
   return BLOG_POSTS.find((p) => p.slug === slug);
 }
 
+/** Posts that link to a given game — the reverse of a post's own relatedGames,
+ * used to link from a game page back to any articles written about it. */
+export function getPostsForGame(gameSlug: string): BlogPost[] {
+  return BLOG_POSTS.filter((p) => p.relatedGames.includes(gameSlug));
+}
+
 export function getAllPosts(): BlogPost[] {
   return [...BLOG_POSTS].sort((a, b) => (a.publishDate < b.publishDate ? 1 : -1));
 }
