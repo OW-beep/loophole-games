@@ -24,6 +24,8 @@ const TEXT_CLASS: Record<string, string> = {
   overdraw: 'text-overdraw',
   burrow: 'text-burrow',
   vantage: 'text-vantage',
+  tumble: 'text-tumble',
+  untangle: 'text-untangle',
 };
 
 interface GameHeaderProps {

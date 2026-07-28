@@ -22,6 +22,8 @@ export const STRIPE_CLASS: Record<string, string> = {
   overdraw: 'bg-overdraw',
   burrow: 'bg-burrow',
   vantage: 'bg-vantage',
+  tumble: 'bg-tumble',
+  untangle: 'bg-untangle',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -59,6 +61,8 @@ export const SOFT_CLASS: Record<string, string> = {
   overdraw: 'group-hover:bg-overdraw-soft dark:group-hover:bg-overdraw/10',
   burrow: 'group-hover:bg-burrow-soft dark:group-hover:bg-burrow/10',
   vantage: 'group-hover:bg-vantage-soft dark:group-hover:bg-vantage/10',
+  tumble: 'group-hover:bg-tumble-soft dark:group-hover:bg-tumble/10',
+  untangle: 'group-hover:bg-untangle-soft dark:group-hover:bg-untangle/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {

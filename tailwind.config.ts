@@ -180,6 +180,16 @@ const config: Config = {
           DEFAULT: '#4A5FC1',
           soft: '#E3E6F7',
         },
+        // 35th game color
+        tumble: {
+          DEFAULT: '#B8622E',
+          soft: '#F5E3D3',
+        },
+        // 36th game color
+        untangle: {
+          DEFAULT: '#2E9A8C',
+          soft: '#D9F0EC',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
