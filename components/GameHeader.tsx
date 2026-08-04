@@ -26,6 +26,10 @@ const TEXT_CLASS: Record<string, string> = {
   vantage: 'text-vantage',
   tumble: 'text-tumble',
   untangle: 'text-untangle',
+  flicker: 'text-flicker',
+  lastlight: 'text-lastlight',
+  blueprint: 'text-blueprint',
+  bloom: 'text-bloom',
 };
 
 interface GameHeaderProps {

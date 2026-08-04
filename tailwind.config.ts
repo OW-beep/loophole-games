@@ -190,6 +190,26 @@ const config: Config = {
           DEFAULT: '#2E9A8C',
           soft: '#D9F0EC',
         },
+        // 37th game color
+        flicker: {
+          DEFAULT: '#D4A017',
+          soft: '#FBF1D3',
+        },
+        // 38th game color
+        lastlight: {
+          DEFAULT: '#455A7A',
+          soft: '#DEE5EE',
+        },
+        // 39th game color
+        blueprint: {
+          DEFAULT: '#6B8E4E',
+          soft: '#E5EDDC',
+        },
+        // 40th game color
+        bloom: {
+          DEFAULT: '#3D8B7A',
+          soft: '#DCEEE9',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
