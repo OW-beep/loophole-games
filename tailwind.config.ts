@@ -210,6 +210,11 @@ const config: Config = {
           DEFAULT: '#3D8B7A',
           soft: '#DCEEE9',
         },
+        // 41st game color
+        apex: {
+          DEFAULT: '#E86A2E',
+          soft: '#FBE5D6',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

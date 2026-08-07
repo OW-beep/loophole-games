@@ -30,6 +30,7 @@ const TEXT_CLASS: Record<string, string> = {
   lastlight: 'text-lastlight',
   blueprint: 'text-blueprint',
   bloom: 'text-bloom',
+  apex: 'text-apex',
 };
 
 interface GameHeaderProps {

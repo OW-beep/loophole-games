@@ -19,7 +19,8 @@ export type GameSlug =
   | 'flicker'
   | 'lastlight'
   | 'blueprint'
-  | 'bloom';
+  | 'bloom'
+  | 'apex';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards';
 
@@ -1161,6 +1162,35 @@ export const GAMES: GameMeta[] = [
       'A pick that only grabs one or two tiles is rarely wrong, but it\u2019s worth checking whether a different color would have grabbed considerably more before committing.',
       'Corners and edges of the board have fewer neighbors, so chains that start there tend to be smaller \u2014 prioritize expanding into the open middle of the board when you have the choice.',
       'Picks late in the game usually matter more than picks early on, since your territory has more border to work with \u2014 it\u2019s fine to spend an early pick on a merely decent option.',
+    ],
+  },
+  {
+    slug: 'apex',
+    index: '41',
+    name: 'Apex',
+    tagline: 'Carry your speed. Mind the line.',
+    description:
+      'A turn-based racing line puzzle: pick an acceleration each turn, and your speed carries forward into the next one. Reach the finish without sliding off the track.',
+    color: 'apex',
+    avgSolveTime: '3:00',
+    difficulty: 'Hard',
+    category: 'movement',
+    howToPlay: [
+      'Your car starts stationary on the track. Each turn, pick one of the 9 directions (including "no change") to adjust your speed.',
+      'Your new speed carries over into your position \u2014 the car then moves exactly that many tiles in one step, in a straight line.',
+      'If that line ever leaves the drivable track, even briefly, the run ends immediately.',
+      'Reach the green finish zone before you run out of turns to win.',
+    ],
+    designNotes: [
+      'This is a classic turn-based racing format sometimes called vector racing: velocity, not just position, carries from turn to turn, so a sharp turn at high speed genuinely doesn\u2019t work the way it would at walking pace \u2014 you have to plan your braking in advance, the same way a real racing line does.',
+      'Every day\u2019s track is generated and then solved by searching every reachable combination of position and speed before you ever see it, so the move budget is set from a real, found solution rather than a guess at how curvy the track looks.',
+      'A fast, straight run and a cautious, braking run can both finish \u2014 the move budget has enough room for a sensible line that isn\u2019t necessarily the mathematically fastest one.',
+    ],
+    strategyTips: [
+      'Speed you build up doesn\u2019t disappear on its own \u2014 you have to actively decelerate before a turn, ideally a move or two before you actually need to change direction.',
+      'The diagonal options change both axes of your speed at once, which is often the most efficient way to both slow down and start turning in the same move.',
+      'Picking "no change" is a real move, not a wasted one, when your current speed is already lined up with where the track goes next.',
+      'On a straightaway, building speed early pays off more than braking late costs you \u2014 save your caution for the turns you can actually see coming.',
     ],
   },
 ];

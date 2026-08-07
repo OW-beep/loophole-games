@@ -28,6 +28,7 @@ export const STRIPE_CLASS: Record<string, string> = {
   lastlight: 'bg-lastlight',
   blueprint: 'bg-blueprint',
   bloom: 'bg-bloom',
+  apex: 'bg-apex',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -71,6 +72,7 @@ export const SOFT_CLASS: Record<string, string> = {
   lastlight: 'group-hover:bg-lastlight-soft dark:group-hover:bg-lastlight/10',
   blueprint: 'group-hover:bg-blueprint-soft dark:group-hover:bg-blueprint/10',
   bloom: 'group-hover:bg-bloom-soft dark:group-hover:bg-bloom/10',
+  apex: 'group-hover:bg-apex-soft dark:group-hover:bg-apex/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {
