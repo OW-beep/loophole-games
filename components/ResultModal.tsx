@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { shareResult } from '@/lib/share';
-import { GAMES } from '@/lib/games/registry';
+import { getGame, getSimilarGames } from '@/lib/games/registry';
 
 interface ResultModalProps {
   open: boolean;
@@ -72,7 +72,11 @@ export function ResultModal({
   if (!open) return null;
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://loophole.games';
-  const otherGames = GAMES.filter((g) => g.slug !== gameSlug).slice(0, 2);
+  // Same-category/difficulty picks instead of a fixed pair — a player who
+  // just ran out of moves for the day is more likely to click through to
+  // something that actually resembles what they were just playing.
+  const thisGame = getGame(gameSlug);
+  const otherGames = thisGame ? getSimilarGames(thisGame, 3) : [];
 
   async function handleShare() {
     const result = await shareResult({
@@ -150,7 +154,9 @@ export function ResultModal({
 
         {otherGames.length > 0 && (
           <div className="border-t border-index dark:border-index-dark pt-4">
-            <p className="stat-line text-ink/40 dark:text-white/30 mb-2">More from the index</p>
+            <p className="stat-line text-ink/40 dark:text-white/30 mb-2">
+              {gameName}&rsquo;s puzzle resets tomorrow — try one of these now
+            </p>
             <div className="flex gap-2 flex-wrap">
               {otherGames.map((g) => (
                 <Link

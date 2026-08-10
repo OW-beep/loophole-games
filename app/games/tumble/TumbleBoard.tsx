@@ -15,7 +15,11 @@ import {
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const TILE_COLOR = '#EFE7DA';
 const GOAL_COLOR = '#4CAF7D';
@@ -95,6 +99,45 @@ export function TumbleBoard({
     setState((s) => attemptRoll(s, dir));
   }
 
+  const dailyFinished = state.won || state.lost;
+
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [coinState, setCoinState] = useState<TumbleState | null>(null);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const coinRoundSettledRef = useRef(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+
+  function startCoinRound() {
+    coinRoundSettledRef.current = false;
+    setCoinState(createInitialState(rollCoinSeed()));
+  }
+
+  function handleCoinRoll(dir: Direction) {
+    setCoinState((s) => (s ? attemptRoll(s, dir) : s));
+  }
+
+  useEffect(() => {
+    if (!coinState || coinRoundSettledRef.current) return;
+    if (!coinState.won && !coinState.lost) return;
+    coinRoundSettledRef.current = true;
+
+    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.movesUsed, movesLimit: coinState.moveLimit });
+    setLastCoinDelta(delta);
+    setCoins((prev) => {
+      const next = Math.max(0, prev + delta);
+      saveCoinBalance(next);
+      if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
+      return next;
+    });
+  }, [coinState, nickname]);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+  }
+
   return (
     <div>
       <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={state.movesUsed} movesLimit={state.moveLimit} />
@@ -166,6 +209,70 @@ export function TumbleBoard({
         score={state.moveLimit}
         streak={streak}
       />
+
+      <CoinModeSection
+        coins={coins}
+        nickname={nickname}
+        onSaveNickname={handleSaveNickname}
+        roundActive={!!coinState}
+        roundFinished={!!coinState && (coinState.won || coinState.lost)}
+        roundWon={!!coinState?.won}
+        lastDelta={lastCoinDelta}
+        onStart={startCoinRound}
+        onShowLeaderboard={() => setShowLeaderboard(true)}
+      >
+        {coinState && (
+          <div>
+            <div
+              className="rounded-lg border-2 border-graphite dark:border-white/70 mb-4 mx-auto"
+              style={{ width: '100%', maxWidth: 380, height: 280 }}
+            >
+              <Canvas camera={{ position: [6, 7, 9], fov: 45 }}>
+                <ambientLight intensity={0.7} />
+                <directionalLight position={[6, 10, 4]} intensity={0.9} />
+                <Board state={coinState} />
+                <Block state={coinState} />
+                <OrbitControls enablePan={false} minDistance={5} maxDistance={18} />
+              </Canvas>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 max-w-[220px] mx-auto">
+              <div />
+              <button
+                onClick={() => handleCoinRoll('up')}
+                disabled={coinState.won || coinState.lost}
+                className="rounded-lg border-2 border-graphite dark:border-white/70 py-2 disabled:opacity-30"
+              >
+                {'\u2191'}
+              </button>
+              <div />
+              <button
+                onClick={() => handleCoinRoll('left')}
+                disabled={coinState.won || coinState.lost}
+                className="rounded-lg border-2 border-graphite dark:border-white/70 py-2 disabled:opacity-30"
+              >
+                {'\u2190'}
+              </button>
+              <button
+                onClick={() => handleCoinRoll('down')}
+                disabled={coinState.won || coinState.lost}
+                className="rounded-lg border-2 border-graphite dark:border-white/70 py-2 disabled:opacity-30"
+              >
+                {'\u2193'}
+              </button>
+              <button
+                onClick={() => handleCoinRoll('right')}
+                disabled={coinState.won || coinState.lost}
+                className="rounded-lg border-2 border-graphite dark:border-white/70 py-2 disabled:opacity-30"
+              >
+                {'\u2192'}
+              </button>
+            </div>
+          </div>
+        )}
+      </CoinModeSection>
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }

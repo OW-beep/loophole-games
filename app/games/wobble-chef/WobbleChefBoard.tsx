@@ -20,9 +20,14 @@ import {
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'playing' | 'falling' | 'won' | 'lost';
+type Mode = 'daily' | 'coin';
 
 interface PlacedItem {
   x: number;
@@ -49,6 +54,8 @@ export function WobbleChefBoard({
   const lastTsRef = useRef<number>(0);
   const statusRef = useRef<Status>('playing');
   const finishedRef = useRef(false);
+  const modeRef = useRef<Mode>('daily');
+  const activeSeedRef = useRef(seed);
 
   const menuRef = useRef<number[]>(createMenu(seed));
   const towerRef = useRef<TowerState>(createInitialTower());
@@ -64,8 +71,23 @@ export function WobbleChefBoard({
   const [streak, setStreak] = useState(0);
   const [everDropped, setEverDropped] = useState(false);
 
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [dailyDone, setDailyDone] = useState(false);
+  const [coinRoundActive, setCoinRoundActive] = useState(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const nicknameRef = useRef(nickname);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+    nicknameRef.current = name;
+  }
+
   const resetRun = useCallback(() => {
-    menuRef.current = createMenu(seed);
+    menuRef.current = createMenu(activeSeedRef.current);
     towerRef.current = createInitialTower();
     stackRef.current = [];
     fallingRef.current = null;
@@ -78,13 +100,17 @@ export function WobbleChefBoard({
     setEverDropped(false);
     statusRef.current = 'playing';
     setStatus('playing');
-  }, [seed]);
+  }, []);
+
+  const startCoinRound = useCallback(() => {
+    activeSeedRef.current = rollCoinSeed();
+    modeRef.current = 'coin';
+    setCoinRoundActive(true);
+    resetRun();
+  }, [resetRun]);
 
   const onTap = useCallback(() => {
-    if (statusRef.current === 'won' || statusRef.current === 'lost') {
-      resetRun();
-      return;
-    }
+    if (statusRef.current === 'won' || statusRef.current === 'lost') return;
     if (statusRef.current !== 'playing') return;
     hasDroppedRef.current = true;
     setEverDropped(true);
@@ -92,7 +118,7 @@ export function WobbleChefBoard({
     fallingRef.current = createFallingItem(menuRef.current[menuIndexRef.current], x);
     statusRef.current = 'falling';
     setStatus('falling');
-  }, [resetRun]);
+  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -122,15 +148,28 @@ export function WobbleChefBoard({
       finishedRef.current = true;
       statusRef.current = won ? 'won' : 'lost';
       setStatus(statusRef.current);
-      recordResult('wobble-chef', {
-        date: dateString,
-        won,
-        moves: menuIndexRef.current,
-        score: menuIndexRef.current,
-        elapsedMs: 0,
-      });
-      setStreak(getStreak('wobble-chef').current);
-      setShowResult(true);
+
+      if (modeRef.current === 'daily') {
+        recordResult('wobble-chef', {
+          date: dateString,
+          won,
+          moves: menuIndexRef.current,
+          score: menuIndexRef.current,
+          elapsedMs: 0,
+        });
+        setStreak(getStreak('wobble-chef').current);
+        setShowResult(true);
+        setDailyDone(true);
+      } else {
+        const delta = computeCoinDelta({ won, movesUsed: menuIndexRef.current, movesLimit: MENU_LENGTH });
+        setLastCoinDelta(delta);
+        setCoins((prev) => {
+          const next = Math.max(0, prev + delta);
+          saveCoinBalance(next);
+          if (nicknameRef.current) submitScore(GLOBAL_LEADERBOARD_SLUG, nicknameRef.current, next);
+          return next;
+        });
+      }
     }
 
     function shiftDown() {
@@ -277,6 +316,22 @@ export function WobbleChefBoard({
         score={stacked}
         streak={streak}
       />
+
+      {dailyDone && (
+        <CoinModeSection
+          coins={coins}
+          nickname={nickname}
+          onSaveNickname={handleSaveNickname}
+          roundActive={coinRoundActive}
+          roundFinished={coinRoundActive && modeRef.current === 'coin' && (status === 'won' || status === 'lost')}
+          roundWon={status === 'won'}
+          lastDelta={lastCoinDelta}
+          onStart={startCoinRound}
+          onShowLeaderboard={() => setShowLeaderboard(true)}
+        />
+      )}
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }

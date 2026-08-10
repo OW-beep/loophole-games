@@ -5,9 +5,14 @@ import { createBowls, BOWL_COUNT, type BowlConfig } from '@/lib/games/noodle-cat
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'playing' | 'won' | 'lost';
+type Mode = 'daily' | 'coin';
 
 export function NoodleCatBoard({
   seed,
@@ -19,6 +24,8 @@ export function NoodleCatBoard({
   puzzleNumber: number;
 }) {
   const game = GAMES.find((g) => g.slug === 'noodle-cat')!;
+  const modeRef = useRef<Mode>('daily');
+  const activeSeedRef = useRef(seed);
   const bowlsRef = useRef<BowlConfig[]>(createBowls(seed));
   const bowlIndexRef = useRef(0);
   const tapsRef = useRef(0);
@@ -34,8 +41,23 @@ export function NoodleCatBoard({
   const [showResult, setShowResult] = useState(false);
   const [streak, setStreak] = useState(0);
 
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [dailyDone, setDailyDone] = useState(false);
+  const [coinRoundActive, setCoinRoundActive] = useState(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const nicknameRef = useRef(nickname);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+    nicknameRef.current = name;
+  }
+
   const resetRun = useCallback(() => {
-    bowlsRef.current = createBowls(seed);
+    bowlsRef.current = createBowls(activeSeedRef.current);
     bowlIndexRef.current = 0;
     tapsRef.current = 0;
     finishedRef.current = false;
@@ -44,7 +66,14 @@ export function NoodleCatBoard({
     setShowResult(false);
     statusRef.current = 'ready';
     setStatus('ready');
-  }, [seed]);
+  }, []);
+
+  const startCoinRound = useCallback(() => {
+    activeSeedRef.current = rollCoinSeed();
+    modeRef.current = 'coin';
+    setCoinRoundActive(true);
+    resetRun();
+  }, [resetRun]);
 
   const finish = useCallback(
     (won: boolean) => {
@@ -52,24 +81,34 @@ export function NoodleCatBoard({
       finishedRef.current = true;
       statusRef.current = won ? 'won' : 'lost';
       setStatus(statusRef.current);
-      recordResult('noodle-cat', {
-        date: dateString,
-        won,
-        moves: bowlIndexRef.current,
-        score: bowlIndexRef.current,
-        elapsedMs: 0,
-      });
-      setStreak(getStreak('noodle-cat').current);
-      setShowResult(true);
+
+      if (modeRef.current === 'daily') {
+        recordResult('noodle-cat', {
+          date: dateString,
+          won,
+          moves: bowlIndexRef.current,
+          score: bowlIndexRef.current,
+          elapsedMs: 0,
+        });
+        setStreak(getStreak('noodle-cat').current);
+        setShowResult(true);
+        setDailyDone(true);
+      } else {
+        const delta = computeCoinDelta({ won, movesUsed: bowlIndexRef.current, movesLimit: BOWL_COUNT });
+        setLastCoinDelta(delta);
+        setCoins((prev) => {
+          const next = Math.max(0, prev + delta);
+          saveCoinBalance(next);
+          if (nicknameRef.current) submitScore(GLOBAL_LEADERBOARD_SLUG, nicknameRef.current, next);
+          return next;
+        });
+      }
     },
     [dateString]
   );
 
   const onTap = useCallback(() => {
-    if (statusRef.current === 'won' || statusRef.current === 'lost') {
-      resetRun();
-      return;
-    }
+    if (statusRef.current === 'won' || statusRef.current === 'lost') return;
     if (statusRef.current === 'ready') {
       statusRef.current = 'playing';
       setStatus('playing');
@@ -94,7 +133,7 @@ export function NoodleCatBoard({
         bowlStartRef.current = Date.now();
       }
     }
-  }, [finish, resetRun]);
+  }, [finish]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -205,6 +244,22 @@ export function NoodleCatBoard({
         score={bowlIndex}
         streak={streak}
       />
+
+      {dailyDone && (
+        <CoinModeSection
+          coins={coins}
+          nickname={nickname}
+          onSaveNickname={handleSaveNickname}
+          roundActive={coinRoundActive}
+          roundFinished={coinRoundActive && modeRef.current === 'coin' && (status === 'won' || status === 'lost')}
+          roundWon={status === 'won'}
+          lastDelta={lastCoinDelta}
+          onStart={startCoinRound}
+          onShowLeaderboard={() => setShowLeaderboard(true)}
+        />
+      )}
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }

@@ -215,6 +215,22 @@ const config: Config = {
           DEFAULT: '#E86A2E',
           soft: '#FBE5D6',
         },
+        pulse: {
+          DEFAULT: '#D1264F',
+          soft: '#FBE0E6',
+        },
+        blip: {
+          DEFAULT: '#2E9E6B',
+          soft: '#DFF4EA',
+        },
+        coin: {
+          DEFAULT: '#C98A1D',
+          soft: '#FBEDD2',
+        },
+        croak: {
+          DEFAULT: '#4E9B4E',
+          soft: '#DFEEDA',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

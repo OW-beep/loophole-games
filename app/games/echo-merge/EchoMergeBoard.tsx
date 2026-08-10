@@ -11,11 +11,16 @@ import {
   type EchoMergeState,
 } from '@/lib/games/echo-merge';
 import { createRng } from '@/lib/daily-seed';
-import { recordResult } from '@/lib/storage';
-import { getStreak } from '@/lib/storage';
+import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
+
+const GAME_SLUG = 'echo-merge';
 
 const VALUE_STYLES: Record<number, string> = {
   2: 'bg-echo-soft text-echo dark:bg-echo/15 dark:text-echo',
@@ -34,64 +39,49 @@ const ARROWS: { dir: Direction; label: string; key: string }[] = [
   { dir: 'right', label: '→', key: 'ArrowRight' },
 ];
 
-export function EchoMergeBoard({ seed, dateString, puzzleNumber }: { seed: number; dateString: string; puzzleNumber: number }) {
-  const game = GAMES.find((g) => g.slug === 'echo-merge')!;
-  const rngRef = useRef(createRng(seed + 99991)); // separate stream from layout rng, deterministic per day
-  const [state, setState] = useState<EchoMergeState>(() => createInitialState(seed));
-  const [selected, setSelected] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const finishedRef = useRef(false);
-  const [streak, setStreak] = useState(0);
+function ArrowButton({ arrow, onPress, disabled }: { arrow: { dir: Direction; label: string }; onPress: (d: Direction) => void; disabled: boolean }) {
+  return (
+    <button
+      onClick={() => onPress(arrow.dir)}
+      disabled={disabled}
+      className="aspect-square border-2 border-graphite dark:border-white/80 font-display font-bold text-lg disabled:opacity-30 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
+    >
+      {arrow.label}
+    </button>
+  );
+}
 
+function BoardView({
+  state,
+  selected,
+  onTileTap,
+  onMove,
+  disabled,
+}: {
+  state: EchoMergeState;
+  selected: number | null;
+  onTileTap: (i: number) => void;
+  onMove: (d: Direction) => void;
+  disabled: boolean;
+}) {
   const echoTrackIdx = useMemo(() => {
     if (!state.pendingEcho) return -1;
     return state.board.findIndex((t) => t?.id === state.pendingEcho!.trackId);
   }, [state]);
 
-  function move(dir: Direction) {
-    if (selected === null || state.won || state.lost) return;
-    setState((prev) => applyMove(prev, selected, dir, rngRef.current));
-    setSelected(null);
-  }
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      const found = ARROWS.find((a) => a.key === e.key);
-      if (found) {
-        e.preventDefault();
-        move(found.dir);
-      }
-    }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  });
-
-  useEffect(() => {
-    if ((state.won || state.lost) && !finishedRef.current) {
-      finishedRef.current = true;
-      recordResult('echo-merge', {
-        date: dateString,
-        won: state.won,
-        moves: state.movesUsed,
-        score: state.score,
-        elapsedMs: 0,
-      });
-      setStreak(getStreak('echo-merge').current);
-      setShowResult(true);
-    }
-  }, [state.won, state.lost, state.movesUsed, state.score, dateString]);
-
   return (
     <div>
-      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={state.movesUsed} movesLimit={MOVES_LIMIT} />
-
       <div className="stat-line flex justify-between text-ink/50 dark:text-white/40 mb-3">
-        <span>Score: <span className="font-mono text-ink dark:text-white">{state.score}</span></span>
-        <span>Target: <span className="font-mono text-ink dark:text-white">{TARGET_VALUE}</span></span>
+        <span>
+          Score: <span className="font-mono text-ink dark:text-white">{state.score}</span>
+        </span>
+        <span>
+          Target: <span className="font-mono text-ink dark:text-white">{TARGET_VALUE}</span>
+        </span>
       </div>
 
       <div
-        className="grid gap-1.5 mb-5 bg-index/30 dark:bg-index-dark/30 p-1.5 border-2 border-graphite dark:border-white/80"
+        className="grid gap-1.5 mb-4 bg-index/30 dark:bg-index-dark/30 p-1.5 border-2 border-graphite dark:border-white/80"
         style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))` }}
       >
         {state.board.map((tile, idx) => {
@@ -100,8 +90,8 @@ export function EchoMergeBoard({ seed, dateString, puzzleNumber }: { seed: numbe
           return (
             <button
               key={idx}
-              onClick={() => tile && setSelected(isSelected ? null : idx)}
-              disabled={!tile || state.won || state.lost}
+              onClick={() => tile && onTileTap(idx)}
+              disabled={disabled || !tile}
               aria-label={tile ? `Tile ${tile.value}` : 'Empty cell'}
               className={[
                 'relative aspect-square flex items-center justify-center font-mono font-bold text-sm sm:text-base transition-transform',
@@ -110,9 +100,7 @@ export function EchoMergeBoard({ seed, dateString, puzzleNumber }: { seed: numbe
               ].join(' ')}
             >
               {tile?.value}
-              {isEcho && (
-                <span className="absolute top-0.5 right-0.5 text-[10px] leading-none">🔁</span>
-              )}
+              {isEcho && <span className="absolute top-0.5 right-0.5 text-[10px] leading-none">🔁</span>}
             </button>
           );
         })}
@@ -124,21 +112,120 @@ export function EchoMergeBoard({ seed, dateString, puzzleNumber }: { seed: numbe
         </p>
         <div className="grid grid-cols-3 gap-2 w-40">
           <div />
-          <ArrowButton arrow={ARROWS[0]} onPress={move} disabled={selected === null} />
+          <ArrowButton arrow={ARROWS[0]} onPress={onMove} disabled={selected === null} />
           <div />
-          <ArrowButton arrow={ARROWS[1]} onPress={move} disabled={selected === null} />
+          <ArrowButton arrow={ARROWS[1]} onPress={onMove} disabled={selected === null} />
           <div />
-          <ArrowButton arrow={ARROWS[3]} onPress={move} disabled={selected === null} />
+          <ArrowButton arrow={ARROWS[3]} onPress={onMove} disabled={selected === null} />
           <div />
-          <ArrowButton arrow={ARROWS[2]} onPress={move} disabled={selected === null} />
+          <ArrowButton arrow={ARROWS[2]} onPress={onMove} disabled={selected === null} />
           <div />
         </div>
       </div>
+    </div>
+  );
+}
+
+export function EchoMergeBoard({ seed, dateString, puzzleNumber }: { seed: number; dateString: string; puzzleNumber: number }) {
+  const game = GAMES.find((g) => g.slug === GAME_SLUG)!;
+
+  // --- Daily puzzle (unchanged behavior) ---
+  const rngRef = useRef(createRng(seed + 99991));
+  const [state, setState] = useState<EchoMergeState>(() => createInitialState(seed));
+  const [selected, setSelected] = useState<number | null>(null);
+  const [showResult, setShowResult] = useState(false);
+  const finishedRef = useRef(false);
+  const [streak, setStreak] = useState(0);
+
+  const dailyFinished = state.won || state.lost;
+
+  function move(dir: Direction) {
+    if (selected === null || dailyFinished) return;
+    setState((prev) => applyMove(prev, selected, dir, rngRef.current));
+    setSelected(null);
+  }
+
+  // --- Coin Mode ---
+  const coinRngRef = useRef(createRng(1));
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [coinState, setCoinState] = useState<EchoMergeState | null>(null);
+  const [coinSelected, setCoinSelected] = useState<number | null>(null);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const coinRoundSettledRef = useRef(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+
+  function startCoinRound() {
+    const coinSeed = rollCoinSeed();
+    coinRngRef.current = createRng(coinSeed + 99991);
+    coinRoundSettledRef.current = false;
+    setCoinSelected(null);
+    setCoinState(createInitialState(coinSeed));
+  }
+
+  function coinMove(dir: Direction) {
+    if (coinSelected === null || !coinState || coinState.won || coinState.lost) return;
+    setCoinState((prev) => (prev ? applyMove(prev, coinSelected, dir, coinRngRef.current) : prev));
+    setCoinSelected(null);
+  }
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const found = ARROWS.find((a) => a.key === e.key);
+      if (!found) return;
+      e.preventDefault();
+      if (!dailyFinished) move(found.dir);
+      else coinMove(found.dir);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
+  useEffect(() => {
+    if ((state.won || state.lost) && !finishedRef.current) {
+      finishedRef.current = true;
+      recordResult(GAME_SLUG, {
+        date: dateString,
+        won: state.won,
+        moves: state.movesUsed,
+        score: state.score,
+        elapsedMs: 0,
+      });
+      setStreak(getStreak(GAME_SLUG).current);
+      setShowResult(true);
+    }
+  }, [state.won, state.lost, state.movesUsed, state.score, dateString]);
+
+  useEffect(() => {
+    if (!coinState || coinRoundSettledRef.current) return;
+    if (!coinState.won && !coinState.lost) return;
+    coinRoundSettledRef.current = true;
+
+    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.movesUsed, movesLimit: MOVES_LIMIT });
+    setLastCoinDelta(delta);
+    setCoins((prev) => {
+      const next = Math.max(0, prev + delta);
+      saveCoinBalance(next);
+      if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
+      return next;
+    });
+  }, [coinState, nickname]);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+  }
+
+  return (
+    <div>
+      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={state.movesUsed} movesLimit={MOVES_LIMIT} />
+
+      <BoardView state={state} selected={selected} onTileTap={(i) => setSelected((s) => (s === i ? null : i))} onMove={move} disabled={dailyFinished} />
 
       <ResultModal
         open={showResult}
         onClose={() => setShowResult(false)}
-        gameSlug="echo-merge"
+        gameSlug={GAME_SLUG}
         gameName="Echo Merge"
         puzzleNumber={puzzleNumber}
         won={state.won}
@@ -147,18 +234,30 @@ export function EchoMergeBoard({ seed, dateString, puzzleNumber }: { seed: numbe
         score={state.score}
         streak={streak}
       />
-    </div>
-  );
-}
 
-function ArrowButton({ arrow, onPress, disabled }: { arrow: { dir: Direction; label: string }; onPress: (d: Direction) => void; disabled: boolean }) {
-  return (
-    <button
-      onClick={() => onPress(arrow.dir)}
-      disabled={disabled}
-      className="aspect-square border-2 border-graphite dark:border-white/80 font-display font-bold text-lg disabled:opacity-30 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
-    >
-      {arrow.label}
-    </button>
+      <CoinModeSection
+        coins={coins}
+        nickname={nickname}
+        onSaveNickname={handleSaveNickname}
+        roundActive={!!coinState}
+        roundFinished={!!coinState && (coinState.won || coinState.lost)}
+        roundWon={!!coinState?.won}
+        lastDelta={lastCoinDelta}
+        onStart={startCoinRound}
+        onShowLeaderboard={() => setShowLeaderboard(true)}
+      >
+        {coinState && (
+          <BoardView
+            state={coinState}
+            selected={coinSelected}
+            onTileTap={(i) => setCoinSelected((s) => (s === i ? null : i))}
+            onMove={coinMove}
+            disabled={coinState.won || coinState.lost}
+          />
+        )}
+      </CoinModeSection>
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
+    </div>
   );
 }

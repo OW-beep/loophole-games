@@ -50,6 +50,22 @@ export function buildGameJsonLd(game: GameMeta) {
   };
 }
 
+export function buildFaqJsonLd(game: GameMeta) {
+  if (!game.faq || game.faq.length === 0) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: game.faq.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
+    })),
+  };
+}
+
 export function buildBreadcrumbJsonLd(game: GameMeta) {
   return {
     '@context': 'https://schema.org',

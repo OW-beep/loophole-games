@@ -19,9 +19,14 @@ import {
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'playing' | 'won' | 'lost';
+type Mode = 'daily' | 'coin';
 
 export function BooRushBoard({
   seed,
@@ -38,6 +43,8 @@ export function BooRushBoard({
   const lastTsRef = useRef<number>(0);
   const flapRef = useRef(false);
   const statusRef = useRef<Status>('ready');
+  const modeRef = useRef<Mode>('daily');
+  const activeSeedRef = useRef(seed);
 
   const gatesRef = useRef<Gate[]>(createCourse(seed));
   const scrollRef = useRef(0);
@@ -50,8 +57,23 @@ export function BooRushBoard({
   const [showResult, setShowResult] = useState(false);
   const [streak, setStreak] = useState(0);
 
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [dailyDone, setDailyDone] = useState(false);
+  const [coinRoundActive, setCoinRoundActive] = useState(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const nicknameRef = useRef(nickname);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+    nicknameRef.current = name;
+  }
+
   const resetRun = useCallback(() => {
-    gatesRef.current = createCourse(seed);
+    gatesRef.current = createCourse(activeSeedRef.current);
     scrollRef.current = 0;
     bodyRef.current = createInitialBody();
     clearedRef.current = 0;
@@ -61,19 +83,23 @@ export function BooRushBoard({
     setShowResult(false);
     statusRef.current = 'ready';
     setStatus('ready');
-  }, [seed]);
+  }, []);
+
+  const startCoinRound = useCallback(() => {
+    activeSeedRef.current = rollCoinSeed();
+    modeRef.current = 'coin';
+    setCoinRoundActive(true);
+    resetRun();
+  }, [resetRun]);
 
   const startOrFlap = useCallback(() => {
-    if (statusRef.current === 'won' || statusRef.current === 'lost') {
-      resetRun();
-      return;
-    }
+    if (statusRef.current === 'won' || statusRef.current === 'lost') return;
     if (statusRef.current === 'ready') {
       statusRef.current = 'playing';
       setStatus('playing');
     }
     flapRef.current = true;
-  }, [resetRun]);
+  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -104,15 +130,28 @@ export function BooRushBoard({
       statusRef.current = won ? 'won' : 'lost';
       setStatus(statusRef.current);
       setScore(clearedRef.current);
-      recordResult('boo-rush', {
-        date: dateString,
-        won,
-        moves: clearedRef.current,
-        score: clearedRef.current,
-        elapsedMs: 0,
-      });
-      setStreak(getStreak('boo-rush').current);
-      setShowResult(true);
+
+      if (modeRef.current === 'daily') {
+        recordResult('boo-rush', {
+          date: dateString,
+          won,
+          moves: clearedRef.current,
+          score: clearedRef.current,
+          elapsedMs: 0,
+        });
+        setStreak(getStreak('boo-rush').current);
+        setShowResult(true);
+        setDailyDone(true);
+      } else {
+        const delta = computeCoinDelta({ won, movesUsed: clearedRef.current, movesLimit: COURSE_LENGTH });
+        setLastCoinDelta(delta);
+        setCoins((prev) => {
+          const next = Math.max(0, prev + delta);
+          saveCoinBalance(next);
+          if (nicknameRef.current) submitScore(GLOBAL_LEADERBOARD_SLUG, nicknameRef.current, next);
+          return next;
+        });
+      }
     }
 
     function drawRoundedRect(x: number, y: number, w: number, h: number, r: number) {
@@ -265,6 +304,22 @@ export function BooRushBoard({
         score={score}
         streak={streak}
       />
+
+      {dailyDone && (
+        <CoinModeSection
+          coins={coins}
+          nickname={nickname}
+          onSaveNickname={handleSaveNickname}
+          roundActive={coinRoundActive}
+          roundFinished={coinRoundActive && modeRef.current === 'coin' && (status === 'won' || status === 'lost')}
+          roundWon={status === 'won'}
+          lastDelta={lastCoinDelta}
+          onStart={startCoinRound}
+          onShowLeaderboard={() => setShowLeaderboard(true)}
+        />
+      )}
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }

@@ -15,7 +15,11 @@ import {
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const CUBE_COLOR = '#6B8E4E';
 const OFFSET = (GRID_SIZE - 1) / 2;
@@ -42,6 +46,62 @@ function MiniView({ label, grid }: { label: string; grid: ViewGrid }) {
   );
 }
 
+function BlueprintView({ state, onToggle, disabled }: { state: BlueprintState; onToggle: (x: number, y: number, z: number) => void; disabled: boolean }) {
+  const currentViews = computeViews(state.voxels);
+
+  return (
+    <div>
+      <div className="flex justify-center gap-6 mb-5">
+        <MiniView label="TARGET \u2014 TOP" grid={state.targetViews.top} />
+        <MiniView label="TARGET \u2014 FRONT" grid={state.targetViews.front} />
+        <MiniView label="TARGET \u2014 SIDE" grid={state.targetViews.side} />
+      </div>
+
+      <div
+        className="rounded-lg border-2 border-graphite dark:border-white/70 mb-5 mx-auto"
+        style={{ width: '100%', maxWidth: 340, height: 280 }}
+      >
+        <Canvas camera={{ position: [6, 6, 7], fov: 45 }}>
+          <ambientLight intensity={0.75} />
+          <directionalLight position={[6, 10, 6]} intensity={0.9} />
+          {Array.from({ length: GRID_SIZE }).map((_, x) =>
+            Array.from({ length: GRID_SIZE }).map((_, y) =>
+              Array.from({ length: GRID_SIZE }).map((_, z) => {
+                const filled = state.voxels.has(voxelKey({ x, y, z }));
+                return (
+                  <mesh
+                    key={`${x},${y},${z}`}
+                    position={[x - OFFSET, y - OFFSET, z - OFFSET]}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!disabled) onToggle(x, y, z);
+                    }}
+                  >
+                    <boxGeometry args={[filled ? 0.85 : 0.5, filled ? 0.85 : 0.5, filled ? 0.85 : 0.5]} />
+                    <meshStandardMaterial
+                      color={filled ? CUBE_COLOR : '#cfd3d8'}
+                      transparent={!filled}
+                      opacity={filled ? 1 : 0.15}
+                    />
+                    {filled && <Edges color="#12161f" />}
+                  </mesh>
+                );
+              })
+            )
+          )}
+          <OrbitControls enablePan={false} minDistance={4} maxDistance={16} />
+        </Canvas>
+      </div>
+
+      <div className="flex justify-center gap-6">
+        <MiniView label="YOUR \u2014 TOP" grid={currentViews.top} />
+        <MiniView label="YOUR \u2014 FRONT" grid={currentViews.front} />
+        <MiniView label="YOUR \u2014 SIDE" grid={currentViews.side} />
+      </div>
+    </div>
+  );
+}
+
 export function BlueprintBoard({
   seed,
   dateString,
@@ -52,6 +112,8 @@ export function BlueprintBoard({
   puzzleNumber: number;
 }) {
   const game = GAMES.find((g) => g.slug === 'blueprint')!;
+
+  // --- Daily puzzle (unchanged behavior) ---
   const [state, setState] = useState<BlueprintState>(() => createInitialState(seed));
   const [showResult, setShowResult] = useState(false);
   const finishedRef = useRef(false);
@@ -72,10 +134,39 @@ export function BlueprintBoard({
     }
   }, [state.won, state.lost, state.movesUsed, state.targetCubeCount, dateString]);
 
-  const currentViews = computeViews(state.voxels);
+  const dailyFinished = state.won || state.lost;
 
-  function handleToggle(x: number, y: number, z: number) {
-    setState((s) => toggleVoxel(s, { x, y, z }));
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [coinState, setCoinState] = useState<BlueprintState | null>(null);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const coinRoundSettledRef = useRef(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+
+  function startCoinRound() {
+    coinRoundSettledRef.current = false;
+    setCoinState(createInitialState(rollCoinSeed()));
+  }
+
+  useEffect(() => {
+    if (!coinState || coinRoundSettledRef.current) return;
+    if (!coinState.won && !coinState.lost) return;
+    coinRoundSettledRef.current = true;
+
+    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.movesUsed, movesLimit: coinState.moveLimit });
+    setLastCoinDelta(delta);
+    setCoins((prev) => {
+      const next = Math.max(0, prev + delta);
+      saveCoinBalance(next);
+      if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
+      return next;
+    });
+  }, [coinState, nickname]);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
   }
 
   return (
@@ -86,55 +177,13 @@ export function BlueprintBoard({
         Build the shape whose top, front, and side views match the blueprint below
       </p>
 
-      <div className="flex justify-center gap-6 mb-5">
-        <MiniView label="TARGET \u2014 TOP" grid={state.targetViews.top} />
-        <MiniView label="TARGET \u2014 FRONT" grid={state.targetViews.front} />
-        <MiniView label="TARGET \u2014 SIDE" grid={state.targetViews.side} />
-      </div>
+      <BlueprintView
+        state={state}
+        onToggle={(x, y, z) => setState((s) => toggleVoxel(s, { x, y, z }))}
+        disabled={dailyFinished}
+      />
 
-      <div
-        className="rounded-lg border-2 border-graphite dark:border-white/70 mb-5 mx-auto"
-        style={{ width: '100%', maxWidth: 340, height: 300 }}
-      >
-        <Canvas camera={{ position: [6, 6, 7], fov: 45 }}>
-          <ambientLight intensity={0.75} />
-          <directionalLight position={[6, 10, 6]} intensity={0.9} />
-          {Array.from({ length: GRID_SIZE }).map((_, x) =>
-            Array.from({ length: GRID_SIZE }).map((_, y) =>
-              Array.from({ length: GRID_SIZE }).map((_, z) => {
-                const filled = state.voxels.has(voxelKey({ x, y, z }));
-                return (
-                  <mesh
-                    key={`${x},${y},${z}`}
-                    position={[x - OFFSET, y - OFFSET, z - OFFSET]}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggle(x, y, z);
-                    }}
-                  >
-                    <boxGeometry args={[filled ? 0.85 : 0.5, filled ? 0.85 : 0.5, filled ? 0.85 : 0.5]} />
-                    <meshStandardMaterial
-                      color={filled ? CUBE_COLOR : '#cfd3d8'}
-                      transparent={!filled}
-                      opacity={filled ? 1 : 0.15}
-                    />
-                    {filled && <Edges color="#12161f" />}
-                  </mesh>
-                );
-              })
-            )
-          )}
-          <OrbitControls enablePan={false} minDistance={4} maxDistance={16} />
-        </Canvas>
-      </div>
-
-      <div className="flex justify-center gap-6 mb-5">
-        <MiniView label="YOUR \u2014 TOP" grid={currentViews.top} />
-        <MiniView label="YOUR \u2014 FRONT" grid={currentViews.front} />
-        <MiniView label="YOUR \u2014 SIDE" grid={currentViews.side} />
-      </div>
-
-      <p className="stat-line text-center text-ink/40 dark:text-white/30">
+      <p className="stat-line text-center text-ink/40 dark:text-white/30 mt-5">
         Click an empty slot to add a cube, or click a solid cube to remove it. Rotate the view to check every
         angle before placing.
       </p>
@@ -151,6 +200,28 @@ export function BlueprintBoard({
         score={state.targetCubeCount}
         streak={streak}
       />
+
+      <CoinModeSection
+        coins={coins}
+        nickname={nickname}
+        onSaveNickname={handleSaveNickname}
+        roundActive={!!coinState}
+        roundFinished={!!coinState && (coinState.won || coinState.lost)}
+        roundWon={!!coinState?.won}
+        lastDelta={lastCoinDelta}
+        onStart={startCoinRound}
+        onShowLeaderboard={() => setShowLeaderboard(true)}
+      >
+        {coinState && (
+          <BlueprintView
+            state={coinState}
+            onToggle={(x, y, z) => setCoinState((s) => (s ? toggleVoxel(s, { x, y, z }) : s))}
+            disabled={coinState.won || coinState.lost}
+          />
+        )}
+      </CoinModeSection>
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }

@@ -15,50 +15,36 @@ import {
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
+const GAME_SLUG = 'burrow';
 const CHARACTER = '\u{1F994}'; // 🦔 a small burrowing critter
 
-export function BurrowBoard({
-  seed,
-  dateString,
-  puzzleNumber,
-}: {
-  seed: number;
-  dateString: string;
-  puzzleNumber: number;
-}) {
-  const game = GAMES.find((g) => g.slug === 'burrow')!;
-  const [state, setState] = useState<BurrowState>(() => createInitialState(seed));
-  const [showResult, setShowResult] = useState(false);
-  const finishedRef = useRef(false);
-  const [streak, setStreak] = useState(0);
+/** Whether a passage exists between two specific cells in the maze — used
+ * purely for rendering walls, independent of the player's current position. */
+function stepPossible(state: BurrowState, a: Cell, b: Cell): boolean {
+  return state.edges.has(edgeKeyFor(a, b));
+}
 
-  useEffect(() => {
-    if ((state.won || state.lost) && !finishedRef.current) {
-      finishedRef.current = true;
-      recordResult('burrow', {
-        date: dateString,
-        won: state.won,
-        moves: state.movesUsed,
-        score: state.moveLimit,
-        elapsedMs: 0,
-      });
-      setStreak(getStreak('burrow').current);
-      setShowResult(true);
-    }
-  }, [state.won, state.lost, state.movesUsed, state.moveLimit, dateString]);
+function edgeKeyFor(a: Cell, b: Cell): string {
+  const ka = `${a.row},${a.col}`;
+  const kb = `${b.row},${b.col}`;
+  return ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
+}
 
+function MazeView({ state, onStep, disabled }: { state: BurrowState; onStep: (c: Cell) => void; disabled: boolean }) {
   return (
     <div>
-      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={state.movesUsed} movesLimit={state.moveLimit} />
-
       <p className="stat-line text-center text-ink/50 dark:text-white/40 mb-4">
-        {state.hasKey ? 'Key collected \u2014 head for the door' : 'Find the key, then the door'}
+        {state.hasKey ? 'Key collected — head for the door' : 'Find the key, then the door'}
       </p>
 
       <div
-        className="grid mx-auto mb-5 border-2 border-graphite dark:border-white/80"
+        className="grid mx-auto mb-3 border-2 border-graphite dark:border-white/80"
         style={{ gridTemplateColumns: `repeat(${GRID_COLS}, 1fr)`, maxWidth: 320 }}
       >
         {Array.from({ length: GRID_ROWS }).flatMap((_, row) =>
@@ -79,8 +65,8 @@ export function BurrowBoard({
             return (
               <button
                 key={`${row}-${col}`}
-                onClick={() => canMoveHere && setState((s) => stepTo(s, cell))}
-                disabled={!canMoveHere || state.won || state.lost}
+                onClick={() => canMoveHere && onStep(cell)}
+                disabled={disabled || !canMoveHere}
                 className="aspect-square flex items-center justify-center text-lg relative"
                 style={{
                   borderRight: rightWall ? '2px solid #1B1D22' : 'none',
@@ -96,13 +82,85 @@ export function BurrowBoard({
       </div>
 
       <p className="stat-line text-center text-ink/40 dark:text-white/30">
-        Tap an adjacent open cell to move. Avoid the marked hazards {'\u2014'} the correct route never crosses one.
+        Tap an adjacent open cell to move. Avoid the marked hazards — the correct route never crosses one.
       </p>
+    </div>
+  );
+}
+
+export function BurrowBoard({ seed, dateString, puzzleNumber }: { seed: number; dateString: string; puzzleNumber: number }) {
+  const game = GAMES.find((g) => g.slug === GAME_SLUG)!;
+
+  // --- Daily puzzle (unchanged behavior) ---
+  const [state, setState] = useState<BurrowState>(() => createInitialState(seed));
+  const [showResult, setShowResult] = useState(false);
+  const finishedRef = useRef(false);
+  const [streak, setStreak] = useState(0);
+
+  useEffect(() => {
+    if ((state.won || state.lost) && !finishedRef.current) {
+      finishedRef.current = true;
+      recordResult(GAME_SLUG, {
+        date: dateString,
+        won: state.won,
+        moves: state.movesUsed,
+        score: state.moveLimit,
+        elapsedMs: 0,
+      });
+      setStreak(getStreak(GAME_SLUG).current);
+      setShowResult(true);
+    }
+  }, [state.won, state.lost, state.movesUsed, state.moveLimit, dateString]);
+
+  const dailyFinished = state.won || state.lost;
+
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [coinState, setCoinState] = useState<BurrowState | null>(null);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const coinRoundSettledRef = useRef(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+
+  function startCoinRound() {
+    coinRoundSettledRef.current = false;
+    setCoinState(createInitialState(rollCoinSeed()));
+  }
+
+  useEffect(() => {
+    if (!coinState || coinRoundSettledRef.current) return;
+    if (!coinState.won && !coinState.lost) return;
+    coinRoundSettledRef.current = true;
+
+    const delta = computeCoinDelta({
+      won: coinState.won,
+      movesUsed: coinState.movesUsed,
+      movesLimit: coinState.moveLimit,
+    });
+    setLastCoinDelta(delta);
+    setCoins((prev) => {
+      const next = Math.max(0, prev + delta);
+      saveCoinBalance(next);
+      if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
+      return next;
+    });
+  }, [coinState, nickname]);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+  }
+
+  return (
+    <div>
+      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={state.movesUsed} movesLimit={state.moveLimit} />
+
+      <MazeView state={state} onStep={(c) => setState((s) => stepTo(s, c))} disabled={dailyFinished} />
 
       <ResultModal
         open={showResult}
         onClose={() => setShowResult(false)}
-        gameSlug="burrow"
+        gameSlug={GAME_SLUG}
         gameName={game.name}
         puzzleNumber={puzzleNumber}
         won={state.won}
@@ -111,18 +169,28 @@ export function BurrowBoard({
         score={state.moveLimit}
         streak={streak}
       />
+
+      <CoinModeSection
+        coins={coins}
+        nickname={nickname}
+        onSaveNickname={handleSaveNickname}
+        roundActive={!!coinState}
+        roundFinished={!!coinState && (coinState.won || coinState.lost)}
+        roundWon={!!coinState?.won}
+        lastDelta={lastCoinDelta}
+        onStart={startCoinRound}
+        onShowLeaderboard={() => setShowLeaderboard(true)}
+      >
+        {coinState && (
+          <MazeView
+            state={coinState}
+            onStep={(c) => setCoinState((s) => (s ? stepTo(s, c) : s))}
+            disabled={coinState.won || coinState.lost}
+          />
+        )}
+      </CoinModeSection>
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
-}
-
-/** Whether a passage exists between two specific cells in the maze — used
- * purely for rendering walls, independent of the player's current position. */
-function stepPossible(state: BurrowState, a: Cell, b: Cell): boolean {
-  return state.edges.has(edgeKeyFor(a, b));
-}
-
-function edgeKeyFor(a: Cell, b: Cell): string {
-  const ka = `${a.row},${a.col}`;
-  const kb = `${b.row},${b.col}`;
-  return ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
 }

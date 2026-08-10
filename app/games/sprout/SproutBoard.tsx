@@ -12,9 +12,14 @@ import {
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'playing' | 'won' | 'lost';
+type Mode = 'daily' | 'coin';
 
 const CX = 150;
 const CY = 150;
@@ -86,6 +91,8 @@ export function SproutBoard({
   puzzleNumber: number;
 }) {
   const game = GAMES.find((g) => g.slug === 'sprout')!;
+  const modeRef = useRef<Mode>('daily');
+  const activeSeedRef = useRef(seed);
   const stagesRef = useRef<StageConfig[]>(createStages(seed));
   const needleGroupRef = useRef<SVGGElement | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -101,8 +108,23 @@ export function SproutBoard({
   const [showResult, setShowResult] = useState(false);
   const [streak, setStreak] = useState(0);
 
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [dailyDone, setDailyDone] = useState(false);
+  const [coinRoundActive, setCoinRoundActive] = useState(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const nicknameRef = useRef(nickname);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+    nicknameRef.current = name;
+  }
+
   const resetRun = useCallback(() => {
-    stagesRef.current = createStages(seed);
+    stagesRef.current = createStages(activeSeedRef.current);
     stageIndexRef.current = 0;
     missesRef.current = 0;
     finishedRef.current = false;
@@ -111,7 +133,14 @@ export function SproutBoard({
     setShowResult(false);
     statusRef.current = 'ready';
     setStatus('ready');
-  }, [seed]);
+  }, []);
+
+  const startCoinRound = useCallback(() => {
+    activeSeedRef.current = rollCoinSeed();
+    modeRef.current = 'coin';
+    setCoinRoundActive(true);
+    resetRun();
+  }, [resetRun]);
 
   const finish = useCallback(
     (won: boolean) => {
@@ -119,24 +148,34 @@ export function SproutBoard({
       finishedRef.current = true;
       statusRef.current = won ? 'won' : 'lost';
       setStatus(statusRef.current);
-      recordResult('sprout', {
-        date: dateString,
-        won,
-        moves: stageIndexRef.current,
-        score: stageIndexRef.current,
-        elapsedMs: 0,
-      });
-      setStreak(getStreak('sprout').current);
-      setShowResult(true);
+
+      if (modeRef.current === 'daily') {
+        recordResult('sprout', {
+          date: dateString,
+          won,
+          moves: stageIndexRef.current,
+          score: stageIndexRef.current,
+          elapsedMs: 0,
+        });
+        setStreak(getStreak('sprout').current);
+        setShowResult(true);
+        setDailyDone(true);
+      } else {
+        const delta = computeCoinDelta({ won, movesUsed: stageIndexRef.current, movesLimit: STAGE_COUNT });
+        setLastCoinDelta(delta);
+        setCoins((prev) => {
+          const next = Math.max(0, prev + delta);
+          saveCoinBalance(next);
+          if (nicknameRef.current) submitScore(GLOBAL_LEADERBOARD_SLUG, nicknameRef.current, next);
+          return next;
+        });
+      }
     },
     [dateString]
   );
 
   const handleTap = useCallback(() => {
-    if (statusRef.current === 'won' || statusRef.current === 'lost') {
-      resetRun();
-      return;
-    }
+    if (statusRef.current === 'won' || statusRef.current === 'lost') return;
     if (statusRef.current === 'ready') {
       statusRef.current = 'playing';
       setStatus('playing');
@@ -162,7 +201,7 @@ export function SproutBoard({
         finish(false);
       }
     }
-  }, [finish, resetRun]);
+  }, [finish]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -237,6 +276,22 @@ export function SproutBoard({
         score={stageIndex}
         streak={streak}
       />
+
+      {dailyDone && (
+        <CoinModeSection
+          coins={coins}
+          nickname={nickname}
+          onSaveNickname={handleSaveNickname}
+          roundActive={coinRoundActive}
+          roundFinished={coinRoundActive && modeRef.current === 'coin' && (status === 'won' || status === 'lost')}
+          roundWon={status === 'won'}
+          lastDelta={lastCoinDelta}
+          onStart={startCoinRound}
+          onShowLeaderboard={() => setShowLeaderboard(true)}
+        />
+      )}
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }

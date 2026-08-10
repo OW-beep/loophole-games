@@ -20,9 +20,17 @@ export type GameSlug =
   | 'lastlight'
   | 'blueprint'
   | 'bloom'
-  | 'apex';
+  | 'apex'
+  | 'pulse'
+  | 'blip'
+  | 'croak';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards';
+
+export interface GameFaqItem {
+  q: string;
+  a: string;
+}
 
 export interface GameMeta {
   slug: GameSlug;
@@ -37,7 +45,17 @@ export interface GameMeta {
   howToPlay: string[];
   designNotes: string[];
   strategyTips: string[];
+  /** Optional per-game FAQ. Rendered on the game page and emitted as FAQPage structured data when present. */
+  faq?: GameFaqItem[];
 }
+
+export const CATEGORY_LABEL: Record<GameCategory, string> = {
+  puzzle: 'Puzzle',
+  movement: 'Movement',
+  word: 'Word',
+  arcade: 'Arcade',
+  cards: 'Cards',
+};
 
 export const GAMES: GameMeta[] = [
   {
@@ -67,6 +85,24 @@ export const GAMES: GameMeta[] = [
       'Low-value tiles (2s and 4s) make cheap, low-risk echo anchors. Park one where you expect to need a merge next turn, rather than always chasing the highest tile on the board.',
       'A wasted move (a tile that\u2019s already blocked) doesn\u2019t cost you a turn or advance the echo queue, so it\u2019s safe to tap around and scout before committing.',
     ],
+    faq: [
+      {
+        q: 'Does the echo count as one of my moves?',
+        a: 'No. The echo fires automatically and doesn\u2019t use up a move from your counter \u2014 only your own taps do.',
+      },
+      {
+        q: 'What happens if the echoed tile can\u2019t slide in that direction anymore?',
+        a: 'Nothing \u2014 it\u2019s treated the same as a blocked manual move and simply has no effect that turn.',
+      },
+      {
+        q: 'Is Echo Merge the same puzzle for everyone each day?',
+        a: 'Yes. The board is seeded from the date, so every player worldwide gets the exact same starting position and can compare results fairly.',
+      },
+      {
+        q: 'Can I undo a move?',
+        a: 'No. Since the echo is tracking your real decisions, undoing would break the puzzle\u2019s logic \u2014 think a move ahead before you tap.',
+      },
+    ],
   },
   {
     slug: 'mirror-loop',
@@ -93,6 +129,24 @@ export const GAMES: GameMeta[] = [
       "The visible half of each beam \u2014 from the emitter to the first mirror \u2014 tells you whether the first mirror's angle is roughly right. Use that to narrow down which mirrors are definitely wrong before spending a rotation.",
       "A target that's already lit means that entire beam is solved. Don't touch those mirrors, even if you're not sure why they're working.",
       "If you're unsure about a mirror, mentally trace the beam through it: given where the beam arrives and the mirror's current angle, where does the reflection go? Does that direction lead toward the second mirror or away from it?",
+    ],
+    faq: [
+      {
+        q: 'Can I see where a beam goes after it hits the first mirror?',
+        a: 'No — the beam is only visible from the emitter to the first mirror it touches. Everything after that has to be reasoned out, not watched.',
+      },
+      {
+        q: 'How many rotations do I get?',
+        a: 'Exactly as many as there are mirrors currently pointing the wrong way — diagnosing which mirrors actually need changing is part of the puzzle.',
+      },
+      {
+        q: 'Does rotating a mirror that\'s already correct cost me anything?',
+        a: 'Yes — every rotation counts against your limited budget, even one on a mirror that didn\'t need to move, so misdiagnosing a correct mirror is a real cost.',
+      },
+      {
+        q: 'What does it mean when a target circle lights up?',
+        a: 'That beam has reached its matching target and is fully solved — leave those mirrors alone even if you\'re unsure why they\'re working.',
+      },
     ],
   },
   {
@@ -121,6 +175,24 @@ export const GAMES: GameMeta[] = [
       'Watch the countdown number on each gray tile. A debt tile about to mature should usually be your next priority, even over a tempting bigger combo elsewhere.',
       'Once a Bad Tile locks in, it\u2019s permanent for that board — plan your matches around it rather than trying to "save" it after the fact.',
     ],
+    faq: [
+      {
+        q: 'How many debt tiles does a match create?',
+        a: 'Match size minus two. A 3-tile match spawns 1 debt tile, a 4-tile match spawns 2, and so on \u2014 bigger combos leave bigger cleanup jobs.',
+      },
+      {
+        q: 'Can a Bad Tile ever be cleared?',
+        a: 'Yes, but only indirectly \u2014 it\u2019s removed if a match happens in a cell adjacent to it. You can\u2019t match a Bad Tile directly, since it isn\u2019t a color.',
+      },
+      {
+        q: 'Why did my swap not do anything?',
+        a: 'Swaps that wouldn\u2019t create a match of 3 or more bounce back for free \u2014 it doesn\u2019t cost you a move, so it\u2019s safe to test one before committing.',
+      },
+      {
+        q: 'What\u2019s the fastest way to lose?',
+        a: 'Ignoring debt tiles near maturity while chasing big matches elsewhere \u2014 several tiles locking into Bad Tiles at once can shrink your usable board faster than your score climbs.',
+      },
+    ],
   },
   {
     slug: 'gravity-word',
@@ -147,6 +219,24 @@ export const GAMES: GameMeta[] = [
       'Scan for short, common words first (3–4 letters) rather than holding out for a long one — clearing small words faster keeps new letters flowing in, which gives you more shots at bigger words later.',
       'Pay attention to which edge refills after each flip. If you need a specific letter, flipping gravity away from that edge is how you\u2019ll eventually draw a fresh one there.',
       'A flip that clears nothing isn\u2019t wasted — it still reshuffles adjacency, which is often exactly what you need to set up a word on the next flip.',
+    ],
+    faq: [
+      {
+        q: 'Does flipping gravity in a direction with no loose letters waste a flip?',
+        a: 'Yes — if nothing moves, you still lose the flip. Check that at least one letter can slide before committing to a direction.',
+      },
+      {
+        q: 'Can a word clear diagonally?',
+        a: 'No. Only full rows and columns are checked for real words — diagonal runs never clear, no matter what they spell.',
+      },
+      {
+        q: 'What happens to letters that already spell a word before I flip?',
+        a: 'They clear immediately once the board settles after any flip, even if that flip\'s main purpose was something else entirely.',
+      },
+      {
+        q: 'Is today\'s letter set the same for everyone?',
+        a: 'Yes, the starting grid and letter pool are generated from the day\'s seed, so every player is solving the exact same board.',
+      },
     ],
   },
   {
@@ -175,6 +265,24 @@ export const GAMES: GameMeta[] = [
       'Work out roughly what the last one or two cells need to sum to before you commit to your final folds — it\u2019s easy to overshoot the target in the last move.',
       'A strip of length 1 can\u2019t be folded any further, so don\u2019t fold so aggressively that you run out of room to course-correct.',
     ],
+    faq: [
+      {
+        q: 'Can I fold at any point along the strip?',
+        a: 'Yes, tap any gap between two adjacent cells. The shorter side always folds onto the longer side — you can\'t choose which side moves.',
+      },
+      {
+        q: 'What happens if I fold down to one cell before hitting the target?',
+        a: 'That\'s a loss for that attempt — a single cell can\'t be folded any further, so make sure your last one or two folds land exactly on the target sum.',
+      },
+      {
+        q: 'Do negative or zero values ever appear on the strip?',
+        a: 'No, every cell starts as a positive number, so totals only ever grow as folds combine cells.',
+      },
+      {
+        q: 'Is there a way to undo a fold?',
+        a: 'No undo — folding is one-directional, the same way creasing real paper is. Plan a couple of folds ahead before committing.',
+      },
+    ],
   },
   {
     slug: 'carry-chain',
@@ -201,6 +309,24 @@ export const GAMES: GameMeta[] = [
       'Track the running total, not just the tile values — the target is about the whole row\u2019s sum, not any single tile.',
       'Merging near the right edge of the row wastes the carry. If you need every point you can get, merge further left.',
       'Since each merge adds 0 or 1 to the total sum, you can often work backward from the target to figure out roughly how many merges you have left to spend.',
+    ],
+    faq: [
+      {
+        q: 'Does the carry ever wrap around to the start of the row?',
+        a: 'No. A carry only ever bumps the tile immediately to the right of the merge; merging at the rightmost edge simply wastes that carry.',
+      },
+      {
+        q: 'Does merging order matter, or just which tiles I pick?',
+        a: 'Order matters — the same two tiles merged at different positions along the row can land the carry on a different neighbor, changing the final total.',
+      },
+      {
+        q: 'Can I merge the same two tiles more than once?',
+        a: 'Once tiles merge they become a single tile, so you\'re always merging the current board state, not the original tiles.',
+      },
+      {
+        q: 'What happens if I run out of merges before hitting the target?',
+        a: 'That attempt ends without a win — track the running total as you go so you\'re not guessing when the last merge is due.',
+      },
     ],
   },
   {
@@ -229,6 +355,24 @@ export const GAMES: GameMeta[] = [
       'Two heavy crates that neighbor each other are often safer shipped back-to-back than spread apart, before something else erodes their mutual support.',
       'A light crate with no neighbors left is always shippable — sometimes it\u2019s worth a "free" shipment just to keep your count moving while you plan the next heavy one.',
     ],
+    faq: [
+      {
+        q: 'What counts as a crate\'s "neighbors" for the support check?',
+        a: 'Only the orthogonally adjacent crates that are still on the board — diagonal crates never count toward support.',
+      },
+      {
+        q: 'Can a crate become shippable again after being unshippable?',
+        a: 'Yes — shipping other crates changes the board, so a crate that lacked support can become shippable once its neighbors\' situation changes.',
+      },
+      {
+        q: 'Do all ten shipments have to be used?',
+        a: 'No, you win the moment your score hits the target — unused shipments simply go unspent.',
+      },
+      {
+        q: 'Is there always a way to reach the target in ten shipments?',
+        a: 'Yes, each day\'s yard is generated so the target is reachable within the shipment budget, though not every ordering of ships gets you there.',
+      },
+    ],
   },
   {
     slug: 'splice',
@@ -254,6 +398,24 @@ export const GAMES: GameMeta[] = [
       'Scan for the longest stretch where every number in the top strand is already \u2264 8 or every number in the bottom strand is already \u2265 9 — those sections don\u2019t need touching.',
       'A single splice can fix several misplaced numbers at once if you pick the range carefully, rather than splicing one column at a time.',
       'If a splice makes things look worse, it might still be progress — sometimes you have to temporarily group the wrong numbers together before a second splice can separate them cleanly.',
+    ],
+    faq: [
+      {
+        q: 'Can I splice a single column instead of a range?',
+        a: 'Yes, a one-column drag is a valid splice — it just swaps that single column between the two strands.',
+      },
+      {
+        q: 'Does splicing the same range twice do anything?',
+        a: 'It undoes itself — two splices of the identical range return both strands to exactly how they were before, so it\'s a safe way to test an idea.',
+      },
+      {
+        q: 'Do the two strands always have the same length?',
+        a: 'Yes, both strands hold eight values each, for sixteen total, and a splice always swaps equal-length stretches between them.',
+      },
+      {
+        q: 'Is the puzzle always solvable within the splice budget?',
+        a: 'Yes — each board is generated by scrambling a solved strand pair, so reversing that same sequence of splices is always a guaranteed solution.',
+      },
     ],
   },
   {
@@ -282,6 +444,24 @@ export const GAMES: GameMeta[] = [
       'Corner and edge tiles have fewer neighbors, so they accumulate heat faster \u2014 watch them carefully.',
       'A tile surrounded by already-equal neighbors can\u2019t contribute to further equalization \u2014 don\u2019t waste a tap on it.',
     ],
+    faq: [
+      {
+        q: 'Does spreading a tile with 0 heat do anything?',
+        a: 'No — there\'s nothing to divide among its neighbors, so tapping an empty tile wastes a tap without changing the board.',
+      },
+      {
+        q: 'What happens to the remainder when heat doesn\'t divide evenly?',
+        a: 'It stays on the tile you tapped — spreading divides the value among neighbors and rounds down, keeping any leftover in place.',
+      },
+      {
+        q: 'Do corner tiles behave differently from tiles in the middle?',
+        a: 'Corner and edge tiles have fewer neighbors, so their heat concentrates faster when neighbors spread into them — watch them closely as the board fills in.',
+      },
+      {
+        q: 'Can I win with a target value other than what the board started with?',
+        a: 'Yes, the win condition is just that every tile matches every other tile — the shared final value isn\'t fixed in advance.',
+      },
+    ],
   },
   {
     slug: 'signal',
@@ -308,6 +488,24 @@ export const GAMES: GameMeta[] = [
       'Start with all the 0-value cells — they can always be resolved immediately and often unlock their neighbors.',
       'After resolving a cell, check all its neighbors: their required count may now be satisfied.',
       'Corner cells have at most 2 neighbors, edge cells at most 3. A corner cell with value 2 can only be resolved after both its neighbors are resolved — plan that chain early.',
+    ],
+    faq: [
+      {
+        q: 'Can I resolve a cell before its neighbor count is satisfied?',
+        a: 'No — a tap only works when the resolved-neighbor count exactly matches the cell\'s number. Tapping too early simply does nothing.',
+      },
+      {
+        q: 'Do diagonal cells count as neighbors?',
+        a: 'No, only the orthogonal (up/down/left/right) cells count toward a cell\'s required resolved-neighbor total.',
+      },
+      {
+        q: 'Is there ever more than one valid order to resolve the board?',
+        a: 'Often yes — the puzzle only guarantees at least one valid order exists, not that it\'s unique, so different starting points can both work.',
+      },
+      {
+        q: 'What should I resolve first?',
+        a: 'Any cell showing 0 — it needs no resolved neighbors at all, so it\'s always available immediately and usually unlocks cells around it.',
+      },
     ],
   },
   {
@@ -336,6 +534,24 @@ export const GAMES: GameMeta[] = [
       'Corner cells have only 2 neighbors, so their overflows are less powerful. Use them as anchors that you prime but don\u2019t trigger until the right moment.',
       'Work from the outside in: clearing edge cells first opens up more room for inner chains to propagate.',
     ],
+    faq: [
+      {
+        q: 'Does tapping a cell that\'s already empty do anything?',
+        a: 'No, tapping only adds a drop to a cell still on the board — an already-cleared cell has nothing left to interact with.',
+      },
+      {
+        q: 'Can one tap clear the whole board?',
+        a: 'In principle yes, if enough cells are primed right at capacity — a single overflow can cascade through a long chain, which is the game\'s biggest scoring moment.',
+      },
+      {
+        q: 'Do all cells share the same capacity?',
+        a: 'No, each cell has its own capacity shown on the tile, so the same number of drops overflows some cells and not others.',
+      },
+      {
+        q: 'What happens to spilled water that lands on a cell at capacity?',
+        a: 'It triggers that cell\'s overflow too, continuing the chain reaction into its own neighbors.',
+      },
+    ],
   },
   {
     slug: 'polarity',
@@ -362,6 +578,24 @@ export const GAMES: GameMeta[] = [
       'Slide magnets that are already close to their target side first \u2014 they need fewer moves and won\u2019t interfere with the rest of the board.',
       'Use opposite-pole magnets as anchors: sliding into them stops you in a predictable place you can plan around.',
       'If a magnet is blocked by a same-pole neighbor, try clearing the blocker first by sliding it away.',
+    ],
+    faq: [
+      {
+        q: 'What happens if two opposite-pole magnets are already adjacent?',
+        a: 'Nothing — they\'re already stopped against each other, so sliding one further in that direction isn\'t possible until something changes.',
+      },
+      {
+        q: 'Can a magnet pass through empty space indefinitely?',
+        a: 'Yes, a magnet keeps sliding until it hits a wall, gets stopped by an opposite pole, or is blocked by a same pole — open space alone never stops it.',
+      },
+      {
+        q: 'Do I have to use every slide in the budget?',
+        a: 'No, you win the instant every magnet is on its correct side — leftover slides just go unused.',
+      },
+      {
+        q: 'Is the solution always achievable in fewer slides than the budget allows?',
+        a: 'Yes, each board is generated with some slack built into the slide limit, so there\'s usually a bit of room to experiment.',
+      },
     ],
   },
   {
@@ -390,6 +624,24 @@ export const GAMES: GameMeta[] = [
       'Moving back and forth rapidly leaves the ghost oscillating in place, which is useful for holding a toggle switch open while you proceed.',
       'The ghost cannot move off the grid. Use walls to make the ghost stay in a useful position rather than following you into the open.',
     ],
+    faq: [
+      {
+        q: 'Does the ghost appear on my very first move?',
+        a: 'No — the ghost needs a previous step to replay, so it first appears after your second move, echoing your first.',
+      },
+      {
+        q: 'Can the ghost trigger a switch on its own?',
+        a: 'Yes, stepping onto a switch toggles it whether it\'s you or your ghost doing the stepping — that\'s the core of most puzzles.',
+      },
+      {
+        q: 'What happens if the ghost\'s replayed move would go off the grid?',
+        a: 'It simply doesn\'t move that turn — same as if you\'d tried to walk into a wall yourself.',
+      },
+      {
+        q: 'Can I use the ghost to block an enemy or a path on purpose?',
+        a: 'Yes — since the ghost occupies real space, deliberately walking a route that leaves it standing somewhere useful is a core strategy.',
+      },
+    ],
   },
   {
     slug: 'tether',
@@ -417,6 +669,24 @@ export const GAMES: GameMeta[] = [
       'Think about where both characters need to end up, then work backward to find a sequence of moves where the walls do the separating work for you.',
       'The tether length limit is your hardest constraint. When a move would exceed it, treat that as information about the puzzle structure, not just a failure.',
     ],
+    faq: [
+      {
+        q: 'What happens if only one character is blocked by a wall?',
+        a: 'That character stays put while the other keeps moving in the chosen direction — the tether stretches to cover the gap between them.',
+      },
+      {
+        q: 'Can the tether ever snap or break?',
+        a: 'No — if a move would stretch it past its maximum length, neither character moves at all that turn.',
+      },
+      {
+        q: 'Do both characters need to reach their goals on the same move?',
+        a: 'Yes, the puzzle only counts as solved once both characters are simultaneously standing on their respective goal tiles.',
+      },
+      {
+        q: 'Is there a way to move the characters independently?',
+        a: 'No — every tap moves both characters in the same direction at once; walls are the only thing that separates their paths.',
+      },
+    ],
   },
   {
     slug: 'drift',
@@ -442,6 +712,24 @@ export const GAMES: GameMeta[] = [
       'Work backward: where do you need to be on the final slide? What wall or object would stop you there? Is that object in the right place, or do you need to move it first?',
       'Shifting an object is often a two-step process: slide into it to move it, then use a different approach to use it as a stopper.',
       'Every slide commits you to a full traversal of the available space. Short slides are impossible unless there is already something in the way — plan your stoppers before you need them.',
+    ],
+    faq: [
+      {
+        q: 'Can I stop a slide partway through, before hitting a wall or object?',
+        a: 'No — once you commit to a direction, your character slides all the way until something blocks it. There\'s no partial move.',
+      },
+      {
+        q: 'Do shiftable objects move every time I slide into them?',
+        a: 'Yes, one step in the direction you were travelling, every time — which means the same object can be repositioned across several slides.',
+      },
+      {
+        q: 'What happens if a shiftable object is pushed off the edge of the board?',
+        a: 'It can\'t be — boards are generated so a solution exists within the given bounds, though a careless push can still put an object somewhere unhelpful.',
+      },
+      {
+        q: 'Is every daily board guaranteed solvable?',
+        a: 'Yes, each puzzle is built backward from a working solution, so a valid slide sequence always exists within the move budget.',
+      },
     ],
   },
   {
@@ -470,6 +758,24 @@ export const GAMES: GameMeta[] = [
       'Ghost phase falling is only dangerous on floors you do not want to fall through. Use it deliberately to drop to a lower level when that is where you need to go.',
       'Sometimes taking an extra step in the wrong direction is correct — not to make progress, but to flip your phase before the next critical move.',
     ],
+    faq: [
+      {
+        q: 'Can I choose which phase I\'m in?',
+        a: 'No — phase flips automatically after every single step, so the only thing you control is how many steps you take and in which direction.',
+      },
+      {
+        q: 'What happens if I\'m in ghost phase and there\'s no floor beneath me?',
+        a: 'You simply don\'t fall — the drop only happens over a floor tile that\'s actually there. Standing over open space in ghost phase is safe.',
+      },
+      {
+        q: 'Does moving diagonally exist in this game?',
+        a: 'No, every move is one orthogonal step — diagonal movement isn\'t part of the mechanic.',
+      },
+      {
+        q: 'Can I take a wasted step just to flip my phase?',
+        a: 'Yes, and it\'s often correct — sometimes the only way to be solid (or ghost) at the right tile is to spend a move purely on parity, not progress.',
+      },
+    ],
   },
   {
     slug: 'boo-rush',
@@ -496,6 +802,24 @@ export const GAMES: GameMeta[] = [
       'Small, frequent taps hold a steadier altitude than a few big ones \u2014 over-flapping sends you rocketing toward the top of the screen.',
       'Look at the next gate\u2019s gap while you\u2019re still approaching the current one. Reacting to the gate you\u2019re already inside is usually too late.',
       'If you keep crashing on the same gate, try arriving at it slightly lower than feels natural \u2014 it\u2019s easier to tap upward through a gap than to fall into one.',
+    ],
+    faq: [
+      {
+        q: 'Is today\'s course randomized differently for every player?',
+        a: 'No — the gate heights and order come from the day\'s seed, so everyone flies through the exact same course.',
+      },
+      {
+        q: 'What happens if I crash partway through?',
+        a: 'The run ends immediately, and your result shows how many gates you cleared before the crash — there\'s no continuing from where you stopped.',
+      },
+      {
+        q: 'Does holding the tap keep the ghost flapping continuously?',
+        a: 'No, each tap is a single flap. Holding does nothing extra — you need to tap again for another flap.',
+      },
+      {
+        q: 'Is there a way to see the whole course before flying it?',
+        a: 'No, you only see what\'s ahead as you fly — reading each gate as it approaches is the entire skill being tested.',
+      },
     ],
   },
   {
@@ -524,6 +848,24 @@ export const GAMES: GameMeta[] = [
       'Blocks you bounce off (without clearing) don\u2019t move or reset \u2014 you get another free shot at them off the rebound, so a miss isn\u2019t always wasted.',
       'Save your most confident, hardest-pulled shot for whichever block sits in the most awkward spot \u2014 a glancing hit there is the likeliest one to fail.',
     ],
+    faq: [
+      {
+        q: 'Does the pull direction have to point away from the blocks?',
+        a: 'No, you can launch in any direction — pulling back and releasing determines both power and angle, and bounces can bring the blob back toward blocks behind it.',
+      },
+      {
+        q: 'What decides whether a hit breaks a block or just bounces off it?',
+        a: 'Speed at the moment of impact — a fast, committed hit breaks the block; a slow, glancing one just deflects the blob away.',
+      },
+      {
+        q: 'Do I get another shot at a block I bounced off without breaking?',
+        a: 'Yes, bounced blocks stay exactly where they are, so a rebound often lines up a second, easier shot at the same block.',
+      },
+      {
+        q: 'Is the launch budget the same every day?',
+        a: 'The board and launch count are generated from the day\'s seed together, so the budget matches that specific block layout.',
+      },
+    ],
   },
   {
     slug: 'sprout',
@@ -550,6 +892,24 @@ export const GAMES: GameMeta[] = [
       'Watch a full revolution before your first tap if you can \u2014 the dial\u2019s speed doesn\u2019t change mid-stage, so one clean read of the timing carries you through the rest of it.',
       'Later stages move faster with a narrower window; aim slightly early rather than late, since human reaction time tends to land taps a beat behind where you intended.',
       'A miss early in a stage isn\u2019t fatal \u2014 the dial keeps sweeping, so you get another pass at the window on the very next revolution.',
+    ],
+    faq: [
+      {
+        q: 'Does the needle\'s speed change partway through a stage?',
+        a: 'No, speed is fixed for the whole stage — it only increases once you advance to the next stage, so one clean read carries you through it.',
+      },
+      {
+        q: 'How many misses can I afford?',
+        a: 'A small budget, shown on screen — a miss or two won\'t end the run immediately, but running out ends it on the next miss.',
+      },
+      {
+        q: 'Does the target arc\'s position repeat between stages?',
+        a: 'No, it\'s randomized daily per stage, though its width and the dial\'s speed follow a fixed difficulty curve you can rely on.',
+      },
+      {
+        q: 'Is today\'s dial the same for every player?',
+        a: 'Yes, the arc placement and pacing come from the day\'s seed, so everyone is racing the same sequence of windows.',
+      },
     ],
   },
   {
@@ -578,6 +938,24 @@ export const GAMES: GameMeta[] = [
       'The swing speed is constant for the whole run, so timing your tap is about reading the swing\u2019s rhythm once, not reacting dish-by-dish.',
       'If you\u2019ve been landing consistently to one side, deliberately aim slightly the other way on your next drop \u2014 you\u2019re correcting the tower\u2019s drift, not just the current dish.',
     ],
+    faq: [
+      {
+        q: 'Does the swing speed change as the tower gets taller?',
+        a: 'No, the swing stays at a constant speed for the whole run — what gets harder is the shrinking margin for error as the tower\'s effective center drifts.',
+      },
+      {
+        q: 'What happens if a dish is close to center but not exact?',
+        a: 'It still lands and joins the tower, but the tower\'s effective center shifts slightly toward that landing spot, making the next drop\'s tolerance tighter.',
+      },
+      {
+        q: 'Is today\'s menu order the same for everyone?',
+        a: 'Yes, the sequence of dishes is fixed for the day and identical for every player.',
+      },
+      {
+        q: 'Can I retry a single dish after a topple?',
+        a: 'No, a topple ends the run — the whole menu has to be stacked in one continuous attempt to count as a win.',
+      },
+    ],
   },
   {
     slug: 'noodle-cat',
@@ -604,6 +982,24 @@ export const GAMES: GameMeta[] = [
       'A steady rhythm beats short frantic bursts \u2014 tapping speed tends to drop off fast right after a burst, right when you need it to hold.',
       'The time budget shrinks faster than the tap target grows across the run, so treat every later bowl as more urgent than the last, not just "a bit harder."',
       'If a bowl is close to finished when time is running low, keep tapping at the same pace rather than rushing \u2014 mistimed taps don\u2019t count for less, so panic doesn\u2019t cost you anything, but it doesn\u2019t help either.',
+    ],
+    faq: [
+      {
+        q: 'Does the tap target increase for every single bowl?',
+        a: 'Yes, and the time budget shrinks at the same time, so later bowls are harder on both fronts, not just one.',
+      },
+      {
+        q: 'Do mistimed or extra taps count against me?',
+        a: 'No, every tap counts toward the target the same way — there\'s no penalty for tapping fast, only for not tapping enough in time.',
+      },
+      {
+        q: 'Is today\'s sequence of bowls the same for everyone?',
+        a: 'Yes, the tap targets and time limits per bowl come from the day\'s seed, so every player faces an identical run.',
+      },
+      {
+        q: 'What happens if I finish a bowl with time to spare?',
+        a: 'The next bowl starts immediately with its own target and clock — leftover time doesn\'t carry over.',
+      },
     ],
   },
   {
@@ -638,6 +1034,24 @@ export const GAMES: GameMeta[] = [
       'A five-catch streak earns a few drops of a wider catch window \u2014 worth protecting a combo for on its own, not just for the score.',
       'The fall speed and sway both ramp up as the run goes on, so the read-and-react timing that worked on the first few drops will feel rushed by the end \u2014 start tracking each drop earlier than instinct suggests.',
     ],
+    faq: [
+      {
+        q: 'Does catching a burr end the run immediately?',
+        a: 'No, it counts as a miss against your miss budget, same as letting an acorn fall — the run only ends when that budget runs out.',
+      },
+      {
+        q: 'How does a gold acorn help exactly?',
+        a: 'Catching one forgives your next miss — it doesn\'t add score by itself, it banks a bit of margin for the harder drops ahead.',
+      },
+      {
+        q: 'What triggers the wider catch window?',
+        a: 'A streak of catches in a row — hit enough consecutive catches and you earn a few drops with extra forgiveness on positioning.',
+      },
+      {
+        q: 'Does every drop sway the same amount?',
+        a: 'No, sway varies drop to drop and tends to increase later in the run, alongside faster fall speed.',
+      },
+    ],
   },
   {
     slug: 'cloud-hop',
@@ -668,6 +1082,24 @@ export const GAMES: GameMeta[] = [
       'The screen wraps left-to-right, so a cloud sitting near one edge is often easier to reach by drifting off the opposite side than by chasing it directly.',
       'Gaps get closer to the bunny\u2019s absolute maximum jump height later in the run, so a landing that felt like it had room to spare early on won\u2019t necessarily feel that way by the end.',
     ],
+    faq: [
+      {
+        q: 'Is there a jump button?',
+        a: 'No — the bunny bounces automatically on a fixed rhythm. The only input is steering left and right to line up the next landing.',
+      },
+      {
+        q: 'What happens if I go off the side of the screen?',
+        a: 'The bunny wraps around and re-enters from the opposite edge, so the screen behaves like a loop rather than a wall.',
+      },
+      {
+        q: 'How long does a rainbow cloud\'s bonus last?',
+        a: 'Just one bounce — it boosts the very next jump\'s height only, so line up that next landing before you take it.',
+      },
+      {
+        q: 'Is every gap actually reachable?',
+        a: 'Yes, gaps are generated to stay within the bunny\'s maximum jump height, though later gaps use more of that maximum than earlier ones.',
+      },
+    ],
   },
   {
     slug: 'twin-peek',
@@ -695,6 +1127,24 @@ export const GAMES: GameMeta[] = [
       'Use your first several flips to build a mental map of the whole board rather than chasing an immediate match \u2014 attempts spent purely scouting often pay for themselves later.',
       'When you flip a card that doesn\u2019t match anything you\u2019ve seen yet, its position is still useful information \u2014 you now know what it isn\u2019t, even before you know what it is.',
       'Protect a combo once you have one going: on a hot streak, a safer, more certain match is worth more than a risky guess at an uncertain one, since a miss resets the streak entirely.',
+    ],
+    faq: [
+      {
+        q: 'What counts as one attempt?',
+        a: 'Each pair of flips, whether they match or not — flipping just one card and stopping doesn\'t use an attempt.',
+      },
+      {
+        q: 'How many matches in a row trigger the bonus attempts?',
+        a: 'Three consecutive matched pairs without a miss in between earns a couple of extra attempts.',
+      },
+      {
+        q: 'Is the card layout the same for every player each day?',
+        a: 'Yes, the arrangement is shuffled from the day\'s seed, so everyone is memorizing the identical board.',
+      },
+      {
+        q: 'Does a mismatched flip give me any information?',
+        a: 'Yes — even a non-matching flip reveals what that card is, which narrows down future guesses even though the attempt is spent.',
+      },
     ],
   },
   {
@@ -726,6 +1176,24 @@ export const GAMES: GameMeta[] = [
       'A tie still costs you nothing, so when you\u2019re unsure, a safe mid-tier card is often better than gambling your best card on a guess.',
       'Watch how the CPU plays its first couple of rounds \u2014 a strong economic pick early is a good sign you\u2019re facing the Economist personality, and you can plan the rest of the match around that read.',
     ],
+    faq: [
+      {
+        q: 'Where do the statistics come from?',
+        a: 'Sourced, dated figures from places like the World Bank, IMF, FAOSTAT/ICO, UN, and IOC — each round shows its data year so you can verify a surprising result.',
+      },
+      {
+        q: 'Can I play the same card twice in a match?',
+        a: 'No, each of your five cards can only be played once per match, so saving strength for the right question matters.',
+      },
+      {
+        q: 'What happens on a tie?',
+        a: 'Neither side wins the round, and it costs you nothing — a safe way to play a mid-tier card when you\'re unsure.',
+      },
+      {
+        q: 'Does the CPU play the same way every match?',
+        a: 'No, it\'s assigned one of a few personalities per match (Economist, Farmer, Explorer, or Balanced), and reading which one you\'re facing is part of the strategy.',
+      },
+    ],
   },
   {
     slug: 'pigment',
@@ -755,6 +1223,24 @@ export const GAMES: GameMeta[] = [
       'White and black shift lightness without changing hue much \u2014 useful for nudging a close mix without overcorrecting.',
       'If a mix stalls below a high match percentage no matter what you add, clear it (it\u2019s free) and try a completely different starting ratio rather than tapping on top of a bad base.',
       'Budget your taps knowing all three targets share one pool \u2014 a target you nail in three taps banks taps for a trickier one later.',
+    ],
+    faq: [
+      {
+        q: 'Does the order I add ink colors matter?',
+        a: 'No, the well tracks a running average of everything added, so ratio matters but the order you tap colors in doesn\'t change the result.',
+      },
+      {
+        q: 'Does clearing the well cost a tap?',
+        a: 'No, clearing is free — only adding ink to the well counts against your shared tap budget.',
+      },
+      {
+        q: 'Do I need an exact 100% match to bottle a color?',
+        a: 'No, the match meter just needs to be close enough — you don\'t need a pixel-perfect match to lock a target in.',
+      },
+      {
+        q: 'Is the tap budget shared across all three targets?',
+        a: 'Yes, one pool covers all three colors, so an efficient early mix leaves more taps available for a trickier later target.',
+      },
     ],
   },
   {
@@ -786,6 +1272,24 @@ export const GAMES: GameMeta[] = [
       'If two neighboring cells both look plausible, look one step further down each branch rather than guessing \u2014 one of them usually leads toward a dead pocket of cells with no way back out.',
       'Save your guesses for real forks in the path. If there\u2019s only one open neighbor, that\u2019s not a guess \u2014 it\u2019s the only move, so tap it with confidence.',
     ],
+    faq: [
+      {
+        q: 'Does a wrong guess remove any numbers I\'ve already placed?',
+        a: 'No, wrong guesses only cost one of your limited attempts — they never undo or corrupt numbers you\'ve already locked in.',
+      },
+      {
+        q: 'Can the path move diagonally between numbers?',
+        a: 'No, the path only connects orthogonally adjacent cells, one step at a time from 1 through 25.',
+      },
+      {
+        q: 'Are the pre-placed numbers always the same amount each day?',
+        a: 'The count varies, but there are always enough fixed clues to guarantee the path is uniquely deducible from adjacency and cell-counting.',
+      },
+      {
+        q: 'What should I do when two neighboring cells both look valid?',
+        a: 'Look further down each branch before guessing — one usually leads into a pocket of cells with no way back out, which rules it out without spending a guess.',
+      },
+    ],
   },
   {
     slug: 'cairn',
@@ -816,6 +1320,24 @@ export const GAMES: GameMeta[] = [
       'The waste card is only useful once \u2014 if it doesn\u2019t pair with anything currently exposed, drawing past it is often better than holding out for a match that may not come.',
       'Cards that sum to 10 with themselves (two 5s) are easy to overlook \u2014 keep an eye out whenever multiple 5s are exposed at once.',
     ],
+    faq: [
+      {
+        q: 'Can I pair the waste card with a pyramid card at any time?',
+        a: 'Yes, as long as the pyramid card is exposed and the two values sum to 10 — pairing itself never costs a move, only drawing does.',
+      },
+      {
+        q: 'Is every deal guaranteed to be solvable?',
+        a: 'No — like traditional pyramid solitaire, not every deal can be fully cleared, which is part of the genre rather than a flaw.',
+      },
+      {
+        q: 'What exposes a new card in the pyramid?',
+        a: 'Clearing both cards directly below it in the row underneath — a card stays covered until everything resting on it is gone.',
+      },
+      {
+        q: 'Do two exposed 5s count as a valid pair?',
+        a: 'Yes, any two exposed cards summing to 10 pair, including two 5s — easy to miss when several fives are on the board at once.',
+      },
+    ],
   },
   {
     slug: 'decant',
@@ -844,6 +1366,24 @@ export const GAMES: GameMeta[] = [
       'The classic trick behind these puzzles: pouring the smallest jug into the largest, refilling the smallest, and pouring again often isolates an amount you can\u2019t reach directly.',
       'If you\u2019re stuck, try emptying everything and starting from a completely different first move \u2014 the first fill you choose quietly commits you to one branch of the whole solution.',
       'The move limit has slack built in beyond the optimal solution, so a small detour won\u2019t sink you \u2014 but repeating the same fill/empty pair rarely helps.',
+    ],
+    faq: [
+      {
+        q: 'Does the target amount always have to end up in a specific jug?',
+        a: 'No, the target can land in any of the three jugs — you don\'t need to aim for one particular container.',
+      },
+      {
+        q: 'What counts as one move?',
+        a: 'Any single fill, empty, or pour — each one, regardless of how much water it moves, counts the same against your move limit.',
+      },
+      {
+        q: 'Is every day\'s target actually reachable?',
+        a: 'Yes, the target is only chosen after verifying a real shortest path reaches it, and the move limit is set from that path plus some slack.',
+      },
+      {
+        q: 'Can I pour only part of a jug\'s contents into another?',
+        a: 'No, a pour always continues until either the source jug is empty or the destination jug is full — there\'s no partial pour.',
+      },
     ],
   },
   {
@@ -874,6 +1414,24 @@ export const GAMES: GameMeta[] = [
       'A cipher letter that appears doubled in a row (like "LL" or "SS" in English) narrows the possibilities a lot \u2014 not many letters double up that often.',
       'Once you\u2019ve locked in three or four letters, try reading the partially-solved phrase out loud \u2014 your ear will often finish words your eyes are still stuck on.',
     ],
+    faq: [
+      {
+        q: 'Does the game tell me if a single letter guess is right or wrong?',
+        a: 'No — there\'s no letter-by-letter feedback. The only signal is whether the fully reconstructed phrase reads correctly.',
+      },
+      {
+        q: 'What happens if I assign a real letter that\'s already used elsewhere?',
+        a: 'It moves — each real letter can only be assigned to one cipher letter at a time, so reassigning it frees it up from its previous spot.',
+      },
+      {
+        q: 'Are the phrases taken from real books, songs, or quotes?',
+        a: 'No, they\'re original one-line sentences written specifically for the game — nothing quoted from existing published work.',
+      },
+      {
+        q: 'Is the move limit the same for every phrase?',
+        a: 'No, it\'s calculated from how many distinct letters that specific day\'s phrase uses, so shorter or letter-light phrases get a smaller budget.',
+      },
+    ],
   },
   {
     slug: 'clearway',
@@ -902,6 +1460,24 @@ export const GAMES: GameMeta[] = [
       'Vertical vehicles sitting in the marked vehicle\u2019s row are usually the real obstacles \u2014 they just need to slide up or down, not out of the grid entirely.',
       'Before moving a vehicle, check whether the space you\u2019re about to occupy is one you\u2019ll need clear again two moves later \u2014 backtracking costs just as much as any other move.',
       'A vehicle with only one legal direction available isn\u2019t a choice \u2014 make that move first and save your thinking for the vehicles with real options.',
+    ],
+    faq: [
+      {
+        q: 'Can a vehicle move diagonally?',
+        a: 'No, vehicles only slide along their own orientation — horizontal ones sideways, vertical ones up and down.',
+      },
+      {
+        q: 'Does one tap move a vehicle one cell or all the way?',
+        a: 'All the way — a single tap slides it as far as it will legally go in that direction, counted as one move regardless of distance.',
+      },
+      {
+        q: 'Is every daily layout guaranteed solvable?',
+        a: 'Yes, each board is generated by scrambling backward from an already-solved position, so reversing that sequence is always a valid route out.',
+      },
+      {
+        q: 'How do I know which vehicle to move first?',
+        a: 'Work backward from the exit — identify whatever\'s directly blocking the marked vehicle, then whatever\'s blocking that vehicle, rather than moving whatever looks convenient.',
+      },
     ],
   },
   {
@@ -932,6 +1508,24 @@ export const GAMES: GameMeta[] = [
       'Early in the deck, risk is usually lower simply because more safe cards are still mixed in \u2014 it\u2019s often correct to hold longer near the start than near the end.',
       'If you\u2019re close to the target and a bust would end the game, banking a smaller-but-safe run beats chasing a bigger one you might not get to keep.',
     ],
+    faq: [
+      {
+        q: 'Does banking cost a move or a card?',
+        a: 'No, banking is free — only drawing the next card counts against the fixed 20-card deck.',
+      },
+      {
+        q: 'Is the deck actually random, or the same for everyone?',
+        a: 'The day\'s 20-card sequence is fixed and identical for every player — the only variable is when each person chooses to bank.',
+      },
+      {
+        q: 'What happens if I draw a bust card?',
+        a: 'Your current run resets to zero immediately — anything already banked earlier in the day\'s play stays safe, but the active run is lost.',
+      },
+      {
+        q: 'Is holding for a longer streak always better?',
+        a: 'Not necessarily — the bonus for length flattens out, so pushing past 5-6 cards often adds more risk than reward.',
+      },
+    ],
   },
   {
     slug: 'burrow',
@@ -960,6 +1554,24 @@ export const GAMES: GameMeta[] = [
       'Hazard tiles are never on the correct route, so if a path you\u2019re tracing runs through one, that branch is a dead end regardless of anything else.',
       'Head toward the key first no matter how the door looks from where you start \u2014 reaching the door early doesn\u2019t count for anything without it.',
       'If you hit a dead end, backtrack immediately rather than searching further down it \u2014 in a perfect maze, a dead end never quietly connects back around.',
+    ],
+    faq: [
+      {
+        q: 'Are the hazard tiles hidden until I step near them?',
+        a: 'No, every hazard is visible from the very first look at the den — nothing is hidden or revealed gradually.',
+      },
+      {
+        q: 'Can the correct route ever cross a hazard tile?',
+        a: 'No, the guaranteed solution never passes through a marked hazard — if a path you\'re tracing does, that branch is wrong.',
+      },
+      {
+        q: 'Does reaching the door before finding the key count for anything?',
+        a: 'No, the door only counts as reached once you\'re holding the key — get the key first no matter how the door looks from your start.',
+      },
+      {
+        q: 'Is the maze guaranteed to have only one path between any two points?',
+        a: 'Yes, each den is a perfect maze with no loops or shortcuts, so every dead end really is a dead end.',
+      },
     ],
   },
   {
@@ -990,6 +1602,24 @@ export const GAMES: GameMeta[] = [
       'Use your first guess as an estimate, not a real answer \u2014 the higher/lower feedback is far more reliable than eyeballing a hidden structure, so let it guide your second guess.',
       'Once you have a higher/lower result, narrow toward the midpoint of the remaining possible range rather than adjusting by just one or two \u2014 you have a limited number of guesses to work with.',
     ],
+    faq: [
+      {
+        q: 'Does the shape ever include floating, disconnected pieces?',
+        a: 'No, it\'s grown from a single seed cube and always stays one connected structure, never scattered fragments.',
+      },
+      {
+        q: 'What does the higher/lower feedback tell me exactly?',
+        a: 'Only whether your guessed total is above or below the real cube count — not by how much, so treat it as a direction, not a distance.',
+      },
+      {
+        q: 'How many angles should I check before guessing?',
+        a: 'At least three, including straight from above and below — those catch cubes that side rotation alone often misses.',
+      },
+      {
+        q: 'Is there a limit to how much I can zoom or rotate?',
+        a: 'No, you can rotate and zoom freely as many times as you like — only submitting a guess counts against your limited attempts.',
+      },
+    ],
   },
   {
     slug: 'tumble',
@@ -1018,6 +1648,24 @@ export const GAMES: GameMeta[] = [
       'Rotate the camera to look straight down before committing to a roll near any gap \u2014 it\u2019s easy to misjudge which tiles are missing from a low angle.',
       'Rolling parallel to a lying block\u2019s long axis stands it up two tiles further on; rolling perpendicular just shifts it sideways while it stays lying down \u2014 those are very different moves.',
       'If the goal is only reachable while standing, plan your last move specifically to arrive standing \u2014 arriving lying across the goal tile doesn\u2019t win.',
+    ],
+    faq: [
+      {
+        q: 'Does the block always alternate between standing and lying flat?',
+        a: 'Yes, every roll flips it between those two states — there\'s no way to slide it while staying in the same orientation.',
+      },
+      {
+        q: 'Does arriving at the goal tile lying down count as a win?',
+        a: 'No, the block must be standing upright on the goal tile specifically — lying across it, even partially, doesn\'t count.',
+      },
+      {
+        q: 'What happens if part of the block rolls onto a missing tile?',
+        a: 'The run ends immediately, even if only one end of the block goes over a gap.',
+      },
+      {
+        q: 'Is every board guaranteed to have a working route?',
+        a: 'Yes, gaps are only cut into tiles that a pre-solved guaranteed route never touches, so a solution always survives.',
+      },
     ],
   },
   {
@@ -1048,6 +1696,24 @@ export const GAMES: GameMeta[] = [
       'If two tiles are stuck swapping places with each other, that\u2019s a 2-cycle \u2014 one swap resolves both of them at once.',
       'Repeated letters can be swapped with any matching tile, not just their "original" one \u2014 use that flexibility to shortcut a longer chain.',
     ],
+    faq: [
+      {
+        q: 'Does the game tell me if a swap is correct?',
+        a: 'No, there\'s no dictionary check along the way — the puzzle just knows the target word and solves itself automatically once the tiles match it.',
+      },
+      {
+        q: 'How is the move limit calculated?',
+        a: 'From the exact minimum number of swaps mathematically required for that day\'s specific scramble, plus a fixed cushion — not from the word\'s length.',
+      },
+      {
+        q: 'Can I swap two tiles holding the same letter?',
+        a: 'Yes, and it\'s often useful — repeated letters can be swapped with any matching tile, not just their original position, to shortcut a longer chain.',
+      },
+      {
+        q: 'What if two tiles are just swapping places with each other?',
+        a: 'That\'s a 2-cycle — a single swap between them resolves both tiles at once.',
+      },
+    ],
   },
   {
     slug: 'flicker',
@@ -1075,6 +1741,24 @@ export const GAMES: GameMeta[] = [
       'If you press a tile and it makes things look worse, that\u2019s not necessarily wrong \u2014 some tiles genuinely need to get lit again temporarily before a later press clears them for good.',
       'Try to fix each row from top to bottom \u2014 once a row above is solved, avoid touching any tile in it again, since re-pressing it will undo your progress.',
       'If you\u2019re stuck, retrace which tiles you\u2019ve pressed an odd number of times \u2014 in this kind of puzzle, only the parity of each tile\u2019s press count ever matters, not the order.',
+    ],
+    faq: [
+      {
+        q: 'Does pressing the same tile twice do anything?',
+        a: 'No, it flips everything back exactly as it was — the same as never having pressed it, so it\'s a safe way to undo a specific move.',
+      },
+      {
+        q: 'Does the order I press tiles in matter?',
+        a: 'No, pressing the same set of tiles in any order always ends at the same result — only which tiles you\'ve pressed, not when, matters.',
+      },
+      {
+        q: 'Is the move budget based on the actual scramble used to generate the board?',
+        a: 'Yes, each day\'s board is scrambled from a solved all-dark grid, and the move budget matches the exact number of tiles used to scramble it.',
+      },
+      {
+        q: 'What does it mean if pressing a tile makes the board look worse?',
+        a: 'It\'s not necessarily wrong — some tiles genuinely need to get lit again temporarily before a later press clears them for good.',
+      },
     ],
   },
   {
@@ -1105,6 +1789,24 @@ export const GAMES: GameMeta[] = [
       'If you\u2019re unsure of the exact math mid-game, mirroring pile sizes into matching pairs is a reasonable fallback \u2014 equal pairs always XOR to zero.',
       'One mistake doesn\u2019t always cost the whole game \u2014 if the CPU\u2019s response leaves an opening again, the same restore-to-zero idea still applies from wherever you are.',
     ],
+    faq: [
+      {
+        q: 'Does the CPU ever make a mistake?',
+        a: 'No, it always plays the mathematically correct move — there\'s no bluffing or suboptimal play to exploit.',
+      },
+      {
+        q: 'Is the starting position always winnable for the player?',
+        a: 'Yes, if the natural starting arrangement would favor whoever moves second, one pile is adjusted before you see it so you always hold the advantage first.',
+      },
+      {
+        q: 'Can I take tokens from more than one pile in a turn?',
+        a: 'No, each turn you take from exactly one pile, though you can take any number of tokens (at least one) from it.',
+      },
+      {
+        q: 'What\'s the core winning idea if I don\'t know the exact math?',
+        a: 'Try to leave pile sizes that pair up evenly after your move — matching pairs are a reasonable fallback for the XOR-zero strategy.',
+      },
+    ],
   },
   {
     slug: 'blueprint',
@@ -1133,6 +1835,24 @@ export const GAMES: GameMeta[] = [
       'The front and side views then tell you how tall each of those columns needs to be, and where \u2014 cross-reference all three before placing a cube you\u2019re unsure about.',
       'Rotate to check a cube from above and from the side before committing \u2014 a cube that looks necessary from the front sometimes turns out to be covered by a neighboring cube in another view.',
       'If your views already match on two sides but not the third, look specifically for cubes that only affect that mismatched view \u2014 you don\u2019t need to rebuild everything.',
+    ],
+    faq: [
+      {
+        q: 'Is there only one correct shape for each puzzle?',
+        a: 'Not necessarily — any shape that produces the exact same three silhouettes as the target counts as correct, even if it\'s not the one used to generate the puzzle.',
+      },
+      {
+        q: 'How is the move budget decided?',
+        a: 'From the exact cube count of the shape actually used to generate that day\'s three views — building precisely that many cubes is always a guaranteed solution.',
+      },
+      {
+        q: 'Can I remove a cube after placing it?',
+        a: 'Yes, clicking an existing cube removes it, so you can freely adjust your shape as you compare it against the target views.',
+      },
+      {
+        q: 'Does the puzzle tell me which view is wrong if I\'m not matching yet?',
+        a: 'Your own shape\'s three views update live next to the target, so you can compare each angle yourself and see exactly where they differ.',
+      },
     ],
   },
   {
@@ -1163,6 +1883,24 @@ export const GAMES: GameMeta[] = [
       'Corners and edges of the board have fewer neighbors, so chains that start there tend to be smaller \u2014 prioritize expanding into the open middle of the board when you have the choice.',
       'Picks late in the game usually matter more than picks early on, since your territory has more border to work with \u2014 it\u2019s fine to spend an early pick on a merely decent option.',
     ],
+    faq: [
+      {
+        q: 'Does picking a color my territory already is count as a move?',
+        a: 'No, picking the current color does nothing and doesn\'t use up a pick — every tap should move you toward a new absorption.',
+      },
+      {
+        q: 'Can one pick absorb tiles from multiple directions at once?',
+        a: 'Yes, if the chosen color touches your territory\'s border in several separate spots, all of those chains get absorbed in the same pick.',
+      },
+      {
+        q: 'How is the move budget set?',
+        a: 'From an actual working solve of that day\'s specific board — not a flat guess — plus a small cushion, so it always reflects the real board.',
+      },
+      {
+        q: 'Is there a fastest possible solution I should aim for?',
+        a: 'Finding the true mathematical optimum is a famously hard problem in general, so the budget is built from a solid working solve rather than a guaranteed-minimum claim.',
+      },
+    ],
   },
   {
     slug: 'apex',
@@ -1192,9 +1930,185 @@ export const GAMES: GameMeta[] = [
       'Picking "no change" is a real move, not a wasted one, when your current speed is already lined up with where the track goes next.',
       'On a straightaway, building speed early pays off more than braking late costs you \u2014 save your caution for the turns you can actually see coming.',
     ],
+    faq: [
+      {
+        q: 'Does picking "no change" ever make sense?',
+        a: 'Yes, it\'s a real move — when your current speed already lines up with where the track goes next, holding steady is often correct.',
+      },
+      {
+        q: 'What happens if my line briefly leaves the track?',
+        a: 'The run ends immediately, even if only part of the straight-line move crosses off the drivable area.',
+      },
+      {
+        q: 'Do diagonal acceleration choices change both axes at once?',
+        a: 'Yes, a diagonal pick adjusts your speed on both axes simultaneously, which is often the most efficient way to slow down and start turning together.',
+      },
+      {
+        q: 'Is the move budget based on the fastest possible route?',
+        a: 'No, it\'s set from a real solved run with enough room for a sensible line, not necessarily the mathematically fastest one.',
+      },
+    ],
+  },
+  {
+    slug: 'pulse',
+    index: '042',
+    name: 'Pulse',
+    tagline: 'Time it right or don\u2019t bother.',
+    description:
+      'A marker sweeps back and forth across a track. Tap to stop it inside the target zone \u2014 the zone shrinks and the sweep speeds up every round.',
+    color: 'pulse',
+    avgSolveTime: '2 min',
+    difficulty: 'Medium',
+    category: 'arcade',
+    howToPlay: [
+      'A marker slides back and forth across a horizontal track, bouncing between the two ends.',
+      'Tap anywhere on the track (or press space) to stop it \u2014 land it inside the highlighted target zone to score a hit.',
+      'The target zone gets narrower and the marker moves faster with each attempt, so the run gets harder as it goes.',
+      'Land enough hits within your attempt budget to win \u2014 too many misses and the run ends early.',
+    ],
+    designNotes: [
+      'Pulse is the site\u2019s first pure-reflex entry \u2014 no move budget to plan around, just a track, a target, and your sense of timing. It\u2019s built on the same seeded-difficulty idea as every other game here: the zone width and sweep speed for each attempt are generated from the day\u2019s seed, so the exact sequence of hard/easy taps is identical for everyone.',
+      'The difficulty ramp is intentional rather than random noise \u2014 attempt one is genuinely forgiving, and the track tightens smoothly toward attempt eight, so a loss usually means the pace caught up with you rather than an unlucky roll.',
+      'Under the hood, the marker\u2019s position at any instant is pure math (a triangle wave over elapsed time), not a physics simulation \u2014 same philosophy as the rest of the index: plain, deterministic, dependency-free.',
+    ],
+    strategyTips: [
+      'Watch a full sweep before your first tap on a new attempt \u2014 the period changes each round, and half a second of observation is cheap compared to a wasted attempt.',
+      'Aim for the center of the target zone, not the edge \u2014 your reaction time has natural jitter, and a center tap survives that jitter better than a tap timed for the edge.',
+      'The zone shrinks gradually, not suddenly \u2014 if you\u2019re missing early attempts, the problem is timing, not the zone size yet.',
+      'You can afford some misses \u2014 the budget has slack built in, so don\u2019t panic-tap early; a rushed miss costs the same as a late one.',
+    ],
+    faq: [
+      {
+        q: 'How many misses can I afford?',
+        a: 'You need 6 hits out of 8 attempts to win, so you have room for 2 misses \u2014 the run only ends early once a win becomes mathematically impossible.',
+      },
+      {
+        q: 'Does the marker move at a constant speed all game?',
+        a: 'No \u2014 it speeds up gradually from your first attempt to your last, alongside the target zone getting narrower.',
+      },
+      {
+        q: 'Is there a physics engine behind the marker?',
+        a: 'No \u2014 its position is calculated directly from elapsed time with a simple back-and-forth formula, so it\u2019s perfectly consistent every run.',
+      },
+      {
+        q: 'Can I play Pulse more than once a day?',
+        a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh random layout each time.',
+      },
+    ],
+  },
+  {
+    slug: 'blip',
+    index: '043',
+    name: 'Blip',
+    tagline: 'Look first, tap second.',
+    description:
+      'One cell in a 3\u00d73 grid lights up at a time. Tap that exact cell before it fades \u2014 the window gets shorter every round.',
+    color: 'blip',
+    avgSolveTime: '2 min',
+    difficulty: 'Medium',
+    category: 'arcade',
+    howToPlay: [
+      'A 3\u00d73 grid sits in front of you. Each attempt, exactly one cell lights up.',
+      'Tap that lit cell before it fades \u2014 tapping any other cell, or letting it fade untouched, counts as a miss.',
+      'The lit window gets shorter with each attempt, so later rounds demand a faster read of where the light landed.',
+      'Land enough correct taps within your attempt budget to win \u2014 too many misses and the run ends early.',
+    ],
+    designNotes: [
+      'Blip is deliberately a different kind of reflex test than Pulse or Sprout \u2014 those are about timing a single continuous sweep, this is about spatial recognition: seeing where something happened and confirming it, fast, rather than predicting a moving target.',
+      'The grid position for each attempt is drawn from the day\u2019s seed, same as everywhere else on the site, so nobody gets an easier or harder sequence of cells than anyone else on a given day.',
+      'The shrinking window is the only difficulty lever \u2014 there\u2019s no trick placement or decoy cells, on purpose. It keeps the rules learnable in one glance while the challenge still ramps up honestly.',
+    ],
+    strategyTips: [
+      'Keep your eyes on the center of the grid, not one corner \u2014 peripheral vision picks up a flash anywhere on a 3\u00d73 grid faster than waiting to scan corner by corner.',
+      'React to the light, not to where you expect it \u2014 the cell is fully random each attempt, so anticipating a pattern will cost you more misses than it saves.',
+      'A late-but-correct tap beats a fast-but-wrong one \u2014 there\u2019s no bonus for speed within the window, only a penalty for missing it.',
+      'If you\u2019re missing late-game attempts, it\u2019s the shrinking window catching up with you, not bad luck \u2014 the early misses are usually the ones worth reviewing.',
+    ],
+    faq: [
+      {
+        q: 'Is there any pattern to which cell lights up?',
+        a: 'No \u2014 each attempt\u2019s cell is drawn independently from the day\u2019s seed, so there\u2019s nothing to predict, only react to.',
+      },
+      {
+        q: 'Does tapping early (before the cell lights) do anything?',
+        a: 'It registers as a miss on the current attempt, the same as tapping the wrong cell \u2014 wait for the light.',
+      },
+      {
+        q: 'How many misses can I afford?',
+        a: 'You need 6 hits out of 8 attempts to win, so you have room for 2 misses \u2014 the run only ends early once a win becomes mathematically impossible.',
+      },
+      {
+        q: 'Can I play Blip more than once a day?',
+        a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh random layout each time.',
+      },
+    ],
+  },
+  {
+    slug: 'croak',
+    index: '044',
+    name: 'Croak',
+    tagline: 'One frog. One pond. Ten hops.',
+    description:
+      'Hop a little frog across a pond of lily pads to reach the goal pad before you run out of hops. Fireflies along the way are worth a detour \u2014 catching one earns an extra hop.',
+    color: 'croak',
+    avgSolveTime: '2 min',
+    difficulty: 'Easy',
+    category: 'movement',
+    howToPlay: [
+      'A frog sits on a lily pad in a 5\u00d75 pond. Some tiles are open water \u2014 the frog can\u2019t land there.',
+      'Use the arrow pad to hop one tile at a time, up, down, left, or right. Hopping toward open water just fails quietly \u2014 it doesn\u2019t cost a hop.',
+      'Reach the marked goal pad before your hop budget runs out to win.',
+      'A few pads have a firefly sitting on them. Land on one and it\u2019s yours \u2014 each firefly caught adds one extra hop to your budget for the rest of the run.',
+    ],
+    designNotes: [
+      'Croak is the first game on the index built entirely around a character rather than an abstract token \u2014 the little green frog is modeled from plain spheres in Three.js, in keeping with the site\u2019s no-external-assets rule: everything you see is generated geometry, not an imported model.',
+      'The pond layout is carved from the day\u2019s seed the same way Shadow\u2019s walls are: random water tiles are added and the layout is discarded and retried until a breadth-first search confirms the goal is actually reachable, so every seed is guaranteed solvable.',
+      'Fireflies are a pure bonus by design \u2014 they can only ever add hops, never remove them, which means sprinkling them onto a layout can never turn a solvable pond into an unsolvable one. That let us add a genuine risk/reward detour without having to re-verify solvability around it.',
+    ],
+    strategyTips: [
+      'The direct route usually beats detouring for every firefly \u2014 the hop budget already has slack built in, so only detour for a firefly if it\u2019s roughly on your way.',
+      'A failed hop toward open water doesn\u2019t cost you anything, so if you\u2019re unsure whether a tile is a pad, it\u2019s free to just try.',
+      'Plan two hops ahead rather than one \u2014 the pond is small enough that a single wrong turn can cost you a firefly detour you didn\u2019t need.',
+      'If you\u2019re short on hops late in a run, prioritize any remaining firefly that sits directly between you and the goal \u2014 it\u2019s the only kind of detour that\u2019s never a net loss.',
+    ],
+    faq: [
+      {
+        q: 'Does hopping toward open water cost a move?',
+        a: 'No \u2014 the frog just stays put and it doesn\u2019t count against your hop budget. Only hops that actually move the frog are counted.',
+      },
+      {
+        q: 'Can I lose a firefly bonus once I\u2019ve collected it?',
+        a: 'No \u2014 once caught, the extra hop is yours for the rest of that run, whether it\u2019s the daily puzzle or a Coin Mode round.',
+      },
+      {
+        q: 'Is every layout guaranteed to be solvable?',
+        a: 'Yes \u2014 the pond is regenerated until a clear path from the start pad to the goal pad is confirmed to exist before the puzzle is ever shown.',
+      },
+      {
+        q: 'Can I play Croak more than once a day?',
+        a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh random pond each time.',
+      },
+    ],
   },
 ];
 
 export function getGame(slug: string): GameMeta | undefined {
   return GAMES.find((g) => g.slug === slug);
+}
+
+/**
+ * Same-category games first (closest match for "if you liked this, try this"),
+ * padded out with same-difficulty games if the category alone doesn't have enough,
+ * excluding the game itself. Deterministic (no randomness) so it's stable for SSR/SEO.
+ */
+export function getSimilarGames(game: GameMeta, count = 3): GameMeta[] {
+  const others = GAMES.filter((g) => g.slug !== game.slug);
+  const sameCategory = others.filter((g) => g.category === game.category);
+  const sameDifficulty = others.filter(
+    (g) => g.category !== game.category && g.difficulty === game.difficulty
+  );
+  const rest = others.filter(
+    (g) => g.category !== game.category && g.difficulty !== game.difficulty
+  );
+  return [...sameCategory, ...sameDifficulty, ...rest].slice(0, count);
 }

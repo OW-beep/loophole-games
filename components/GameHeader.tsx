@@ -31,9 +31,10 @@ const TEXT_CLASS: Record<string, string> = {
   blueprint: 'text-blueprint',
   bloom: 'text-bloom',
   apex: 'text-apex',
-};
-
-interface GameHeaderProps {
+  pulse: 'text-pulse',
+  blip: 'text-blip',
+  croak: 'text-croak',
+};interface GameHeaderProps {
   game: GameMeta;
   puzzleNumber: number;
   movesUsed: number;

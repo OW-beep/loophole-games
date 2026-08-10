@@ -20,9 +20,14 @@ import {
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'flying' | 'won' | 'lost';
+type Mode = 'daily' | 'coin';
 
 export function BlobbleBoard({
   seed,
@@ -38,6 +43,8 @@ export function BlobbleBoard({
   const rafRef = useRef<number | null>(null);
   const lastTsRef = useRef<number>(0);
   const statusRef = useRef<Status>('ready');
+  const modeRef = useRef<Mode>('daily');
+  const activeSeedRef = useRef(seed);
 
   const blocksRef = useRef<Block[]>(createBlocks(seed));
   const bodyRef = useRef<BlobBody>(createBlobAtAnchor());
@@ -50,11 +57,28 @@ export function BlobbleBoard({
   const [status, setStatus] = useState<Status>('ready');
   const [launchesUsed, setLaunchesUsed] = useState(0);
   const [cleared, setCleared] = useState(0);
+  const [blockCount, setBlockCount] = useState(blocksRef.current.length);
   const [showResult, setShowResult] = useState(false);
   const [streak, setStreak] = useState(0);
 
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [dailyDone, setDailyDone] = useState(false);
+  const [coinRoundActive, setCoinRoundActive] = useState(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const nicknameRef = useRef(nickname);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+    nicknameRef.current = name;
+  }
+
   const resetRun = useCallback(() => {
-    blocksRef.current = createBlocks(seed);
+    blocksRef.current = createBlocks(activeSeedRef.current);
+    setBlockCount(blocksRef.current.length);
     bodyRef.current = createBlobAtAnchor();
     launchesRef.current = 0;
     clearedRef.current = 0;
@@ -65,7 +89,14 @@ export function BlobbleBoard({
     setShowResult(false);
     statusRef.current = 'ready';
     setStatus('ready');
-  }, [seed]);
+  }, []);
+
+  const startCoinRound = useCallback(() => {
+    activeSeedRef.current = rollCoinSeed();
+    modeRef.current = 'coin';
+    setCoinRoundActive(true);
+    resetRun();
+  }, [resetRun]);
 
   const toCanvasPoint = useCallback((clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
@@ -78,15 +109,12 @@ export function BlobbleBoard({
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
-      if (statusRef.current === 'won' || statusRef.current === 'lost') {
-        resetRun();
-        return;
-      }
+      if (statusRef.current === 'won' || statusRef.current === 'lost') return;
       if (statusRef.current !== 'ready') return;
       draggingRef.current = true;
       dragPointRef.current = toCanvasPoint(e.clientX, e.clientY);
     },
-    [resetRun, toCanvasPoint]
+    [toCanvasPoint]
   );
 
   const onPointerMove = useCallback(
@@ -125,15 +153,28 @@ export function BlobbleBoard({
       finishedRef.current = true;
       statusRef.current = won ? 'won' : 'lost';
       setStatus(statusRef.current);
-      recordResult('blobble', {
-        date: dateString,
-        won,
-        moves: launchesRef.current,
-        score: clearedRef.current,
-        elapsedMs: 0,
-      });
-      setStreak(getStreak('blobble').current);
-      setShowResult(true);
+
+      if (modeRef.current === 'daily') {
+        recordResult('blobble', {
+          date: dateString,
+          won,
+          moves: launchesRef.current,
+          score: clearedRef.current,
+          elapsedMs: 0,
+        });
+        setStreak(getStreak('blobble').current);
+        setShowResult(true);
+        setDailyDone(true);
+      } else {
+        const delta = computeCoinDelta({ won, movesUsed: launchesRef.current, movesLimit: LAUNCH_BUDGET });
+        setLastCoinDelta(delta);
+        setCoins((prev) => {
+          const next = Math.max(0, prev + delta);
+          saveCoinBalance(next);
+          if (nicknameRef.current) submitScore(GLOBAL_LEADERBOARD_SLUG, nicknameRef.current, next);
+          return next;
+        });
+      }
     }
 
     function drawRoundedRect(x: number, y: number, w: number, h: number, r: number) {
@@ -262,7 +303,7 @@ export function BlobbleBoard({
       </div>
 
       <div className="stat-line text-ink/50 dark:text-white/40 text-center mb-3">
-        cleared {cleared}/{blocksRef.current.length} blocks · {LAUNCH_BUDGET - launchesUsed} launches left
+        cleared {cleared}/{blockCount} blocks · {LAUNCH_BUDGET - launchesUsed} launches left
       </div>
 
       <ResultModal
@@ -277,6 +318,22 @@ export function BlobbleBoard({
         score={cleared}
         streak={streak}
       />
+
+      {dailyDone && (
+        <CoinModeSection
+          coins={coins}
+          nickname={nickname}
+          onSaveNickname={handleSaveNickname}
+          roundActive={coinRoundActive}
+          roundFinished={coinRoundActive && modeRef.current === 'coin' && (status === 'won' || status === 'lost')}
+          roundWon={status === 'won'}
+          lastDelta={lastCoinDelta}
+          onStart={startCoinRound}
+          onShowLeaderboard={() => setShowLeaderboard(true)}
+        />
+      )}
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }

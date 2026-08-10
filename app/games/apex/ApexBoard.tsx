@@ -14,7 +14,11 @@ import {
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const TRACK_COLOR = '#5C7A8A';
 const OFF_TRACK_COLOR = '#B7D9A0';
@@ -79,6 +83,44 @@ const ARROW_GRID: { label: string; aRow: number; aCol: number }[] = [
   { label: '\u2199', aRow: 1, aCol: -1 }, { label: '\u2193', aRow: 1, aCol: 0 }, { label: '\u2198', aRow: 1, aCol: 1 },
 ];
 
+function ApexView({ state, onMove, disabled }: { state: ApexState; onMove: (aRow: number, aCol: number) => void; disabled: boolean }) {
+  return (
+    <div>
+      <div
+        className="rounded-lg border-2 border-graphite dark:border-white/70 mb-4 mx-auto"
+        style={{ width: '100%', maxWidth: 420, height: 280 }}
+      >
+        <Canvas camera={{ position: [0, 12, 9], fov: 50 }}>
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[6, 10, 4]} intensity={0.9} />
+          <Ground />
+          <Track state={state} />
+          <Trail path={state.path} />
+          <Car position={state.position} />
+          <OrbitControls enablePan={false} minDistance={6} maxDistance={22} />
+        </Canvas>
+      </div>
+
+      <p className="stat-line text-center text-ink/40 dark:text-white/30 mb-3">
+        Speed: {state.velocity.dRow}, {state.velocity.dCol}
+      </p>
+
+      <div className="grid grid-cols-3 gap-2 max-w-[180px] mx-auto">
+        {ARROW_GRID.map(({ label, aRow, aCol }) => (
+          <button
+            key={label}
+            onClick={() => onMove(aRow, aCol)}
+            disabled={disabled}
+            className="aspect-square rounded-lg border-2 border-graphite dark:border-white/70 text-lg disabled:opacity-30"
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ApexBoard({
   seed,
   dateString,
@@ -89,6 +131,8 @@ export function ApexBoard({
   puzzleNumber: number;
 }) {
   const game = GAMES.find((g) => g.slug === 'apex')!;
+
+  // --- Daily puzzle (unchanged behavior) ---
   const [state, setState] = useState<ApexState>(() => createInitialState(seed));
   const [showResult, setShowResult] = useState(false);
   const finishedRef = useRef(false);
@@ -109,6 +153,41 @@ export function ApexBoard({
     }
   }, [state.won, state.lost, state.movesUsed, state.moveLimit, dateString]);
 
+  const dailyFinished = state.won || state.lost;
+
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [coinState, setCoinState] = useState<ApexState | null>(null);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const coinRoundSettledRef = useRef(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+
+  function startCoinRound() {
+    coinRoundSettledRef.current = false;
+    setCoinState(createInitialState(rollCoinSeed()));
+  }
+
+  useEffect(() => {
+    if (!coinState || coinRoundSettledRef.current) return;
+    if (!coinState.won && !coinState.lost) return;
+    coinRoundSettledRef.current = true;
+
+    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.movesUsed, movesLimit: coinState.moveLimit });
+    setLastCoinDelta(delta);
+    setCoins((prev) => {
+      const next = Math.max(0, prev + delta);
+      saveCoinBalance(next);
+      if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
+      return next;
+    });
+  }, [coinState, nickname]);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+  }
+
   return (
     <div>
       <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={state.movesUsed} movesLimit={state.moveLimit} />
@@ -117,39 +196,9 @@ export function ApexBoard({
         Pick an acceleration each turn {'\u2014'} reach the green finish line without leaving the track
       </p>
 
-      <div
-        className="rounded-lg border-2 border-graphite dark:border-white/70 mb-4 mx-auto"
-        style={{ width: '100%', maxWidth: 420, height: 300 }}
-      >
-        <Canvas camera={{ position: [0, 12, 9], fov: 50 }}>
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[6, 10, 4]} intensity={0.9} />
-          <Ground />
-          <Track state={state} />
-          <Trail path={state.path} />
-          <Car position={state.position} />
-          <OrbitControls enablePan={false} minDistance={6} maxDistance={22} />
-        </Canvas>
-      </div>
+      <ApexView state={state} onMove={(aRow, aCol) => setState((s) => attemptMove(s, aRow, aCol))} disabled={dailyFinished} />
 
-      <p className="stat-line text-center text-ink/40 dark:text-white/30 mb-3">
-        Speed: {state.velocity.dRow}, {state.velocity.dCol}
-      </p>
-
-      <div className="grid grid-cols-3 gap-2 max-w-[180px] mx-auto mb-5">
-        {ARROW_GRID.map(({ label, aRow, aCol }) => (
-          <button
-            key={label}
-            onClick={() => setState((s) => attemptMove(s, aRow, aCol))}
-            disabled={state.won || state.lost}
-            className="aspect-square rounded-lg border-2 border-graphite dark:border-white/70 text-lg disabled:opacity-30"
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      <p className="stat-line text-center text-ink/40 dark:text-white/30">
+      <p className="stat-line text-center text-ink/40 dark:text-white/30 mt-5">
         Each pick nudges your speed in that direction, then you move that many tiles in one step. Leaving the
         track ends the run.
       </p>
@@ -166,6 +215,28 @@ export function ApexBoard({
         score={state.moveLimit}
         streak={streak}
       />
+
+      <CoinModeSection
+        coins={coins}
+        nickname={nickname}
+        onSaveNickname={handleSaveNickname}
+        roundActive={!!coinState}
+        roundFinished={!!coinState && (coinState.won || coinState.lost)}
+        roundWon={!!coinState?.won}
+        lastDelta={lastCoinDelta}
+        onStart={startCoinRound}
+        onShowLeaderboard={() => setShowLeaderboard(true)}
+      >
+        {coinState && (
+          <ApexView
+            state={coinState}
+            onMove={(aRow, aCol) => setCoinState((s) => (s ? attemptMove(s, aRow, aCol) : s))}
+            disabled={coinState.won || coinState.lost}
+          />
+        )}
+      </CoinModeSection>
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }

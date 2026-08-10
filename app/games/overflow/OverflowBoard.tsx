@@ -1,68 +1,57 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import {
-  createInitialState, tapCell,
-  GRID_SIZE, TAP_BUDGET, type OverflowState,
-} from '@/lib/games/overflow';
+import { createInitialState, tapCell, GRID_SIZE, TAP_BUDGET, type OverflowState } from '@/lib/games/overflow';
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
-export function OverflowBoard({ seed, dateString, puzzleNumber }: { seed: number; dateString: string; puzzleNumber: number }) {
-  const game = GAMES.find(g => g.slug === 'overflow')!;
-  const [state, setState] = useState<OverflowState>(() => createInitialState(seed));
+const GAME_SLUG = 'overflow';
+
+function GridView({ state, onTap, disabled }: { state: OverflowState; onTap: (i: number) => void; disabled: boolean }) {
   const [toast, setToast] = useState<string | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const finishedRef = useRef(false);
-  const [streak, setStreak] = useState(0);
 
   function handleTap(i: number) {
-    if (state.won || state.lost) return;
-    setState(prev => {
-      const next = tapCell(prev, i);
-      if (next.lastChainSize >= 3) setToast(`Chain ×${next.lastChainSize}!`);
-      return next;
-    });
+    onTap(i);
   }
 
   useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 1200);
-    return () => clearTimeout(t);
-  }, [toast]);
-
-  useEffect(() => {
-    if ((state.won || state.lost) && !finishedRef.current) {
-      finishedRef.current = true;
-      recordResult('overflow', { date: dateString, won: state.won, moves: state.tapsUsed, score: state.score, elapsedMs: 0 });
-      setStreak(getStreak('overflow').current);
-      setShowResult(true);
+    if (state.lastChainSize >= 3) {
+      setToast(`Chain ×${state.lastChainSize}!`);
+      const t = setTimeout(() => setToast(null), 1200);
+      return () => clearTimeout(t);
     }
-  }, [state.won, state.lost, state.tapsUsed, state.score, dateString]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.tapsUsed]);
 
   return (
     <div>
-      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={state.tapsUsed} movesLimit={TAP_BUDGET} />
       <div className="stat-line flex justify-between text-ink/50 dark:text-white/40 mb-3">
-        <span>Score: <span className="font-mono text-lg text-ink dark:text-white">{state.score}</span> / {state.target}</span>
-        <span>Taps left: <span className="font-mono text-ink dark:text-white">{TAP_BUDGET - state.tapsUsed}</span></span>
+        <span>
+          Score: <span className="font-mono text-lg text-ink dark:text-white">{state.score}</span> / {state.target}
+        </span>
+        <span>
+          Taps left: <span className="font-mono text-ink dark:text-white">{TAP_BUDGET - state.tapsUsed}</span>
+        </span>
       </div>
       <div className="relative">
         <div
-          className="grid gap-1 mb-5 bg-index/30 dark:bg-index-dark/30 p-1.5 border-2 border-graphite dark:border-white/80"
+          className="grid gap-1 mb-4 bg-index/30 dark:bg-index-dark/30 p-1.5 border-2 border-graphite dark:border-white/80"
           style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))` }}
         >
           {state.cells.map((cell, i) => {
             if (!cell) return <div key={i} className="aspect-square bg-panel dark:bg-panel-dark" />;
-            const pct = cell.level / cell.capacity;
             const isAlmost = cell.level === cell.capacity - 1;
             return (
               <button
                 key={i}
                 onClick={() => handleTap(i)}
-                disabled={state.won || state.lost}
+                disabled={disabled}
                 className={[
                   'aspect-square flex flex-col items-center justify-center font-mono border-2 transition-colors',
                   isAlmost
@@ -85,13 +74,107 @@ export function OverflowBoard({ seed, dateString, puzzleNumber }: { seed: number
       <p className="stat-line text-ink/50 dark:text-white/40 text-center">
         Tap a cell to add a drop. Pulsing cells are about to overflow.
       </p>
+    </div>
+  );
+}
+
+export function OverflowBoard({ seed, dateString, puzzleNumber }: { seed: number; dateString: string; puzzleNumber: number }) {
+  const game = GAMES.find((g) => g.slug === GAME_SLUG)!;
+
+  // --- Daily puzzle (unchanged behavior) ---
+  const [state, setState] = useState<OverflowState>(() => createInitialState(seed));
+  const [showResult, setShowResult] = useState(false);
+  const finishedRef = useRef(false);
+  const [streak, setStreak] = useState(0);
+
+  function handleTap(i: number) {
+    if (state.won || state.lost) return;
+    setState((prev) => tapCell(prev, i));
+  }
+
+  useEffect(() => {
+    if ((state.won || state.lost) && !finishedRef.current) {
+      finishedRef.current = true;
+      recordResult(GAME_SLUG, { date: dateString, won: state.won, moves: state.tapsUsed, score: state.score, elapsedMs: 0 });
+      setStreak(getStreak(GAME_SLUG).current);
+      setShowResult(true);
+    }
+  }, [state.won, state.lost, state.tapsUsed, state.score, dateString]);
+
+  const dailyFinished = state.won || state.lost;
+
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [coinState, setCoinState] = useState<OverflowState | null>(null);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const coinRoundSettledRef = useRef(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+
+  function startCoinRound() {
+    coinRoundSettledRef.current = false;
+    setCoinState(createInitialState(rollCoinSeed()));
+  }
+
+  function handleCoinTap(i: number) {
+    if (!coinState || coinState.won || coinState.lost) return;
+    setCoinState((prev) => (prev ? tapCell(prev, i) : prev));
+  }
+
+  useEffect(() => {
+    if (!coinState || coinRoundSettledRef.current) return;
+    if (!coinState.won && !coinState.lost) return;
+    coinRoundSettledRef.current = true;
+
+    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.tapsUsed, movesLimit: TAP_BUDGET });
+    setLastCoinDelta(delta);
+    setCoins((prev) => {
+      const next = Math.max(0, prev + delta);
+      saveCoinBalance(next);
+      if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
+      return next;
+    });
+  }, [coinState, nickname]);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+  }
+
+  return (
+    <div>
+      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={state.tapsUsed} movesLimit={TAP_BUDGET} />
+
+      <GridView state={state} onTap={handleTap} disabled={dailyFinished} />
+
       <ResultModal
-        open={showResult} onClose={() => setShowResult(false)}
-        gameSlug="overflow" gameName="Overflow"
-        puzzleNumber={puzzleNumber} won={state.won}
-        moves={state.tapsUsed} movesLimit={TAP_BUDGET}
-        score={state.score} streak={streak}
+        open={showResult}
+        onClose={() => setShowResult(false)}
+        gameSlug={GAME_SLUG}
+        gameName="Overflow"
+        puzzleNumber={puzzleNumber}
+        won={state.won}
+        moves={state.tapsUsed}
+        movesLimit={TAP_BUDGET}
+        score={state.score}
+        streak={streak}
       />
+
+      <CoinModeSection
+        coins={coins}
+        nickname={nickname}
+        onSaveNickname={handleSaveNickname}
+        roundActive={!!coinState}
+        roundFinished={!!coinState && (coinState.won || coinState.lost)}
+        roundWon={!!coinState?.won}
+        lastDelta={lastCoinDelta}
+        onStart={startCoinRound}
+        onShowLeaderboard={() => setShowLeaderboard(true)}
+      >
+        {coinState && <GridView state={coinState} onTap={handleCoinTap} disabled={coinState.won || coinState.lost} />}
+      </CoinModeSection>
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }

@@ -1,14 +1,17 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import {
-  createInitialState, applySlide, getMagnetAt,
-  GRID_SIZE, SLIDE_BUDGET, type PolarityState,
-} from '@/lib/games/polarity';
+import { createInitialState, applySlide, getMagnetAt, GRID_SIZE, SLIDE_BUDGET, type PolarityState } from '@/lib/games/polarity';
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
+
+const GAME_SLUG = 'polarity';
 
 const DIRS: { label: string; dr: number; dc: number; key: string }[] = [
   { label: '↑', dr: -1, dc: 0, key: 'ArrowUp' },
@@ -17,61 +20,45 @@ const DIRS: { label: string; dr: number; dc: number; key: string }[] = [
   { label: '→', dr: 0, dc: 1, key: 'ArrowRight' },
 ];
 
-export function PolarityBoard({ seed, dateString, puzzleNumber }: { seed: number; dateString: string; puzzleNumber: number }) {
-  const game = GAMES.find(g => g.slug === 'polarity')!;
-  const [state, setState] = useState<PolarityState>(() => createInitialState(seed));
-  const [selected, setSelected] = useState<number | null>(null); // magnet index
-  const [showResult, setShowResult] = useState(false);
-  const finishedRef = useRef(false);
-  const [streak, setStreak] = useState(0);
+function DirButton({ d, onPress, disabled }: { d: { label: string; dr: number; dc: number }; onPress: (dr: number, dc: number) => void; disabled: boolean }) {
+  return (
+    <button
+      onClick={() => onPress(d.dr, d.dc)}
+      disabled={disabled}
+      className="aspect-square border-2 border-graphite dark:border-white/80 font-display font-bold text-lg disabled:opacity-30 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
+    >
+      {d.label}
+    </button>
+  );
+}
 
-  function handleCellTap(cellIdx: number) {
-    if (state.won || state.lost) return;
-    const mag = getMagnetAt(state.positions, cellIdx);
-    if (mag === null) { setSelected(null); return; }
-    setSelected(selected === mag ? null : mag);
-  }
-
-  function handleDir(dr: number, dc: number) {
-    if (selected === null || state.won || state.lost) return;
-    setState(prev => applySlide(prev, selected, dr, dc));
-  }
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      const d = DIRS.find(d => d.key === e.key);
-      if (d) { e.preventDefault(); handleDir(d.dr, d.dc); }
-    }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  });
-
-  useEffect(() => {
-    if ((state.won || state.lost) && !finishedRef.current) {
-      finishedRef.current = true;
-      recordResult('polarity', { date: dateString, won: state.won, moves: state.slidesUsed, score: 0, elapsedMs: 0 });
-      setStreak(getStreak('polarity').current);
-      setShowResult(true);
-    }
-  }, [state.won, state.lost, state.slidesUsed, dateString]);
-
-  const HALF = GRID_SIZE / 2;
-
+function PolarityView({
+  state,
+  selected,
+  onCellTap,
+  onDir,
+  disabled,
+}: {
+  state: PolarityState;
+  selected: number | null;
+  onCellTap: (cellIdx: number) => void;
+  onDir: (dr: number, dc: number) => void;
+  disabled: boolean;
+}) {
   return (
     <div>
-      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={state.slidesUsed} movesLimit={SLIDE_BUDGET} />
       <div className="stat-line flex gap-4 text-ink/50 dark:text-white/40 mb-3">
-        <span>Goal: <span className="text-polarity font-bold">+</span> left · <span className="font-bold" style={{color:'#C23B8E'}}>−</span> right</span>
-        <span>Slides left: <span className="font-mono text-ink dark:text-white">{SLIDE_BUDGET - state.slidesUsed}</span></span>
+        <span>
+          Goal: <span className="text-polarity font-bold">+</span> left · <span className="font-bold" style={{ color: '#C23B8E' }}>−</span> right
+        </span>
+        <span>
+          Slides left: <span className="font-mono text-ink dark:text-white">{SLIDE_BUDGET - state.slidesUsed}</span>
+        </span>
       </div>
 
-      {/* Grid with half-markers */}
-      <div className="border-2 border-graphite dark:border-white/80 mb-5 relative overflow-hidden">
+      <div className="border-2 border-graphite dark:border-white/80 mb-4 relative overflow-hidden">
         <div className="absolute top-0 bottom-0 left-1/2 border-l-2 border-dashed border-graphite/30 dark:border-white/20 pointer-events-none" />
-        <div
-          className="grid gap-1 bg-index/30 dark:bg-index-dark/30 p-1.5"
-          style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))` }}
-        >
+        <div className="grid gap-1 bg-index/30 dark:bg-index-dark/30 p-1.5" style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))` }}>
           {Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, cellIdx) => {
             const mag = getMagnetAt(state.positions, cellIdx);
             const isSelected = mag !== null && mag === selected;
@@ -79,8 +66,8 @@ export function PolarityBoard({ seed, dateString, puzzleNumber }: { seed: number
             return (
               <button
                 key={cellIdx}
-                onClick={() => handleCellTap(cellIdx)}
-                disabled={state.won || state.lost}
+                onClick={() => onCellTap(cellIdx)}
+                disabled={disabled}
                 className={[
                   'aspect-square flex items-center justify-center font-mono font-bold text-xl border-2 transition-colors',
                   mag !== null
@@ -107,36 +94,159 @@ export function PolarityBoard({ seed, dateString, puzzleNumber }: { seed: number
         </p>
         <div className="grid grid-cols-3 gap-2 w-36">
           <div />
-          <DirButton d={DIRS[0]} onPress={handleDir} disabled={selected === null} />
+          <DirButton d={DIRS[0]} onPress={onDir} disabled={selected === null} />
           <div />
-          <DirButton d={DIRS[1]} onPress={handleDir} disabled={selected === null} />
+          <DirButton d={DIRS[1]} onPress={onDir} disabled={selected === null} />
           <div />
-          <DirButton d={DIRS[3]} onPress={handleDir} disabled={selected === null} />
+          <DirButton d={DIRS[3]} onPress={onDir} disabled={selected === null} />
           <div />
-          <DirButton d={DIRS[2]} onPress={handleDir} disabled={selected === null} />
+          <DirButton d={DIRS[2]} onPress={onDir} disabled={selected === null} />
           <div />
         </div>
       </div>
-
-      <ResultModal
-        open={showResult} onClose={() => setShowResult(false)}
-        gameSlug="polarity" gameName="Polarity"
-        puzzleNumber={puzzleNumber} won={state.won}
-        moves={state.slidesUsed} movesLimit={SLIDE_BUDGET}
-        streak={streak}
-      />
     </div>
   );
 }
 
-function DirButton({ d, onPress, disabled }: { d: { label: string; dr: number; dc: number }; onPress: (dr: number, dc: number) => void; disabled: boolean }) {
+export function PolarityBoard({ seed, dateString, puzzleNumber }: { seed: number; dateString: string; puzzleNumber: number }) {
+  const game = GAMES.find((g) => g.slug === GAME_SLUG)!;
+
+  // --- Daily puzzle (unchanged behavior) ---
+  const [state, setState] = useState<PolarityState>(() => createInitialState(seed));
+  const [selected, setSelected] = useState<number | null>(null);
+  const [showResult, setShowResult] = useState(false);
+  const finishedRef = useRef(false);
+  const [streak, setStreak] = useState(0);
+
+  const dailyFinished = state.won || state.lost;
+
+  function handleCellTap(cellIdx: number) {
+    if (dailyFinished) return;
+    const mag = getMagnetAt(state.positions, cellIdx);
+    if (mag === null) {
+      setSelected(null);
+      return;
+    }
+    setSelected((s) => (s === mag ? null : mag));
+  }
+
+  function handleDir(dr: number, dc: number) {
+    if (selected === null || dailyFinished) return;
+    setState((prev) => applySlide(prev, selected, dr, dc));
+  }
+
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [coinState, setCoinState] = useState<PolarityState | null>(null);
+  const [coinSelected, setCoinSelected] = useState<number | null>(null);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const coinRoundSettledRef = useRef(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+
+  function startCoinRound() {
+    coinRoundSettledRef.current = false;
+    setCoinSelected(null);
+    setCoinState(createInitialState(rollCoinSeed()));
+  }
+
+  function handleCoinCellTap(cellIdx: number) {
+    if (!coinState || coinState.won || coinState.lost) return;
+    const mag = getMagnetAt(coinState.positions, cellIdx);
+    if (mag === null) {
+      setCoinSelected(null);
+      return;
+    }
+    setCoinSelected((s) => (s === mag ? null : mag));
+  }
+
+  function handleCoinDir(dr: number, dc: number) {
+    if (coinSelected === null || !coinState || coinState.won || coinState.lost) return;
+    setCoinState((prev) => (prev ? applySlide(prev, coinSelected, dr, dc) : prev));
+  }
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const d = DIRS.find((d) => d.key === e.key);
+      if (!d) return;
+      e.preventDefault();
+      if (!dailyFinished) handleDir(d.dr, d.dc);
+      else handleCoinDir(d.dr, d.dc);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
+  useEffect(() => {
+    if ((state.won || state.lost) && !finishedRef.current) {
+      finishedRef.current = true;
+      recordResult(GAME_SLUG, { date: dateString, won: state.won, moves: state.slidesUsed, score: 0, elapsedMs: 0 });
+      setStreak(getStreak(GAME_SLUG).current);
+      setShowResult(true);
+    }
+  }, [state.won, state.lost, state.slidesUsed, dateString]);
+
+  useEffect(() => {
+    if (!coinState || coinRoundSettledRef.current) return;
+    if (!coinState.won && !coinState.lost) return;
+    coinRoundSettledRef.current = true;
+
+    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.slidesUsed, movesLimit: SLIDE_BUDGET });
+    setLastCoinDelta(delta);
+    setCoins((prev) => {
+      const next = Math.max(0, prev + delta);
+      saveCoinBalance(next);
+      if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
+      return next;
+    });
+  }, [coinState, nickname]);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+  }
+
   return (
-    <button
-      onClick={() => onPress(d.dr, d.dc)}
-      disabled={disabled}
-      className="aspect-square border-2 border-graphite dark:border-white/80 font-display font-bold text-lg disabled:opacity-30 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
-    >
-      {d.label}
-    </button>
+    <div>
+      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={state.slidesUsed} movesLimit={SLIDE_BUDGET} />
+
+      <PolarityView state={state} selected={selected} onCellTap={handleCellTap} onDir={handleDir} disabled={dailyFinished} />
+
+      <ResultModal
+        open={showResult}
+        onClose={() => setShowResult(false)}
+        gameSlug={GAME_SLUG}
+        gameName="Polarity"
+        puzzleNumber={puzzleNumber}
+        won={state.won}
+        moves={state.slidesUsed}
+        movesLimit={SLIDE_BUDGET}
+        streak={streak}
+      />
+
+      <CoinModeSection
+        coins={coins}
+        nickname={nickname}
+        onSaveNickname={handleSaveNickname}
+        roundActive={!!coinState}
+        roundFinished={!!coinState && (coinState.won || coinState.lost)}
+        roundWon={!!coinState?.won}
+        lastDelta={lastCoinDelta}
+        onStart={startCoinRound}
+        onShowLeaderboard={() => setShowLeaderboard(true)}
+      >
+        {coinState && (
+          <PolarityView
+            state={coinState}
+            selected={coinSelected}
+            onCellTap={handleCoinCellTap}
+            onDir={handleCoinDir}
+            disabled={coinState.won || coinState.lost}
+          />
+        )}
+      </CoinModeSection>
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
+    </div>
   );
 }

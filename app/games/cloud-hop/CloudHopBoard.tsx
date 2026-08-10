@@ -22,9 +22,14 @@ import {
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'playing' | 'won' | 'lost';
+type Mode = 'daily' | 'coin';
 
 const TOTAL_CLIMBS = CLOUD_COUNT - 1;
 
@@ -43,6 +48,8 @@ export function CloudHopBoard({
   const lastTsRef = useRef<number>(0);
   const statusRef = useRef<Status>('ready');
   const finishedRef = useRef(false);
+  const modeRef = useRef<Mode>('daily');
+  const activeSeedRef = useRef(seed);
 
   const cloudsRef = useRef<Cloud[]>(createClouds(seed));
   const indexRef = useRef(1);
@@ -64,8 +71,23 @@ export function CloudHopBoard({
   const [showResult, setShowResult] = useState(false);
   const [streak, setStreak] = useState(0);
 
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [dailyDone, setDailyDone] = useState(false);
+  const [coinRoundActive, setCoinRoundActive] = useState(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const nicknameRef = useRef(nickname);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+    nicknameRef.current = name;
+  }
+
   const resetRun = useCallback(() => {
-    cloudsRef.current = createClouds(seed);
+    cloudsRef.current = createClouds(activeSeedRef.current);
     indexRef.current = 1;
     climbedRef.current = 0;
     heightRef.current = 0;
@@ -80,19 +102,23 @@ export function CloudHopBoard({
     setShowResult(false);
     statusRef.current = 'ready';
     setStatus('ready');
-  }, [seed]);
+  }, []);
+
+  const startCoinRound = useCallback(() => {
+    activeSeedRef.current = rollCoinSeed();
+    modeRef.current = 'coin';
+    setCoinRoundActive(true);
+    resetRun();
+  }, [resetRun]);
 
   const startIfReady = useCallback(() => {
-    if (statusRef.current === 'won' || statusRef.current === 'lost') {
-      resetRun();
-      return;
-    }
+    if (statusRef.current === 'won' || statusRef.current === 'lost') return;
     if (statusRef.current === 'ready') {
       statusRef.current = 'playing';
       setStatus('playing');
       vyRef.current = BOUNCE_VELOCITY;
     }
-  }, [resetRun]);
+  }, []);
 
   const toCanvasX = useCallback((clientX: number) => {
     const canvas = canvasRef.current;
@@ -167,15 +193,28 @@ export function CloudHopBoard({
       finishedRef.current = true;
       statusRef.current = won ? 'won' : 'lost';
       setStatus(statusRef.current);
-      recordResult('cloud-hop', {
-        date: dateString,
-        won,
-        moves: climbedRef.current,
-        score: climbedRef.current,
-        elapsedMs: 0,
-      });
-      setStreak(getStreak('cloud-hop').current);
-      setShowResult(true);
+
+      if (modeRef.current === 'daily') {
+        recordResult('cloud-hop', {
+          date: dateString,
+          won,
+          moves: climbedRef.current,
+          score: climbedRef.current,
+          elapsedMs: 0,
+        });
+        setStreak(getStreak('cloud-hop').current);
+        setShowResult(true);
+        setDailyDone(true);
+      } else {
+        const delta = computeCoinDelta({ won, movesUsed: climbedRef.current, movesLimit: TOTAL_CLIMBS });
+        setLastCoinDelta(delta);
+        setCoins((prev) => {
+          const next = Math.max(0, prev + delta);
+          saveCoinBalance(next);
+          if (nicknameRef.current) submitScore(GLOBAL_LEADERBOARD_SLUG, nicknameRef.current, next);
+          return next;
+        });
+      }
     }
 
     function drawCloud(x: number, y: number, cloud: Cloud) {
@@ -376,6 +415,22 @@ export function CloudHopBoard({
         score={climbed}
         streak={streak}
       />
+
+      {dailyDone && (
+        <CoinModeSection
+          coins={coins}
+          nickname={nickname}
+          onSaveNickname={handleSaveNickname}
+          roundActive={coinRoundActive}
+          roundFinished={coinRoundActive && modeRef.current === 'coin' && (status === 'won' || status === 'lost')}
+          roundWon={status === 'won'}
+          lastDelta={lastCoinDelta}
+          onStart={startCoinRound}
+          onShowLeaderboard={() => setShowLeaderboard(true)}
+        />
+      )}
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }

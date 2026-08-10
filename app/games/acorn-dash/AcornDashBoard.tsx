@@ -25,9 +25,14 @@ import {
 import { recordResult, getStreak } from '@/lib/storage';
 import { GameHeader } from '@/components/GameHeader';
 import { ResultModal } from '@/components/ResultModal';
+import { CoinLeaderboard } from '@/components/CoinLeaderboard';
+import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
+import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'playing' | 'won' | 'lost';
+type Mode = 'daily' | 'coin';
 
 const RESPAWN_PAUSE_MS = 200;
 
@@ -46,6 +51,8 @@ export function AcornDashBoard({
   const lastTsRef = useRef<number>(0);
   const statusRef = useRef<Status>('ready');
   const finishedRef = useRef(false);
+  const modeRef = useRef<Mode>('daily');
+  const activeSeedRef = useRef(seed);
 
   const harvestRef = useRef<DropItem[]>(createHarvest(seed));
   const totalAcornsRef = useRef<number>(countAcorns(harvestRef.current));
@@ -69,12 +76,29 @@ export function AcornDashBoard({
   const [misses, setMisses] = useState(0);
   const [combo, setCombo] = useState(0);
   const [focused, setFocused] = useState(false);
+  const [totalAcorns, setTotalAcorns] = useState(totalAcornsRef.current);
   const [showResult, setShowResult] = useState(false);
   const [streak, setStreak] = useState(0);
 
+  // --- Coin Mode ---
+  const [coins, setCoins] = useState<number>(() => loadCoinBalance());
+  const [dailyDone, setDailyDone] = useState(false);
+  const [coinRoundActive, setCoinRoundActive] = useState(false);
+  const [lastCoinDelta, setLastCoinDelta] = useState(0);
+  const [nickname, setNicknameState] = useState<string>(() => getNickname());
+  const nicknameRef = useRef(nickname);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  function handleSaveNickname(name: string) {
+    saveNickname(name);
+    setNicknameState(name);
+    nicknameRef.current = name;
+  }
+
   const resetRun = useCallback(() => {
-    harvestRef.current = createHarvest(seed);
+    harvestRef.current = createHarvest(activeSeedRef.current);
     totalAcornsRef.current = countAcorns(harvestRef.current);
+    setTotalAcorns(totalAcornsRef.current);
     indexRef.current = 0;
     itemYRef.current = SPAWN_Y;
     itemElapsedRef.current = 0;
@@ -93,18 +117,25 @@ export function AcornDashBoard({
     setShowResult(false);
     statusRef.current = 'ready';
     setStatus('ready');
-  }, [seed]);
+  }, []);
+
+  const startCoinRound = useCallback(() => {
+    activeSeedRef.current = rollCoinSeed();
+    modeRef.current = 'coin';
+    setCoinRoundActive(true);
+    resetRun();
+  }, [resetRun]);
 
   const startIfReady = useCallback(() => {
-    if (statusRef.current === 'won' || statusRef.current === 'lost') {
-      resetRun();
-      return;
-    }
+    // Once a run has ended, only the explicit "Play again for Coins" button
+    // starts a new one — a stray tap/drag shouldn't silently replay today's
+    // puzzle (or a Coin Mode round already scored).
+    if (statusRef.current === 'won' || statusRef.current === 'lost') return;
     if (statusRef.current === 'ready') {
       statusRef.current = 'playing';
       setStatus('playing');
     }
-  }, [resetRun]);
+  }, []);
 
   const toCanvasX = useCallback((clientX: number) => {
     const canvas = canvasRef.current;
@@ -181,15 +212,28 @@ export function AcornDashBoard({
       finishedRef.current = true;
       statusRef.current = won ? 'won' : 'lost';
       setStatus(statusRef.current);
-      recordResult('acorn-dash', {
-        date: dateString,
-        won,
-        moves: caughtRef.current,
-        score: caughtRef.current,
-        elapsedMs: 0,
-      });
-      setStreak(getStreak('acorn-dash').current);
-      setShowResult(true);
+
+      if (modeRef.current === 'daily') {
+        recordResult('acorn-dash', {
+          date: dateString,
+          won,
+          moves: caughtRef.current,
+          score: caughtRef.current,
+          elapsedMs: 0,
+        });
+        setStreak(getStreak('acorn-dash').current);
+        setShowResult(true);
+        setDailyDone(true);
+      } else {
+        const delta = computeCoinDelta({ won, movesUsed: missesRef.current, movesLimit: MISS_BUDGET + 1 });
+        setLastCoinDelta(delta);
+        setCoins((prev) => {
+          const next = Math.max(0, prev + delta);
+          saveCoinBalance(next);
+          if (nicknameRef.current) submitScore(GLOBAL_LEADERBOARD_SLUG, nicknameRef.current, next);
+          return next;
+        });
+      }
     }
 
     function drawAcorn(x: number, y: number, golden: boolean) {
@@ -416,7 +460,7 @@ export function AcornDashBoard({
         game={game}
         puzzleNumber={puzzleNumber}
         movesUsed={caught}
-        movesLimit={totalAcornsRef.current}
+        movesLimit={totalAcorns}
       />
 
       <div
@@ -446,7 +490,7 @@ export function AcornDashBoard({
       </div>
 
       <div className="stat-line text-ink/50 dark:text-white/40 text-center mb-3">
-        drag / arrow keys to move · caught {caught}/{totalAcornsRef.current} · misses {misses}/{MISS_BUDGET}
+        drag / arrow keys to move · caught {caught}/{totalAcorns} · misses {misses}/{MISS_BUDGET}
         {combo >= 3 ? ` · combo \u00d7${combo}` : ''}
       </div>
       <div className="stat-line text-ink/40 dark:text-white/30 text-center mb-3">
@@ -462,10 +506,26 @@ export function AcornDashBoard({
         puzzleNumber={puzzleNumber}
         won={status === 'won'}
         moves={caught}
-        movesLimit={totalAcornsRef.current}
+        movesLimit={totalAcorns}
         score={caught}
         streak={streak}
       />
+
+      {dailyDone && (
+        <CoinModeSection
+          coins={coins}
+          nickname={nickname}
+          onSaveNickname={handleSaveNickname}
+          roundActive={coinRoundActive}
+          roundFinished={coinRoundActive && modeRef.current === 'coin' && (status === 'won' || status === 'lost')}
+          roundWon={status === 'won'}
+          lastDelta={lastCoinDelta}
+          onStart={startCoinRound}
+          onShowLeaderboard={() => setShowLeaderboard(true)}
+        />
+      )}
+
+      {showLeaderboard && <CoinLeaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }
