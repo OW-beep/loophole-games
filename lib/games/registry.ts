@@ -23,7 +23,9 @@ export type GameSlug =
   | 'apex'
   | 'pulse'
   | 'blip'
-  | 'croak';
+  | 'croak'
+  | 'bounce'
+  | 'wiggle';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards';
 
@@ -2087,6 +2089,100 @@ export const GAMES: GameMeta[] = [
       {
         q: 'Can I play Croak more than once a day?',
         a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh random pond each time.',
+      },
+    ],
+  },
+  {
+    slug: 'bounce',
+    index: '045',
+    name: 'Bounce',
+    tagline: 'One bunny. One sky. Ten hops.',
+    description:
+      'Bounce a chibi bunny across a field of floating cloud platforms to reach the rainbow goal before you run out of hops. Stars along the way are worth a detour \u2014 each one earns an extra hop.',
+    color: 'bounce',
+    avgSolveTime: '2 min',
+    difficulty: 'Easy',
+    category: 'movement',
+    howToPlay: [
+      'A bunny stands on a cloud platform floating in a 5\u00d75 sky field. Some tiles are open sky \u2014 the bunny can\u2019t land there.',
+      'Use the arrow pad to hop one tile at a time, up, down, left, or right. Hopping toward open sky just fails quietly \u2014 it doesn\u2019t cost a hop.',
+      'Reach the marked rainbow platform before your hop budget runs out to win.',
+      'A few platforms have a star sitting on them. Land on one and it\u2019s yours \u2014 each star caught adds one extra hop to your budget for the rest of the run.',
+    ],
+    designNotes: [
+      'Bounce shares its generator with Croak on purpose \u2014 that layout logic already proved itself (BFS-verified solvable, retried until a path exists) across hundreds of seeds, so reusing it here means the puzzle itself is a known quantity and all the new work could go into the character and the sky setting instead.',
+      'The bunny is built entirely from Three.js primitive spheres at a higher segment count than the site\u2019s earlier 3D character, specifically to read as smooth and rounded rather than faceted \u2014 a deliberately chibi proportion, oversized head, small body, big glossy eyes with a tiny highlight sphere for sparkle.',
+      'Where Croak leans into an earthy pond palette, Bounce is built around saturated pastel pop color \u2014 cotton-candy clouds, a rainbow goal platform, a bright pink bunny \u2014 as a genuinely different visual mood from the rest of the index rather than a reskin in name only.',
+    ],
+    strategyTips: [
+      'The direct route usually beats detouring for every star \u2014 the hop budget already has slack built in, so only detour for a star if it\u2019s roughly on your way.',
+      'A failed hop toward open sky doesn\u2019t cost you anything, so if you\u2019re unsure whether a tile is a platform, it\u2019s free to just try.',
+      'Plan two hops ahead rather than one \u2014 the field is small enough that a single wrong turn can cost you a star detour you didn\u2019t need.',
+      'If you\u2019re short on hops late in a run, prioritize any remaining star that sits directly between you and the goal \u2014 it\u2019s the only kind of detour that\u2019s never a net loss.',
+    ],
+    faq: [
+      {
+        q: 'Is Bounce just Croak with a different skin?',
+        a: 'The layout generator is the same proven logic, yes \u2014 but the character, the color palette, and the setting are all built fresh for this one.',
+      },
+      {
+        q: 'Does hopping toward open sky cost a move?',
+        a: 'No \u2014 the bunny just stays put and it doesn\u2019t count against your hop budget. Only hops that actually move the bunny are counted.',
+      },
+      {
+        q: 'Is every layout guaranteed to be solvable?',
+        a: 'Yes \u2014 the sky field is regenerated until a clear path from the start platform to the goal platform is confirmed to exist before the puzzle is ever shown.',
+      },
+      {
+        q: 'Can I play Bounce more than once a day?',
+        a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh random sky each time.',
+      },
+    ],
+  },
+  {
+    slug: 'wiggle',
+    index: '046',
+    name: 'Wiggle',
+    tagline: 'Every step you take, you can never take back.',
+    description:
+      'Guide a caterpillar around a small grid to eat every leaf \u2014 but every cell it crosses becomes part of its own body, and it can never cross itself again.',
+    color: 'wiggle',
+    avgSolveTime: '2 min',
+    difficulty: 'Medium',
+    category: 'movement',
+    howToPlay: [
+      'A caterpillar sits on a 6\u00d76 grid. Use the arrow pad to move it one cell at a time, up, down, left, or right.',
+      'Every cell it has ever stood on stays part of its body \u2014 trying to move back onto it just fails quietly, for free.',
+      'Eat every leaf on the grid before you run out of moves to win.',
+      'There are no walls and no preset obstacles anywhere \u2014 the only thing that can ever block you is your own trail.',
+    ],
+    designNotes: [
+      'Wiggle is deliberately the odd one out among the site\u2019s movement games. Croak, Bounce, Shadow, Tether, Phase, Drift, Burrow, and Clearway are all built around navigating a fixed layout decided at generation time. Wiggle has no layout at all \u2014 the entire challenge is self-inflicted, and the puzzle is really about choosing an order to visit things in that doesn\u2019t paint you into a corner.',
+      'Solvability here isn\u2019t verified after the fact, it\u2019s guaranteed by how the puzzle is built: generation performs a random self-avoiding walk across the grid first, then places every leaf directly on top of that walk. Simply retracing the generated route always clears the board \u2014 confirmed by simulating that exact retrace on 500 separate seeds during development.',
+      'Because a player is free to leave the generated route at any point, it\u2019s entirely possible to box yourself in early and lose with leaves still on the board. That\u2019s treated as a normal, intended outcome \u2014 the same way running out of a move budget is elsewhere on the site \u2014 not a sign anything is broken.',
+    ],
+    strategyTips: [
+      'Think one move further than you need to \u2014 a cell that looks fine to enter can still trap you if both of its other exits are already part of your trail.',
+      'Hug the edges and corners early, and save the open middle of the grid for later \u2014 the middle has more escape routes if a plan falls through.',
+      'A blocked move costs nothing, so if you\u2019re unsure whether a direction is safe, it\u2019s free to just try it and see.',
+      'When two leaves are close together, eat them back-to-back before wandering off \u2014 doubling back later to grab a leaf you skipped is often what causes a self-trap.',
+    ],
+    faq: [
+      {
+        q: 'Does bumping into my own trail cost a move?',
+        a: 'No \u2014 it fails quietly and doesn\u2019t count against your move budget, so it\u2019s always safe to test a direction you\u2019re unsure about.',
+      },
+      {
+        q: 'Can I get stuck with no legal moves left?',
+        a: 'Yes \u2014 if every cell next to you is already part of your trail, the run ends there. This is an intended way to lose, not a bug.',
+      },
+      {
+        q: 'Are there ever walls or obstacles placed on the grid?',
+        a: 'No \u2014 the grid starts completely open. Your own trail is the only thing that can ever block a move.',
+      },
+      {
+        q: 'Can I play Wiggle more than once a day?',
+        a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh random grid each time.',
       },
     ],
   },

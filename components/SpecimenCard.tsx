@@ -32,6 +32,8 @@ export const STRIPE_CLASS: Record<string, string> = {
   pulse: 'bg-pulse',
   blip: 'bg-blip',
   croak: 'bg-croak',
+  bounce: 'bg-bounce',
+  wiggle: 'bg-wiggle',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -79,6 +81,8 @@ export const SOFT_CLASS: Record<string, string> = {
   pulse: 'group-hover:bg-pulse-soft dark:group-hover:bg-pulse/10',
   blip: 'group-hover:bg-blip-soft dark:group-hover:bg-blip/10',
   croak: 'group-hover:bg-croak-soft dark:group-hover:bg-croak/10',
+  bounce: 'group-hover:bg-bounce-soft dark:group-hover:bg-bounce/10',
+  wiggle: 'group-hover:bg-wiggle-soft dark:group-hover:bg-wiggle/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {

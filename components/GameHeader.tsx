@@ -34,6 +34,8 @@ const TEXT_CLASS: Record<string, string> = {
   pulse: 'text-pulse',
   blip: 'text-blip',
   croak: 'text-croak',
+  bounce: 'text-bounce',
+  wiggle: 'text-wiggle',
 };interface GameHeaderProps {
   game: GameMeta;
   puzzleNumber: number;

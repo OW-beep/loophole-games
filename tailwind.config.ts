@@ -231,6 +231,14 @@ const config: Config = {
           DEFAULT: '#4E9B4E',
           soft: '#DFEEDA',
         },
+        bounce: {
+          DEFAULT: '#E0559B',
+          soft: '#FCE3F0',
+        },
+        wiggle: {
+          DEFAULT: '#7DB33A',
+          soft: '#E7F3D9',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
