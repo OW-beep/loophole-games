@@ -1,4 +1,4 @@
-export type BlogCategory = 'trend' | 'biz' | 'culture' | 'insight' | 'data';
+export type BlogCategory = 'culture' | 'insight' | 'data';
 
 export interface BlogPost {
   slug: string;
@@ -13,11 +13,9 @@ export interface BlogPost {
 }
 
 export const CATEGORY_LABEL: Record<BlogCategory, string> = {
-  trend: 'Trends',
-  biz: 'Business',
-  culture: 'Culture',
-  insight: 'Psychology',
-  data: 'Data & Trivia',
+  culture: 'Culture & Trends',
+  insight: 'Game Science',
+  data: 'World Data',
 };
 
 export const BLOG_POSTS: BlogPost[] = [
@@ -38,7 +36,7 @@ export const BLOG_POSTS: BlogPost[] = [
     tagline: 'The user numbers are real and growing. The market-size numbers depend entirely on who you ask.',
     description:
       'Cloud gaming has quietly become a daily habit for hundreds of millions of players. We break down what the data actually shows versus what the marketing decks claim.',
-    category: 'biz',
+    category: 'culture',
     publishDate: '2026-05-27',
     readTime: '7 min read',
     relatedGames: ['boo-rush', 'drift'],
@@ -49,7 +47,7 @@ export const BLOG_POSTS: BlogPost[] = [
     tagline: 'Mobile games make more money than console and PC combined \u2014 and almost none of it comes from most players.',
     description:
       'A plain-English breakdown of how free-to-play games actually make money, why mobile now outearns every other platform, and what that means for players.',
-    category: 'biz',
+    category: 'culture',
     publishDate: '2026-06-03',
     readTime: '7 min read',
     relatedGames: ['color-debt', 'overflow'],
@@ -60,7 +58,7 @@ export const BLOG_POSTS: BlogPost[] = [
     tagline: 'More indie games are released \u2014 and make more money \u2014 than ever. Almost none of that money reaches most of them.',
     description:
       'Steam released over 19,000 games in a single year. Indie revenue hit a record high. Here\u2019s why most developers still saw almost none of it.',
-    category: 'biz',
+    category: 'culture',
     publishDate: '2026-06-10',
     readTime: '7 min read',
     relatedGames: ['sprout', 'noodle-cat'],
@@ -82,7 +80,7 @@ export const BLOG_POSTS: BlogPost[] = [
     tagline: 'Not to replace developers \u2014 to remove the parts of the job nobody enjoyed in the first place.',
     description:
       'Beyond the hype and the fear, a grounded look at where AI tools are genuinely changing game development in 2026, and where they clearly are not.',
-    category: 'trend',
+    category: 'culture',
     publishDate: '2026-06-24',
     readTime: '6 min read',
     relatedGames: ['phase', 'carry-chain'],
@@ -93,7 +91,7 @@ export const BLOG_POSTS: BlogPost[] = [
     tagline: 'No install, no account, no 40GB update. The most frictionless way to play games in 2026 is also one of the oldest.',
     description:
       'Instant, no-download browser games are having a real resurgence. Here\u2019s why the format that predates the App Store is suddenly relevant again.',
-    category: 'trend',
+    category: 'culture',
     publishDate: '2026-07-01',
     readTime: '5 min read',
     relatedGames: ['boo-rush', 'blobble'],
@@ -148,7 +146,7 @@ export const BLOG_POSTS: BlogPost[] = [
     tagline: 'No install, no account, no 40GB update \u2014 just a link and a game.',
     description:
       'A practical guide to genuinely no-download browser games in 2026: what makes one actually good, and where to find puzzle and arcade games that open instantly.',
-    category: 'trend',
+    category: 'culture',
     publishDate: '2026-07-16',
     readTime: '5 min read',
     relatedGames: ['boo-rush', 'cloud-hop'],
@@ -229,7 +227,7 @@ export const BLOG_POSTS: BlogPost[] = [
       'You never see the recipe behind the target color \u2014 the match meter is the only clue you get, and it\u2019s enough.',
     description:
       'Strategy tips for Pigment, Loophole\u2019s daily color-mixing puzzle: how the match percentage works, why order doesn\u2019t matter but ratio does, and how to stop wasting taps on the wrong base color.',
-    category: 'trend',
+    category: 'culture',
     publishDate: '2026-07-22',
     readTime: '4 min read',
     relatedGames: ['pigment'],

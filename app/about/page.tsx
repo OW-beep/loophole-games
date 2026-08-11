@@ -28,6 +28,22 @@ export default function AboutPage() {
           ready, not on a schedule.
         </p>
       </div>
+
+      <h2 className="font-display font-bold text-xl mt-10 mb-3">Who's behind this</h2>
+      <div className="space-y-4 text-ink/80 dark:text-white/70 leading-relaxed">
+        <p>
+          Loophole is built and maintained by LH, a solo hobbyist who just really likes puzzle
+          games. This index exists mainly because I wanted more good ones to play and started
+          making my own.
+        </p>
+      </div>
+
+      <h2 className="font-display font-bold text-xl mt-10 mb-3">Contact</h2>
+      <div className="space-y-4 text-ink/80 dark:text-white/70 leading-relaxed">
+        <p>
+          Questions, bug reports, or puzzle feedback: <a href="mailto:openwave25@gmail.com" className="underline">openwave25@gmail.com</a>
+        </p>
+      </div>
     </article>
   );
 }

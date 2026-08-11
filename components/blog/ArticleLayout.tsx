@@ -5,8 +5,6 @@ import { CATEGORY_LABEL, getAllPosts } from '@/lib/blog/registry';
 import { RelatedGames } from './RelatedGames';
 
 const STRIPE_CLASS: Record<string, string> = {
-  trend: 'bg-trend',
-  biz: 'bg-biz',
   culture: 'bg-culture',
   insight: 'bg-insight',
   data: 'bg-duel',

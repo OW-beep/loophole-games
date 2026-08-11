@@ -239,6 +239,10 @@ const config: Config = {
           DEFAULT: '#7DB33A',
           soft: '#E7F3D9',
         },
+        stax: {
+          DEFAULT: '#FF6B4A',
+          soft: '#FFE3DB',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

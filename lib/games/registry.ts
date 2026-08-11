@@ -25,7 +25,8 @@ export type GameSlug =
   | 'blip'
   | 'croak'
   | 'bounce'
-  | 'wiggle';
+  | 'wiggle'
+  | 'stax';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards';
 
@@ -2183,6 +2184,53 @@ export const GAMES: GameMeta[] = [
       {
         q: 'Can I play Wiggle more than once a day?',
         a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh random grid each time.',
+      },
+    ],
+  },
+  {
+    slug: 'stax',
+    index: '047',
+    name: 'Stax',
+    tagline: 'Perfect it, or lose it.',
+    description:
+      'A block slides back and forth on top of the tower \u2014 tap to drop it. Land it perfectly to keep the tower at full width and build a combo; a sloppy drop slices it down; miss entirely and the run is over.',
+    color: 'stax',
+    avgSolveTime: '2 min',
+    difficulty: 'Medium',
+    category: 'arcade',
+    howToPlay: [
+      'A colored block slides left and right on top of your tower. Tap, click, or press space to drop it.',
+      'Landing exactly on top of the block below keeps the tower at full width and adds to your combo.',
+      'A partial landing slices the block down to only the part that overlapped \u2014 the tower gets a little narrower.',
+      'Miss the tower completely and the run ends there. Reach the target height before that happens to win.',
+    ],
+    designNotes: [
+      'Stax is the site\u2019s first game where the daily challenge isn\u2019t a fixed layout at all \u2014 the target height and the speed ramp are identical for everyone, but the actual outcome is pure reflex and timing, the same spirit as Boo Rush or Cloud Hop rather than a solvable-by-construction puzzle.',
+      'Every three perfect drops in a row widens the tower back a little, up to its original starting width \u2014 a small comeback mechanic so an early rough patch isn\u2019t a permanent sentence for the rest of the run.',
+      'The overlap math \u2014 what counts as perfect, what gets sliced, what counts as a total miss \u2014 lives entirely in a small set of plain functions with no rendering code in them at all, and was unit tested against perfect, partial, and total-miss drops before any 3D was built on top of it.',
+    ],
+    strategyTips: [
+      'Watch the block\u2019s rhythm for a moment before your first tap of a run \u2014 the swing is smooth and repeating, so a beat of observation pays for itself.',
+      'Chasing perfects is worth it \u2014 three in a row visibly widens your margin for the next few drops, which compounds.',
+      'The swing gets faster as you climb, so don\u2019t rely on a reaction speed that only worked for the first few blocks.',
+      'If the tower has gotten narrow, play it safer rather than greedier \u2014 a near-perfect keeps you alive; a miss for the sake of style ends the run outright.',
+    ],
+    faq: [
+      {
+        q: 'Is the daily layout different for everyone, like the puzzle games?',
+        a: 'No \u2014 Stax has no fixed layout to solve. Everyone gets the same target height and the same speed ramp; what happens after that is entirely down to your own timing.',
+      },
+      {
+        q: 'What exactly counts as a "perfect" drop?',
+        a: 'Landing close enough that almost nothing gets sliced off. It doesn\u2019t have to be pixel-exact, just close.',
+      },
+      {
+        q: 'Can the tower recover after a bad drop?',
+        a: 'Yes \u2014 three perfect drops in a row widens it back a step, up to its original width, so one mistake isn\u2019t permanent.',
+      },
+      {
+        q: 'Can I play Stax more than once a day?',
+        a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays any time.',
       },
     ],
   },
