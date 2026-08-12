@@ -20,6 +20,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const GAME_SLUG = 'croak';
@@ -256,10 +257,11 @@ export function CroakBoard({ seed, dateString, puzzleNumber }: { seed: number; d
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const coinRoundSettledRef = useRef(false);
   const [lastCoinDelta, setLastCoinDelta] = useState(0);
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
 
   function startCoinRound() {
     coinRoundSettledRef.current = false;
-    setCoinState(createInitialState(rollCoinSeed()));
+    setCoinState(createInitialState(rollCoinSeed(), scaleLimit(BASE_MOVE_LIMIT, difficulty)));
   }
 
   function coinHop(dir: Dir) {
@@ -276,6 +278,7 @@ export function CroakBoard({ seed, dateString, puzzleNumber }: { seed: number; d
       won: coinState.won,
       movesUsed: coinState.movesUsed,
       movesLimit: currentMoveLimit(coinState),
+      difficulty,
     });
     setLastCoinDelta(delta);
     setCoins((prev) => {
@@ -284,7 +287,7 @@ export function CroakBoard({ seed, dateString, puzzleNumber }: { seed: number; d
       if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
       return next;
     });
-  }, [coinState, nickname]);
+  }, [coinState, nickname, difficulty]);
 
   function handleSaveNickname(name: string) {
     saveNickname(name);
@@ -324,6 +327,7 @@ export function CroakBoard({ seed, dateString, puzzleNumber }: { seed: number; d
         lastDelta={lastCoinDelta}
         onStart={startCoinRound}
         onShowLeaderboard={() => setShowLeaderboard(true)}
+        onDifficultyChange={setDifficulty}
       >
         {coinState && <PondView state={coinState} onHop={coinHop} disabled={coinState.won || coinState.lost} />}
       </CoinModeSection>

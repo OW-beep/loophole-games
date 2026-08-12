@@ -35,6 +35,7 @@ export const STRIPE_CLASS: Record<string, string> = {
   bounce: 'bg-bounce',
   wiggle: 'bg-wiggle',
   stax: 'bg-stax',
+  clash: 'bg-clash',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -85,6 +86,7 @@ export const SOFT_CLASS: Record<string, string> = {
   bounce: 'group-hover:bg-bounce-soft dark:group-hover:bg-bounce/10',
   wiggle: 'group-hover:bg-wiggle-soft dark:group-hover:bg-wiggle/10',
   stax: 'group-hover:bg-stax-soft dark:group-hover:bg-stax/10',
+  clash: 'group-hover:bg-clash-soft dark:group-hover:bg-clash/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {

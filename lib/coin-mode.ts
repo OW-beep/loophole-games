@@ -19,6 +19,8 @@
 //      round finishes, then submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, balance)
 // See app/games/fold/FoldBoard.tsx for the reference implementation.
 
+import { DIFFICULTY_COIN_MULTIPLIER, type Difficulty } from './difficulty';
+
 export const GLOBAL_LEADERBOARD_SLUG = 'global';
 const COIN_KEY = 'loophole:coins:global';
 const STARTING_COINS = 100;
@@ -61,18 +63,32 @@ export function saveCoinBalance(balance: number) {
  * close to winBase + winEfficiencyBonusMax; a clear that used almost the
  * whole move budget earns close to just winBase; a loss costs losePenalty.
  */
+/**
+ * Coin delta for a finished Coin Mode round. `movesUsed`/`movesLimit` come
+ * straight from the same props every game already feeds into GameHeader,
+ * so this needs no per-game calibration: a tight, efficient clear earns
+ * close to winBase + winEfficiencyBonusMax; a clear that used almost the
+ * whole move budget earns close to just winBase; a loss costs losePenalty.
+ * `difficulty` (optional, defaults to 'normal') scales the whole result —
+ * Hard pays more on a win and costs more on a loss, a real stakes choice
+ * rather than a cosmetic label.
+ */
 export function computeCoinDelta({
   won,
   movesUsed,
   movesLimit,
+  difficulty = 'normal',
 }: {
   won: boolean;
   movesUsed: number;
   movesLimit: number;
+  difficulty?: Difficulty;
 }): number {
-  if (!won) return -COIN_RULES.losePenalty;
+  const mult = DIFFICULTY_COIN_MULTIPLIER[difficulty];
+  if (!won) return -Math.round(COIN_RULES.losePenalty * mult);
   const leftoverRatio = movesLimit > 0 ? Math.max(0, (movesLimit - movesUsed) / movesLimit) : 0;
-  return COIN_RULES.winBase + Math.round(COIN_RULES.winEfficiencyBonusMax * leftoverRatio);
+  const base = COIN_RULES.winBase + Math.round(COIN_RULES.winEfficiencyBonusMax * leftoverRatio);
+  return Math.round(base * mult);
 }
 
 /** A fresh, non-daily seed for a Coin Mode round — never collides with today's daily seed. */

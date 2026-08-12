@@ -26,7 +26,8 @@ export type GameSlug =
   | 'croak'
   | 'bounce'
   | 'wiggle'
-  | 'stax';
+  | 'stax'
+  | 'clash';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards';
 
@@ -2231,6 +2232,53 @@ export const GAMES: GameMeta[] = [
       {
         q: 'Can I play Stax more than once a day?',
         a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays any time.',
+      },
+    ],
+  },
+  {
+    slug: 'clash',
+    index: '048',
+    name: 'Clash',
+    tagline: 'The enemy\u2019s whole plan is right there. Beat it anyway.',
+    description:
+      'A turn-based battle against a slime with its entire attack sequence shown up front. Attack, Defend, or unleash a cooldown-limited Special each turn to bring it down before your own HP runs out.',
+    color: 'clash',
+    avgSolveTime: '3 min',
+    difficulty: 'Medium',
+    category: 'puzzle',
+    howToPlay: [
+      'The enemy\u2019s full incoming-damage sequence for the battle is shown before you make a single move \u2014 nothing about its attacks is hidden or random.',
+      'Each turn, choose Attack (steady damage out), Defend (halves the damage you take that turn, deals none back), or Special (heavy damage, but goes on a 2-turn cooldown after use).',
+      'Bring the enemy\u2019s HP to zero before your own HP runs out, within the turn budget, to win.',
+      'Using Special on cooldown just fails quietly \u2014 it doesn\u2019t cost a turn, so it\u2019s always safe to check.',
+    ],
+    designNotes: [
+      'Clash is built closer to a tactics game\u2019s telegraphed-intent screen than to a normal RPG\u2019s hidden dice rolls \u2014 you always know exactly what\u2019s coming, so a loss means a planning mistake, not bad luck.',
+      'Solvability is guaranteed the same way it is for Croak, Bounce, and Wiggle: generation runs a simple, deliberately non-optimal greedy strategy against the candidate battle and only keeps battles that strategy can actually win. A thoughtful player can usually beat that baseline with better Special timing, so the guaranteed floor still leaves real room for skill.',
+      'The slime enemy visibly shrinks and flashes as its HP drops \u2014 a small piece of direct visual feedback so the numbers on screen aren\u2019t the only thing telling you the fight is going your way.',
+    ],
+    strategyTips: [
+      'Scan the whole incoming sequence before your first move \u2014 you already have all the information you\u2019ll ever get, so there\u2019s no benefit to deciding turn-by-turn only.',
+      'Save Special for a turn right after a big hit you\u2019re about to Defend \u2014 Defend doesn\u2019t deal damage, so pairing a defensive turn with an offensive one nearby keeps your overall damage output on track.',
+      'Don\u2019t Defend on small hits \u2014 the cost of Defending (dealing zero damage) is the same whether the incoming hit is small or large, so it only pays off against the bigger numbers.',
+      'Track the cooldown, not just your instinct \u2014 Special is only usable every third turn at best, so plan two attacks ahead rather than reaching for it on cooldown out of habit.',
+    ],
+    faq: [
+      {
+        q: 'Is any part of the enemy\u2019s pattern hidden or randomized during the fight?',
+        a: 'No \u2014 the entire incoming-damage sequence for the battle is shown before your first move and never changes.',
+      },
+      {
+        q: 'What happens if I try to use Special while it\u2019s on cooldown?',
+        a: 'Nothing \u2014 it fails quietly and doesn\u2019t use up a turn, so it\u2019s free to check whether it\u2019s available.',
+      },
+      {
+        q: 'Is every battle guaranteed to be winnable?',
+        a: 'Yes \u2014 a battle is only ever shown if a simple baseline strategy can already beat it, so a better plan than that baseline is never required, just rewarded.',
+      },
+      {
+        q: 'Can I play Clash more than once a day?',
+        a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh battle each time.',
       },
     ],
   },

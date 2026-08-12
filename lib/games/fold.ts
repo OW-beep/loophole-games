@@ -25,6 +25,8 @@ interface FoldResult {
  * Folds `strip` at `creaseIndex` (a value between 1 and strip.length - 1).
  * The shorter side always folds onto the longer side, mirrored, with
  * overlapping cells summed — exactly like folding a real strip of paper.
+ * `budget` defaults to FOLD_BUDGET so the daily puzzle is unaffected; Coin
+ * Mode can pass a difficulty-scaled value instead (see scaleLimit()).
  */
 function foldWithFreshness(strip: number[], freshIn: boolean[], creaseIndex: number): FoldResult {
   const n = strip.length;
@@ -90,7 +92,7 @@ export function createInitialState(seed: number): FoldState {
   return { strip, foldsUsed: 0, target, won: false, lost: false };
 }
 
-export function applyFold(state: FoldState, creaseIndex: number): FoldState {
+export function applyFold(state: FoldState, creaseIndex: number, budget: number = FOLD_BUDGET): FoldState {
   if (state.won || state.lost) return state;
   if (state.strip.length <= 1) return state;
 
@@ -99,7 +101,7 @@ export function applyFold(state: FoldState, creaseIndex: number): FoldState {
 
   const foldsUsed = state.foldsUsed + 1;
   const won = nextStrip.includes(state.target);
-  const lost = !won && (foldsUsed >= FOLD_BUDGET || nextStrip.length === 1);
+  const lost = !won && (foldsUsed >= budget || nextStrip.length === 1);
 
   return { strip: nextStrip, foldsUsed, target: state.target, won, lost };
 }

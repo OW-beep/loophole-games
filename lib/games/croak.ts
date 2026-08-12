@@ -34,6 +34,7 @@ export interface CroakState {
   player: number;
   goal: number;
   fireflies: Set<number>; // uncollected firefly cells
+  baseLimit: number; // defaults to BASE_MOVE_LIMIT; Coin Mode can scale this by difficulty
   bonusMoves: number; // extra moves earned so far
   movesUsed: number;
   won: boolean;
@@ -75,7 +76,7 @@ function isReachable(start: number, goal: number, pads: Set<number>): boolean {
   return false;
 }
 
-export function createInitialState(seed: number): CroakState {
+export function createInitialState(seed: number, baseLimit: number = BASE_MOVE_LIMIT): CroakState {
   const rng = createRng(seed);
   const positions = seededShuffle(Array.from({ length: TOTAL }, (_, i) => i), rng);
   const start = positions[0];
@@ -102,6 +103,7 @@ export function createInitialState(seed: number): CroakState {
     player: start,
     goal,
     fireflies,
+    baseLimit,
     bonusMoves: 0,
     movesUsed: 0,
     won: false,
@@ -123,7 +125,7 @@ export function applyHop(state: CroakState, dir: Dir): CroakState {
   }
 
   const movesUsed = state.movesUsed + 1;
-  const moveLimit = BASE_MOVE_LIMIT + bonusMoves;
+  const moveLimit = state.baseLimit + bonusMoves;
   const won = player === state.goal;
   const lost = !won && movesUsed >= moveLimit;
 
@@ -131,5 +133,5 @@ export function applyHop(state: CroakState, dir: Dir): CroakState {
 }
 
 export function currentMoveLimit(state: CroakState): number {
-  return BASE_MOVE_LIMIT + state.bonusMoves;
+  return state.baseLimit + state.bonusMoves;
 }

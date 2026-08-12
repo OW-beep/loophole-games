@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
+import { DIFFICULTY_ORDER, DIFFICULTY_LABEL, type Difficulty } from '@/lib/difficulty';
 
 /**
  * Presentational shell for Coin Mode, shared by every game's board. Leans
@@ -9,6 +10,13 @@ import { useState, type ReactNode } from 'react';
  * separate "gamer" style — it reads as an arcade ticket stub, not a neon
  * overlay. All the game-specific board goes in `children`, rendered only
  * once a round is active.
+ *
+ * Difficulty is optional and additive: pass `onDifficultyChange` to show
+ * the Easy/Normal/Hard picker (hidden while a round is active); a board
+ * that doesn't pass it renders exactly as before. See fold/CroakBoard for
+ * reference wiring — the picker only changes what the *board* does with
+ * the selected value (scaling its own move budget via scaleLimit()) and
+ * what it passes into computeCoinDelta; this component just displays it.
  */
 export function CoinModeSection({
   coins,
@@ -20,6 +28,7 @@ export function CoinModeSection({
   lastDelta,
   onStart,
   onShowLeaderboard,
+  onDifficultyChange,
   children,
 }: {
   coins: number;
@@ -31,9 +40,16 @@ export function CoinModeSection({
   lastDelta: number;
   onStart: () => void;
   onShowLeaderboard: () => void;
+  onDifficultyChange?: (difficulty: Difficulty) => void;
   children?: ReactNode;
 }) {
   const [draft, setDraft] = useState('');
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+
+  function selectDifficulty(d: Difficulty) {
+    setDifficulty(d);
+    onDifficultyChange?.(d);
+  }
 
   return (
     <div className="mt-10">
@@ -79,6 +95,28 @@ export function CoinModeSection({
             >
               Save
             </button>
+          </div>
+        )}
+
+        {!roundActive && onDifficultyChange && (
+          <div className="mb-4">
+            <p className="stat-line text-ink/40 dark:text-white/30 mb-1.5">Difficulty</p>
+            <div className="grid grid-cols-3 gap-1.5">
+              {DIFFICULTY_ORDER.map((d) => (
+                <button
+                  key={d}
+                  onClick={() => selectDifficulty(d)}
+                  className={[
+                    'stat-line border-2 px-2 py-1.5 transition-colors',
+                    difficulty === d
+                      ? 'border-coin bg-coin text-white'
+                      : 'border-index dark:border-index-dark text-ink/60 dark:text-white/50 hover:border-coin',
+                  ].join(' ')}
+                >
+                  {DIFFICULTY_LABEL[d]}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

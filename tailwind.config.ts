@@ -243,6 +243,10 @@ const config: Config = {
           DEFAULT: '#FF6B4A',
           soft: '#FFE3DB',
         },
+        clash: {
+          DEFAULT: '#5A6ACF',
+          soft: '#E2E5FA',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
