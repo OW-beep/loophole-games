@@ -9,6 +9,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const GAME_SLUG = 'waypoint';
@@ -99,8 +100,12 @@ export function WaypointBoard({ seed, dateString, puzzleNumber }: { seed: number
   const coinRoundSettledRef = useRef(false);
   const [lastCoinDelta, setLastCoinDelta] = useState(0);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(MOVE_BUDGET);
+
   function startCoinRound() {
     coinRoundSettledRef.current = false;
+    coinBudgetRef.current = scaleLimit(MOVE_BUDGET, difficulty);
     setCoinState(createInitialState(rollCoinSeed()));
   }
 
@@ -117,7 +122,7 @@ export function WaypointBoard({ seed, dateString, puzzleNumber }: { seed: number
     if (!coinState.won && !coinState.lost) return;
     coinRoundSettledRef.current = true;
 
-    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.movesUsed, movesLimit: MOVE_BUDGET });
+    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.movesUsed, movesLimit: coinBudgetRef.current, difficulty });
     setLastCoinDelta(delta);
     setCoins((prev) => {
       const next = Math.max(0, prev + delta);
@@ -125,7 +130,7 @@ export function WaypointBoard({ seed, dateString, puzzleNumber }: { seed: number
       if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
       return next;
     });
-  }, [coinState, nickname]);
+  }, [coinState, nickname, difficulty]);
 
   function handleSaveNickname(name: string) {
     saveNickname(name);
@@ -161,11 +166,12 @@ export function WaypointBoard({ seed, dateString, puzzleNumber }: { seed: number
         lastDelta={lastCoinDelta}
         onStart={startCoinRound}
         onShowLeaderboard={() => setShowLeaderboard(true)}
+        onDifficultyChange={setDifficulty}
       >
         {coinState && (
           <BoardView
             state={coinState}
-            onTap={(i) => setCoinState((s) => (s ? guessNext(s, i) : s))}
+            onTap={(i) => setCoinState((s) => (s ? guessNext(s, i, coinBudgetRef.current) : s))}
             disabled={coinState.won || coinState.lost}
           />
         )}

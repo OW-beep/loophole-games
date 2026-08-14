@@ -29,6 +29,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'playing' | 'won' | 'lost';
@@ -119,12 +120,16 @@ export function AcornDashBoard({
     setStatus('ready');
   }, []);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(MISS_BUDGET);
+
   const startCoinRound = useCallback(() => {
     activeSeedRef.current = rollCoinSeed();
     modeRef.current = 'coin';
+    coinBudgetRef.current = scaleLimit(MISS_BUDGET, difficulty, 1);
     setCoinRoundActive(true);
     resetRun();
-  }, [resetRun]);
+  }, [resetRun, difficulty]);
 
   const startIfReady = useCallback(() => {
     // Once a run has ended, only the explicit "Play again for Coins" button
@@ -225,7 +230,7 @@ export function AcornDashBoard({
         setShowResult(true);
         setDailyDone(true);
       } else {
-        const delta = computeCoinDelta({ won, movesUsed: missesRef.current, movesLimit: MISS_BUDGET + 1 });
+        const delta = computeCoinDelta({ won, movesUsed: missesRef.current, movesLimit: coinBudgetRef.current + 1, difficulty });
         setLastCoinDelta(delta);
         setCoins((prev) => {
           const next = Math.max(0, prev + delta);
@@ -434,7 +439,7 @@ export function AcornDashBoard({
             itemElapsedRef.current = 0;
             pauseRef.current = RESPAWN_PAUSE_MS;
 
-            if (missesRef.current > MISS_BUDGET) {
+            if (missesRef.current > coinBudgetRef.current) {
               finish(false);
             } else if (indexRef.current >= DROP_COUNT) {
               finish(true);
@@ -490,7 +495,7 @@ export function AcornDashBoard({
       </div>
 
       <div className="stat-line text-ink/50 dark:text-white/40 text-center mb-3">
-        drag / arrow keys to move · caught {caught}/{totalAcorns} · misses {misses}/{MISS_BUDGET}
+        drag / arrow keys to move · caught {caught}/{totalAcorns} · misses {misses}/{coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : MISS_BUDGET}
         {combo >= 3 ? ` · combo \u00d7${combo}` : ''}
       </div>
       <div className="stat-line text-ink/40 dark:text-white/30 text-center mb-3">
@@ -522,6 +527,7 @@ export function AcornDashBoard({
           lastDelta={lastCoinDelta}
           onStart={startCoinRound}
           onShowLeaderboard={() => setShowLeaderboard(true)}
+          onDifficultyChange={setDifficulty}
         />
       )}
 

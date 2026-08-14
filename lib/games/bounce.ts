@@ -30,6 +30,7 @@ export interface BounceState {
   player: number;
   goal: number;
   stars: Set<number>; // uncollected star cells
+  baseLimit: number; // defaults to BASE_MOVE_LIMIT; Coin Mode can scale this by difficulty
   bonusMoves: number;
   movesUsed: number;
   won: boolean;
@@ -71,7 +72,7 @@ function isReachable(start: number, goal: number, platforms: Set<number>): boole
   return false;
 }
 
-export function createInitialState(seed: number): BounceState {
+export function createInitialState(seed: number, baseLimit: number = BASE_MOVE_LIMIT): BounceState {
   const rng = createRng(seed);
   const positions = seededShuffle(Array.from({ length: TOTAL }, (_, i) => i), rng);
   const start = positions[0];
@@ -96,6 +97,7 @@ export function createInitialState(seed: number): BounceState {
     player: start,
     goal,
     stars,
+    baseLimit,
     bonusMoves: 0,
     movesUsed: 0,
     won: false,
@@ -117,7 +119,7 @@ export function applyHop(state: BounceState, dir: Dir): BounceState {
   }
 
   const movesUsed = state.movesUsed + 1;
-  const moveLimit = BASE_MOVE_LIMIT + bonusMoves;
+  const moveLimit = state.baseLimit + bonusMoves;
   const won = player === state.goal;
   const lost = !won && movesUsed >= moveLimit;
 
@@ -125,5 +127,5 @@ export function applyHop(state: BounceState, dir: Dir): BounceState {
 }
 
 export function currentMoveLimit(state: BounceState): number {
-  return BASE_MOVE_LIMIT + state.bonusMoves;
+  return state.baseLimit + state.bonusMoves;
 }

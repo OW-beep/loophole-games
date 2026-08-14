@@ -16,6 +16,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'playing' | 'won' | 'lost';
@@ -124,7 +125,7 @@ export function SproutBoard({
   }
 
   const resetRun = useCallback(() => {
-    stagesRef.current = createStages(activeSeedRef.current);
+    stagesRef.current = createStages(activeSeedRef.current, coinRoundActiveRef.current ? coinBudgetRef.current : STAGE_COUNT);
     stageIndexRef.current = 0;
     missesRef.current = 0;
     finishedRef.current = false;
@@ -135,12 +136,18 @@ export function SproutBoard({
     setStatus('ready');
   }, []);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(STAGE_COUNT);
+  const coinRoundActiveRef = useRef(false);
+
   const startCoinRound = useCallback(() => {
     activeSeedRef.current = rollCoinSeed();
     modeRef.current = 'coin';
+    coinBudgetRef.current = scaleLimit(STAGE_COUNT, difficulty, 1);
+    coinRoundActiveRef.current = true;
     setCoinRoundActive(true);
     resetRun();
-  }, [resetRun]);
+  }, [resetRun, difficulty]);
 
   const finish = useCallback(
     (won: boolean) => {
@@ -161,7 +168,7 @@ export function SproutBoard({
         setShowResult(true);
         setDailyDone(true);
       } else {
-        const delta = computeCoinDelta({ won, movesUsed: stageIndexRef.current, movesLimit: STAGE_COUNT });
+        const delta = computeCoinDelta({ won, movesUsed: stageIndexRef.current, movesLimit: coinBudgetRef.current, difficulty });
         setLastCoinDelta(delta);
         setCoins((prev) => {
           const next = Math.max(0, prev + delta);
@@ -189,7 +196,7 @@ export function SproutBoard({
     if (isInWindow(stage, phase)) {
       stageIndexRef.current += 1;
       setStageIndex(stageIndexRef.current);
-      if (stageIndexRef.current >= STAGE_COUNT) {
+      if (stageIndexRef.current >= (coinRoundActiveRef.current ? coinBudgetRef.current : STAGE_COUNT)) {
         finish(true);
         return;
       }
@@ -229,11 +236,11 @@ export function SproutBoard({
     };
   }, []);
 
-  const stage = stagesRef.current[Math.min(stageIndexRef.current, STAGE_COUNT - 1)];
+  const stage = stagesRef.current[Math.min(stageIndexRef.current, stagesRef.current.length - 1)];
 
   return (
     <div>
-      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={stageIndex} movesLimit={STAGE_COUNT} />
+      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={stageIndex} movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : STAGE_COUNT} />
 
       <div
         className="relative mb-5 border-2 border-graphite dark:border-white/80 overflow-hidden touch-none select-none mx-auto bg-white dark:bg-panel-dark"
@@ -272,7 +279,7 @@ export function SproutBoard({
         puzzleNumber={puzzleNumber}
         won={status === 'won'}
         moves={stageIndex}
-        movesLimit={STAGE_COUNT}
+        movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : STAGE_COUNT}
         score={stageIndex}
         streak={streak}
       />
@@ -288,6 +295,7 @@ export function SproutBoard({
           lastDelta={lastCoinDelta}
           onStart={startCoinRound}
           onShowLeaderboard={() => setShowLeaderboard(true)}
+          onDifficultyChange={setDifficulty}
         />
       )}
 

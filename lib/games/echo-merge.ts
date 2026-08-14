@@ -156,7 +156,8 @@ export function applyMove(
   state: EchoMergeState,
   fromIdx: number,
   dir: Direction,
-  rng: () => number
+  rng: () => number,
+  budget: number = MOVES_LIMIT
 ): EchoMergeState {
   if (state.won || state.lost) return state;
   const tile = state.board[fromIdx];
@@ -211,7 +212,7 @@ export function applyMove(
 
   const movesUsed = state.movesUsed + 1;
   const won = board.some((t) => t && t.value >= TARGET_VALUE);
-  const lost = !won && movesUsed >= MOVES_LIMIT;
+  const lost = !won && movesUsed >= budget;
 
   return {
     board,

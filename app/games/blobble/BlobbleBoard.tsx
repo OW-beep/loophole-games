@@ -24,6 +24,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'flying' | 'won' | 'lost';
@@ -91,12 +92,16 @@ export function BlobbleBoard({
     setStatus('ready');
   }, []);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(LAUNCH_BUDGET);
+
   const startCoinRound = useCallback(() => {
     activeSeedRef.current = rollCoinSeed();
     modeRef.current = 'coin';
+    coinBudgetRef.current = scaleLimit(LAUNCH_BUDGET, difficulty, 1);
     setCoinRoundActive(true);
     resetRun();
-  }, [resetRun]);
+  }, [resetRun, difficulty]);
 
   const toCanvasPoint = useCallback((clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
@@ -166,7 +171,7 @@ export function BlobbleBoard({
         setShowResult(true);
         setDailyDone(true);
       } else {
-        const delta = computeCoinDelta({ won, movesUsed: launchesRef.current, movesLimit: LAUNCH_BUDGET });
+        const delta = computeCoinDelta({ won, movesUsed: launchesRef.current, movesLimit: coinBudgetRef.current, difficulty });
         setLastCoinDelta(delta);
         setCoins((prev) => {
           const next = Math.max(0, prev + delta);
@@ -261,7 +266,7 @@ export function BlobbleBoard({
           setLaunchesUsed(launchesRef.current);
           if (clearedRef.current >= blocksRef.current.length) {
             finish(true);
-          } else if (launchesRef.current >= LAUNCH_BUDGET) {
+          } else if (launchesRef.current >= coinBudgetRef.current) {
             finish(false);
           } else {
             bodyRef.current = createBlobAtAnchor();
@@ -284,7 +289,7 @@ export function BlobbleBoard({
 
   return (
     <div>
-      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={launchesUsed} movesLimit={LAUNCH_BUDGET} />
+      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={launchesUsed} movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : LAUNCH_BUDGET} />
 
       <div
         className="relative mb-5 border-2 border-graphite dark:border-white/80 overflow-hidden touch-none select-none mx-auto"
@@ -303,7 +308,7 @@ export function BlobbleBoard({
       </div>
 
       <div className="stat-line text-ink/50 dark:text-white/40 text-center mb-3">
-        cleared {cleared}/{blockCount} blocks · {LAUNCH_BUDGET - launchesUsed} launches left
+        cleared {cleared}/{blockCount} blocks · {(coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : LAUNCH_BUDGET) - launchesUsed} launches left
       </div>
 
       <ResultModal
@@ -314,7 +319,7 @@ export function BlobbleBoard({
         puzzleNumber={puzzleNumber}
         won={status === 'won'}
         moves={launchesUsed}
-        movesLimit={LAUNCH_BUDGET}
+        movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : LAUNCH_BUDGET}
         score={cleared}
         streak={streak}
       />
@@ -330,6 +335,7 @@ export function BlobbleBoard({
           lastDelta={lastCoinDelta}
           onStart={startCoinRound}
           onShowLeaderboard={() => setShowLeaderboard(true)}
+          onDifficultyChange={setDifficulty}
         />
       )}
 

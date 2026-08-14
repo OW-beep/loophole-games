@@ -18,6 +18,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const GAME_SLUG = 'echo-merge';
@@ -155,17 +156,21 @@ export function EchoMergeBoard({ seed, dateString, puzzleNumber }: { seed: numbe
   const coinRoundSettledRef = useRef(false);
   const [lastCoinDelta, setLastCoinDelta] = useState(0);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(MOVES_LIMIT);
+
   function startCoinRound() {
     const coinSeed = rollCoinSeed();
     coinRngRef.current = createRng(coinSeed + 99991);
     coinRoundSettledRef.current = false;
+    coinBudgetRef.current = scaleLimit(MOVES_LIMIT, difficulty);
     setCoinSelected(null);
     setCoinState(createInitialState(coinSeed));
   }
 
   function coinMove(dir: Direction) {
     if (coinSelected === null || !coinState || coinState.won || coinState.lost) return;
-    setCoinState((prev) => (prev ? applyMove(prev, coinSelected, dir, coinRngRef.current) : prev));
+    setCoinState((prev) => (prev ? applyMove(prev, coinSelected, dir, coinRngRef.current, coinBudgetRef.current) : prev));
     setCoinSelected(null);
   }
 
@@ -201,7 +206,7 @@ export function EchoMergeBoard({ seed, dateString, puzzleNumber }: { seed: numbe
     if (!coinState.won && !coinState.lost) return;
     coinRoundSettledRef.current = true;
 
-    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.movesUsed, movesLimit: MOVES_LIMIT });
+    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.movesUsed, movesLimit: coinBudgetRef.current, difficulty });
     setLastCoinDelta(delta);
     setCoins((prev) => {
       const next = Math.max(0, prev + delta);
@@ -209,7 +214,7 @@ export function EchoMergeBoard({ seed, dateString, puzzleNumber }: { seed: numbe
       if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
       return next;
     });
-  }, [coinState, nickname]);
+  }, [coinState, nickname, difficulty]);
 
   function handleSaveNickname(name: string) {
     saveNickname(name);
@@ -245,6 +250,7 @@ export function EchoMergeBoard({ seed, dateString, puzzleNumber }: { seed: numbe
         lastDelta={lastCoinDelta}
         onStart={startCoinRound}
         onShowLeaderboard={() => setShowLeaderboard(true)}
+        onDifficultyChange={setDifficulty}
       >
         {coinState && (
           <BoardView

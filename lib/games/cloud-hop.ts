@@ -54,14 +54,14 @@ export interface Cloud {
  * between consecutive clouds stays under MAX_JUMP_HEIGHT, so a landing is
  * always physically reachable — later gaps just use a bigger share of that
  * maximum, which is what actually ramps the difficulty. */
-export function createClouds(seed: number): Cloud[] {
+export function createClouds(seed: number, cloudCount: number = CLOUD_COUNT): Cloud[] {
   const rng = createRng(seed);
   const clouds: Cloud[] = [
     { type: 'safe', height: 0, baseX: CANVAS_WIDTH / 2, driftAmp: 0, driftFreq: 0, driftPhase: 0 },
   ];
   let height = 0;
-  for (let i = 1; i < CLOUD_COUNT; i++) {
-    const progress = (i - 1) / Math.max(1, CLOUD_COUNT - 2);
+  for (let i = 1; i < cloudCount; i++) {
+    const progress = (i - 1) / Math.max(1, cloudCount - 2);
     const fraction = GAP_EARLY_FRACTION + progress * (GAP_LATE_FRACTION - GAP_EARLY_FRACTION);
     const gap = GAP_MIN + rng() * (MAX_JUMP_HEIGHT * fraction - GAP_MIN);
     height += gap;

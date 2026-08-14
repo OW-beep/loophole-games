@@ -93,7 +93,7 @@ export function createInitialState(seed: number): HeatmapState {
   };
 }
 
-export function tapCell(state: HeatmapState, i: number): HeatmapState {
+export function tapCell(state: HeatmapState, i: number, budget: number = TAP_BUDGET): HeatmapState {
   if (state.won || state.lost) return state;
   if (!canTap(state.values, state.tapped, i)) return state;
 
@@ -102,7 +102,7 @@ export function tapCell(state: HeatmapState, i: number): HeatmapState {
   const tapsUsed = state.tapsUsed + 1;
   const score = state.score + state.values[i];
   const won = score >= state.target;
-  const lost = !won && tapsUsed >= TAP_BUDGET;
+  const lost = !won && tapsUsed >= budget;
 
   return { ...state, tapped, tapsUsed, score, won, lost };
 }

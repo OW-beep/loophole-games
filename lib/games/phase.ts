@@ -98,7 +98,7 @@ export function createInitialState(seed: number): PhaseState {
   return { player, stepCount: 0, walls, holes, goal, movesUsed: 0, won: false, lost: false };
 }
 
-export function applyMove(state: PhaseState, dir: Dir): PhaseState {
+export function applyMove(state: PhaseState, dir: Dir, budget: number = MOVE_LIMIT): PhaseState {
   if (state.won || state.lost) return state;
   const [dr, dc] = DIRS[dir];
   const ghost = isGhostPhase(state.stepCount + 1);
@@ -108,7 +108,7 @@ export function applyMove(state: PhaseState, dir: Dir): PhaseState {
   const stepCount = state.stepCount + 1;
   const movesUsed = state.movesUsed + 1;
   const won = player === state.goal;
-  const lost = !won && movesUsed >= MOVE_LIMIT;
+  const lost = !won && movesUsed >= budget;
 
   return { ...state, player, stepCount, movesUsed, won, lost };
 }

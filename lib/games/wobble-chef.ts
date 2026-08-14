@@ -35,9 +35,9 @@ export const FOOD_TYPES: FoodType[] = [
 
 /** Today's dish order — a fixed sequence generated from the daily seed, the
  * same for every player. */
-export function createMenu(seed: number): number[] {
+export function createMenu(seed: number, menuLength: number = MENU_LENGTH): number[] {
   const rng = createRng(seed);
-  return Array.from({ length: MENU_LENGTH }, () => Math.floor(rng() * FOOD_TYPES.length));
+  return Array.from({ length: menuLength }, () => Math.floor(rng() * FOOD_TYPES.length));
 }
 
 export interface FallingItem {

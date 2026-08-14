@@ -16,6 +16,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const GAME_SLUG = 'twin-peek';
@@ -113,10 +114,12 @@ function SymbolIcon({ symbol }: { symbol: CardSymbol }) {
  */
 function TwinPeekRound({
   seed,
+  baseBudget = MOVE_BUDGET,
   onFinish,
   onProgress,
 }: {
   seed: number;
+  baseBudget?: number;
   onFinish: (result: { won: boolean; attempts: number; pairs: number; budget: number }) => void;
   onProgress: (attempts: number, budget: number) => void;
 }) {
@@ -130,7 +133,7 @@ function TwinPeekRound({
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
 
-  const budget = MOVE_BUDGET + bonusBudget;
+  const budget = baseBudget + bonusBudget;
   const pairsFound = matched.filter(Boolean).length / 2;
 
   useEffect(() => {
@@ -176,10 +179,10 @@ function TwinPeekRound({
         const solvedPairs = nextMatched.filter(Boolean).length / 2;
         if (solvedPairs === GRID_SIZE / 2) {
           setDone(true);
-          onFinish({ won: true, attempts: nextAttempts, pairs: solvedPairs, budget: MOVE_BUDGET + nextBonus });
-        } else if (nextAttempts >= MOVE_BUDGET + nextBonus) {
+          onFinish({ won: true, attempts: nextAttempts, pairs: solvedPairs, budget: baseBudget + nextBonus });
+        } else if (nextAttempts >= baseBudget + nextBonus) {
           setDone(true);
-          onFinish({ won: false, attempts: nextAttempts, pairs: solvedPairs, budget: MOVE_BUDGET + nextBonus });
+          onFinish({ won: false, attempts: nextAttempts, pairs: solvedPairs, budget: baseBudget + nextBonus });
         }
       } else {
         setCombo(0);
@@ -192,15 +195,15 @@ function TwinPeekRound({
           });
           setSelected([]);
           setBusy(false);
-          if (nextAttempts >= MOVE_BUDGET + bonusBudget) {
+          if (nextAttempts >= baseBudget + bonusBudget) {
             const solvedPairs = matched.filter(Boolean).length / 2;
             setDone(true);
-            onFinish({ won: false, attempts: nextAttempts, pairs: solvedPairs, budget: MOVE_BUDGET + bonusBudget });
+            onFinish({ won: false, attempts: nextAttempts, pairs: solvedPairs, budget: baseBudget + bonusBudget });
           }
         }, 700);
       }
     },
-    [done, busy, revealed, matched, selected, layout, attempts, combo, bonusBudget, onFinish]
+    [done, busy, revealed, matched, selected, layout, attempts, combo, bonusBudget, baseBudget, onFinish]
   );
 
   return (
@@ -291,8 +294,11 @@ export function TwinPeekBoard({ seed, dateString, puzzleNumber }: { seed: number
   const [nickname, setNicknameState] = useState<string>(() => getNickname());
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [lastCoinDelta, setLastCoinDelta] = useState(0);
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(MOVE_BUDGET);
 
   function startCoinRound() {
+    coinBudgetRef.current = scaleLimit(MOVE_BUDGET, difficulty, 4);
     setCoinDone(false);
     setCoinKey(rollCoinSeed());
   }
@@ -300,7 +306,7 @@ export function TwinPeekBoard({ seed, dateString, puzzleNumber }: { seed: number
   function handleCoinFinish(result: { won: boolean; attempts: number; pairs: number; budget: number }) {
     setCoinDone(true);
     setCoinWon(result.won);
-    const delta = computeCoinDelta({ won: result.won, movesUsed: result.attempts, movesLimit: result.budget });
+    const delta = computeCoinDelta({ won: result.won, movesUsed: result.attempts, movesLimit: result.budget, difficulty });
     setLastCoinDelta(delta);
     setCoins((prev) => {
       const next = Math.max(0, prev + delta);
@@ -350,9 +356,10 @@ export function TwinPeekBoard({ seed, dateString, puzzleNumber }: { seed: number
         lastDelta={lastCoinDelta}
         onStart={startCoinRound}
         onShowLeaderboard={() => setShowLeaderboard(true)}
+        onDifficultyChange={setDifficulty}
       >
         {coinKey !== null && !coinDone && (
-          <TwinPeekRound key={coinKey} seed={coinKey} onFinish={handleCoinFinish} onProgress={() => {}} />
+          <TwinPeekRound key={coinKey} seed={coinKey} baseBudget={coinBudgetRef.current} onFinish={handleCoinFinish} onProgress={() => {}} />
         )}
       </CoinModeSection>
 

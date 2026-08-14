@@ -90,6 +90,7 @@ export const SOFT_CLASS: Record<string, string> = {
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {
+  const isNew = Number(game.index) >= 42;
   return (
     <Link
       href={`/games/${game.slug}`}
@@ -100,7 +101,14 @@ export function SpecimenCard({ game }: { game: GameMeta }) {
 
       <div className="flex items-start justify-between mb-3">
         <span className="stat-line text-ink/40 dark:text-white/30">{game.index} / FILE</span>
-        <StreakBadge gameSlug={game.slug} />
+        <div className="flex items-center gap-1.5">
+          {isNew && (
+            <span className="stat-line border-2 border-coin bg-coin text-white px-1.5 py-0.5 leading-none">
+              NEW
+            </span>
+          )}
+          <StreakBadge gameSlug={game.slug} />
+        </div>
       </div>
 
       <h3 className="font-display font-bold text-2xl mb-1">{game.name}</h3>

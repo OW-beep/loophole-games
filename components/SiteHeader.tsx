@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ThemeToggle } from './ThemeToggle';
+import { CoinBadge } from './CoinBadge';
 
 export function SiteHeader() {
   return (
@@ -20,6 +21,7 @@ export function SiteHeader() {
           <Link href="/about" className="stat-line hover:underline hidden sm:inline">
             About
           </Link>
+          <CoinBadge />
           <ThemeToggle />
         </nav>
       </div>

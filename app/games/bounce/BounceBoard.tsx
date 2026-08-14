@@ -8,6 +8,7 @@ import {
   createInitialState,
   applyHop,
   currentMoveLimit,
+  BASE_MOVE_LIMIT,
   GRID_SIZE,
   type BounceState,
   type Dir,
@@ -19,6 +20,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const GAME_SLUG = 'bounce';
@@ -317,9 +319,11 @@ export function BounceBoard({ seed, dateString, puzzleNumber }: { seed: number; 
   const coinRoundSettledRef = useRef(false);
   const [lastCoinDelta, setLastCoinDelta] = useState(0);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+
   function startCoinRound() {
     coinRoundSettledRef.current = false;
-    setCoinState(createInitialState(rollCoinSeed()));
+    setCoinState(createInitialState(rollCoinSeed(), scaleLimit(BASE_MOVE_LIMIT, difficulty)));
   }
 
   function coinHop(dir: Dir) {
@@ -336,6 +340,7 @@ export function BounceBoard({ seed, dateString, puzzleNumber }: { seed: number; 
       won: coinState.won,
       movesUsed: coinState.movesUsed,
       movesLimit: currentMoveLimit(coinState),
+      difficulty,
     });
     setLastCoinDelta(delta);
     setCoins((prev) => {
@@ -344,7 +349,7 @@ export function BounceBoard({ seed, dateString, puzzleNumber }: { seed: number; 
       if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
       return next;
     });
-  }, [coinState, nickname]);
+  }, [coinState, nickname, difficulty]);
 
   function handleSaveNickname(name: string) {
     saveNickname(name);
@@ -384,6 +389,7 @@ export function BounceBoard({ seed, dateString, puzzleNumber }: { seed: number; 
         lastDelta={lastCoinDelta}
         onStart={startCoinRound}
         onShowLeaderboard={() => setShowLeaderboard(true)}
+        onDifficultyChange={setDifficulty}
       >
         {coinState && <SkyView state={coinState} onHop={coinHop} disabled={coinState.won || coinState.lost} />}
       </CoinModeSection>

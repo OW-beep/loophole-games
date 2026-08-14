@@ -105,7 +105,7 @@ export function createInitialState(seed: number): DriftState {
   return { player, boxes, walls, goal, slidesUsed: 0, won: false, lost: false };
 }
 
-export function applySlide(state: DriftState, dir: Dir): DriftState {
+export function applySlide(state: DriftState, dir: Dir, budget: number = SLIDE_LIMIT): DriftState {
   if (state.won || state.lost) return state;
   const [dr, dc] = DIRS[dir];
   const { player, boxes } = slideOne(state.player, state.boxes, state.walls, dr, dc);
@@ -113,6 +113,6 @@ export function applySlide(state: DriftState, dir: Dir): DriftState {
 
   const slidesUsed = state.slidesUsed + 1;
   const won = player === state.goal;
-  const lost = !won && slidesUsed >= SLIDE_LIMIT;
+  const lost = !won && slidesUsed >= budget;
   return { ...state, player, boxes, slidesUsed, won, lost };
 }

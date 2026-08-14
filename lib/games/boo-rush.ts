@@ -38,14 +38,14 @@ export interface Gate {
 /** Deterministically builds today's course from the daily seed. Every gap is
  * reachable from the previous one because consecutive centers are clamped to
  * within MAX_GAP_SHIFT of each other. */
-export function createCourse(seed: number): Gate[] {
+export function createCourse(seed: number, courseLength: number = COURSE_LENGTH): Gate[] {
   const rng = createRng(seed);
   const gates: Gate[] = [];
   const minCenter = EDGE_MARGIN + GAP_HEIGHT / 2;
   const maxCenter = CANVAS_HEIGHT - EDGE_MARGIN - GAP_HEIGHT / 2;
   let prevCenter = CANVAS_HEIGHT / 2;
 
-  for (let i = 0; i < COURSE_LENGTH; i++) {
+  for (let i = 0; i < courseLength; i++) {
     const low = Math.max(minCenter, prevCenter - MAX_GAP_SHIFT);
     const high = Math.min(maxCenter, prevCenter + MAX_GAP_SHIFT);
     const center = low + rng() * (high - low);

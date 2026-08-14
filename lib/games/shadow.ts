@@ -78,7 +78,7 @@ export function createInitialState(seed: number): ShadowState {
   };
 }
 
-export function applyMove(state: ShadowState, dir: Dir): ShadowState {
+export function applyMove(state: ShadowState, dir: Dir, budget: number = MOVE_LIMIT): ShadowState {
   if (state.won || state.lost) return state;
 
   // 1. Resolve queued ghost echo
@@ -97,7 +97,7 @@ export function applyMove(state: ShadowState, dir: Dir): ShadowState {
 
   const movesUsed = state.movesUsed + 1;
   const won = player === state.goal;
-  const lost = !won && movesUsed >= MOVE_LIMIT;
+  const lost = !won && movesUsed >= budget;
 
   return { ...state, player, ghost, ghostPending, movesUsed, won, lost };
 }

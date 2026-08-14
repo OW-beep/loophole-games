@@ -17,6 +17,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const GAME_SLUG = 'blip';
@@ -126,9 +127,11 @@ export function BlipBoard({ seed, dateString, puzzleNumber }: { seed: number; da
   const coinRoundSettledRef = useRef(false);
   const [lastCoinDelta, setLastCoinDelta] = useState(0);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+
   function startCoinRound() {
     coinRoundSettledRef.current = false;
-    setCoinState(createInitialState(rollCoinSeed()));
+    setCoinState(createInitialState(rollCoinSeed(), scaleLimit(ATTEMPT_BUDGET, difficulty)));
   }
 
   useEffect(() => {
@@ -139,7 +142,8 @@ export function BlipBoard({ seed, dateString, puzzleNumber }: { seed: number; da
     const delta = computeCoinDelta({
       won: coinState.won,
       movesUsed: coinState.attemptsUsed,
-      movesLimit: ATTEMPT_BUDGET,
+      movesLimit: coinState.attemptBudget,
+      difficulty,
     });
     setLastCoinDelta(delta);
     setCoins((prev) => {
@@ -148,7 +152,7 @@ export function BlipBoard({ seed, dateString, puzzleNumber }: { seed: number; da
       if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
       return next;
     });
-  }, [coinState, nickname]);
+  }, [coinState, nickname, difficulty]);
 
   function handleSaveNickname(name: string) {
     saveNickname(name);
@@ -193,6 +197,7 @@ export function BlipBoard({ seed, dateString, puzzleNumber }: { seed: number; da
         lastDelta={lastCoinDelta}
         onStart={startCoinRound}
         onShowLeaderboard={() => setShowLeaderboard(true)}
+        onDifficultyChange={setDifficulty}
       >
         {coinState && (
           <>

@@ -9,6 +9,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const GAME_SLUG = 'heatmap';
@@ -108,14 +109,18 @@ export function HeatmapBoard({ seed, dateString, puzzleNumber }: { seed: number;
   const coinRoundSettledRef = useRef(false);
   const [lastCoinDelta, setLastCoinDelta] = useState(0);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(TAP_BUDGET);
+
   function startCoinRound() {
     coinRoundSettledRef.current = false;
+    coinBudgetRef.current = scaleLimit(TAP_BUDGET, difficulty);
     setCoinState(createInitialState(rollCoinSeed()));
   }
 
   function handleCoinTap(i: number) {
     if (!coinState || coinState.won || coinState.lost) return;
-    setCoinState((prev) => (prev ? tapCell(prev, i) : prev));
+    setCoinState((prev) => (prev ? tapCell(prev, i, coinBudgetRef.current) : prev));
   }
 
   useEffect(() => {
@@ -123,7 +128,7 @@ export function HeatmapBoard({ seed, dateString, puzzleNumber }: { seed: number;
     if (!coinState.won && !coinState.lost) return;
     coinRoundSettledRef.current = true;
 
-    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.tapsUsed, movesLimit: TAP_BUDGET });
+    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.tapsUsed, movesLimit: coinBudgetRef.current, difficulty });
     setLastCoinDelta(delta);
     setCoins((prev) => {
       const next = Math.max(0, prev + delta);
@@ -131,7 +136,7 @@ export function HeatmapBoard({ seed, dateString, puzzleNumber }: { seed: number;
       if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
       return next;
     });
-  }, [coinState, nickname]);
+  }, [coinState, nickname, difficulty]);
 
   function handleSaveNickname(name: string) {
     saveNickname(name);
@@ -167,6 +172,7 @@ export function HeatmapBoard({ seed, dateString, puzzleNumber }: { seed: number;
         lastDelta={lastCoinDelta}
         onStart={startCoinRound}
         onShowLeaderboard={() => setShowLeaderboard(true)}
+        onDifficultyChange={setDifficulty}
       >
         {coinState && <GridView state={coinState} onTap={handleCoinTap} disabled={coinState.won || coinState.lost} />}
       </CoinModeSection>

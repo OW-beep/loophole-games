@@ -114,7 +114,7 @@ export function createInitialState(seed: number): OverflowState {
   return { cells, tapsUsed: 0, score: 0, target, won: false, lost: false, lastChainSize: 0 };
 }
 
-export function tapCell(state: OverflowState, i: number): OverflowState {
+export function tapCell(state: OverflowState, i: number, budget: number = TAP_BUDGET): OverflowState {
   if (state.won || state.lost) return state;
   if (state.cells[i] === null) return state;
 
@@ -122,7 +122,7 @@ export function tapCell(state: OverflowState, i: number): OverflowState {
   const tapsUsed = state.tapsUsed + 1;
   const score = state.score + cleared;
   const won = score >= state.target;
-  const lost = !won && tapsUsed >= TAP_BUDGET;
+  const lost = !won && tapsUsed >= budget;
 
   return { cells, tapsUsed, score, target: state.target, won, lost, lastChainSize: cleared };
 }

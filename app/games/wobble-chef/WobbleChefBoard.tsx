@@ -24,6 +24,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'playing' | 'falling' | 'won' | 'lost';
@@ -87,7 +88,7 @@ export function WobbleChefBoard({
   }
 
   const resetRun = useCallback(() => {
-    menuRef.current = createMenu(activeSeedRef.current);
+    menuRef.current = createMenu(activeSeedRef.current, coinRoundActiveRef.current ? coinBudgetRef.current : MENU_LENGTH);
     towerRef.current = createInitialTower();
     stackRef.current = [];
     fallingRef.current = null;
@@ -102,12 +103,18 @@ export function WobbleChefBoard({
     setStatus('playing');
   }, []);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(MENU_LENGTH);
+  const coinRoundActiveRef = useRef(false);
+
   const startCoinRound = useCallback(() => {
     activeSeedRef.current = rollCoinSeed();
     modeRef.current = 'coin';
+    coinBudgetRef.current = scaleLimit(MENU_LENGTH, difficulty, 1);
+    coinRoundActiveRef.current = true;
     setCoinRoundActive(true);
     resetRun();
-  }, [resetRun]);
+  }, [resetRun, difficulty]);
 
   const onTap = useCallback(() => {
     if (statusRef.current === 'won' || statusRef.current === 'lost') return;
@@ -161,7 +168,7 @@ export function WobbleChefBoard({
         setShowResult(true);
         setDailyDone(true);
       } else {
-        const delta = computeCoinDelta({ won, movesUsed: menuIndexRef.current, movesLimit: MENU_LENGTH });
+        const delta = computeCoinDelta({ won, movesUsed: menuIndexRef.current, movesLimit: coinBudgetRef.current, difficulty });
         setLastCoinDelta(delta);
         setCoins((prev) => {
           const next = Math.max(0, prev + delta);
@@ -257,7 +264,7 @@ export function WobbleChefBoard({
             menuIndexRef.current += 1;
             setStacked(menuIndexRef.current);
             fallingRef.current = null;
-            if (menuIndexRef.current >= MENU_LENGTH) {
+            if (menuIndexRef.current >= (coinRoundActiveRef.current ? coinBudgetRef.current : MENU_LENGTH)) {
               finish(true);
             } else {
               statusRef.current = 'playing';
@@ -282,7 +289,7 @@ export function WobbleChefBoard({
 
   return (
     <div>
-      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={stacked} movesLimit={MENU_LENGTH} />
+      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={stacked} movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : MENU_LENGTH} />
 
       <div
         className="relative mb-5 border-2 border-graphite dark:border-white/80 overflow-hidden touch-none select-none mx-auto"
@@ -301,7 +308,7 @@ export function WobbleChefBoard({
       </div>
 
       <div className="stat-line text-ink/50 dark:text-white/40 text-center mb-3">
-        tap / click / space to drop · stack today&rsquo;s {MENU_LENGTH}-dish menu without a topple
+        tap / click / space to drop · stack today&rsquo;s {coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : MENU_LENGTH}-dish menu without a topple
       </div>
 
       <ResultModal
@@ -312,7 +319,7 @@ export function WobbleChefBoard({
         puzzleNumber={puzzleNumber}
         won={status === 'won'}
         moves={stacked}
-        movesLimit={MENU_LENGTH}
+        movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : MENU_LENGTH}
         score={stacked}
         streak={streak}
       />
@@ -328,6 +335,7 @@ export function WobbleChefBoard({
           lastDelta={lastCoinDelta}
           onStart={startCoinRound}
           onShowLeaderboard={() => setShowLeaderboard(true)}
+          onDifficultyChange={setDifficulty}
         />
       )}
 

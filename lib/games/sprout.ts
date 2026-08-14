@@ -18,11 +18,11 @@ export interface StageConfig {
  * across the run — faster revolutions, narrower windows — while the
  * window's *position* each stage is random, so the run isn't memorizable
  * from difficulty alone. */
-export function createStages(seed: number): StageConfig[] {
+export function createStages(seed: number, stageCount: number = STAGE_COUNT): StageConfig[] {
   const rng = createRng(seed);
   const stages: StageConfig[] = [];
-  for (let i = 0; i < STAGE_COUNT; i++) {
-    const progress = STAGE_COUNT > 1 ? i / (STAGE_COUNT - 1) : 0;
+  for (let i = 0; i < stageCount; i++) {
+    const progress = stageCount > 1 ? i / (stageCount - 1) : 0;
     const durationMs = 2200 - progress * 900; // 2200ms -> 1300ms
     const windowWidth = 0.26 - progress * 0.12; // 0.26 -> 0.14
     const windowStart = rng() * (1 - windowWidth);

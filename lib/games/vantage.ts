@@ -81,7 +81,7 @@ export function createInitialState(seed: number): VantageState {
   };
 }
 
-export function submitGuess(state: VantageState, value: number): VantageState {
+export function submitGuess(state: VantageState, value: number, budget: number = GUESS_BUDGET): VantageState {
   if (state.won || state.lost) return state;
   if (!Number.isFinite(value) || value <= 0) return state;
 
@@ -89,7 +89,7 @@ export function submitGuess(state: VantageState, value: number): VantageState {
     value === state.trueCount ? 'correct' : value < state.trueCount ? 'higher' : 'lower';
   const guesses = [...state.guesses, { value, result }];
   const won = result === 'correct';
-  const lost = !won && guesses.length >= GUESS_BUDGET;
+  const lost = !won && guesses.length >= budget;
 
   return { ...state, guesses, won, lost };
 }

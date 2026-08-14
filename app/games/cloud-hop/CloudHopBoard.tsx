@@ -26,6 +26,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'playing' | 'won' | 'lost';
@@ -87,7 +88,7 @@ export function CloudHopBoard({
   }
 
   const resetRun = useCallback(() => {
-    cloudsRef.current = createClouds(activeSeedRef.current);
+    cloudsRef.current = createClouds(activeSeedRef.current, coinRoundActiveRef.current ? coinCloudCountRef.current : CLOUD_COUNT);
     indexRef.current = 1;
     climbedRef.current = 0;
     heightRef.current = 0;
@@ -104,12 +105,20 @@ export function CloudHopBoard({
     setStatus('ready');
   }, []);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(TOTAL_CLIMBS);
+  const coinCloudCountRef = useRef(CLOUD_COUNT);
+  const coinRoundActiveRef = useRef(false);
+
   const startCoinRound = useCallback(() => {
     activeSeedRef.current = rollCoinSeed();
     modeRef.current = 'coin';
+    coinBudgetRef.current = scaleLimit(TOTAL_CLIMBS, difficulty, 1);
+    coinCloudCountRef.current = coinBudgetRef.current + 1;
+    coinRoundActiveRef.current = true;
     setCoinRoundActive(true);
     resetRun();
-  }, [resetRun]);
+  }, [resetRun, difficulty]);
 
   const startIfReady = useCallback(() => {
     if (statusRef.current === 'won' || statusRef.current === 'lost') return;
@@ -206,7 +215,7 @@ export function CloudHopBoard({
         setShowResult(true);
         setDailyDone(true);
       } else {
-        const delta = computeCoinDelta({ won, movesUsed: climbedRef.current, movesLimit: TOTAL_CLIMBS });
+        const delta = computeCoinDelta({ won, movesUsed: climbedRef.current, movesLimit: coinBudgetRef.current, difficulty });
         setLastCoinDelta(delta);
         setCoins((prev) => {
           const next = Math.max(0, prev + delta);
@@ -339,7 +348,7 @@ export function CloudHopBoard({
         heightRef.current += vyRef.current * dt;
         maxHeightRef.current = Math.max(maxHeightRef.current, heightRef.current);
 
-        if (vyRef.current < 0 && indexRef.current < CLOUD_COUNT) {
+        if (vyRef.current < 0 && indexRef.current < (coinRoundActiveRef.current ? coinCloudCountRef.current : CLOUD_COUNT)) {
           const target = cloudsRef.current[indexRef.current];
           if (prevHeight > target.height && heightRef.current <= target.height) {
             const tx = cloudX(target, timeRef.current);
@@ -352,7 +361,7 @@ export function CloudHopBoard({
               climbedRef.current += 1;
               setClimbed(climbedRef.current);
               indexRef.current += 1;
-              if (indexRef.current >= CLOUD_COUNT) {
+              if (indexRef.current >= (coinRoundActiveRef.current ? coinCloudCountRef.current : CLOUD_COUNT)) {
                 finish(true);
               }
             }
@@ -378,7 +387,7 @@ export function CloudHopBoard({
 
   return (
     <div>
-      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={climbed} movesLimit={TOTAL_CLIMBS} />
+      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={climbed} movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : TOTAL_CLIMBS} />
 
       <div
         className="relative mb-5 border-2 border-graphite dark:border-white/80 overflow-hidden touch-none select-none mx-auto"
@@ -397,7 +406,7 @@ export function CloudHopBoard({
       </div>
 
       <div className="stat-line text-ink/50 dark:text-white/40 text-center mb-3">
-        drag / arrow keys to steer · climbed {climbed}/{TOTAL_CLIMBS}
+        drag / arrow keys to steer · climbed {climbed}/{coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : TOTAL_CLIMBS}
       </div>
       <div className="stat-line text-ink/40 dark:text-white/30 text-center mb-3">
         rainbow clouds boost the next bounce · edges wrap around
@@ -411,7 +420,7 @@ export function CloudHopBoard({
         puzzleNumber={puzzleNumber}
         won={status === 'won'}
         moves={climbed}
-        movesLimit={TOTAL_CLIMBS}
+        movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : TOTAL_CLIMBS}
         score={climbed}
         streak={streak}
       />
@@ -427,6 +436,7 @@ export function CloudHopBoard({
           lastDelta={lastCoinDelta}
           onStart={startCoinRound}
           onShowLeaderboard={() => setShowLeaderboard(true)}
+          onDifficultyChange={setDifficulty}
         />
       )}
 

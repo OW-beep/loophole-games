@@ -97,7 +97,8 @@ export function applySlide(
   state: PolarityState,
   mag: number,
   dr: number,
-  dc: number
+  dc: number,
+  budget: number = SLIDE_BUDGET
 ): PolarityState {
   if (state.won || state.lost) return state;
   const next = slide(state.positions, state.polarities, mag, dr, dc);
@@ -105,7 +106,7 @@ export function applySlide(
 
   const slidesUsed = state.slidesUsed + 1;
   const won = checkWon(next, state.polarities);
-  const lost = !won && slidesUsed >= SLIDE_BUDGET;
+  const lost = !won && slidesUsed >= budget;
 
   return { ...state, positions: next, slidesUsed, won, lost };
 }

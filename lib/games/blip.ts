@@ -32,26 +32,27 @@ export interface BlipAttempt {
 export interface BlipState {
   seed: number;
   attempts: BlipAttempt[];
+  attemptBudget: number;
   attemptsUsed: number;
   hits: number;
   won: boolean;
   lost: boolean;
 }
 
-function attemptDifficulty(rng: () => number, index: number): Pick<BlipAttempt, 'targetCell' | 'windowMs'> {
-  const progress = index / Math.max(1, ATTEMPT_BUDGET - 1); // 0 → 1 across the run
+function attemptDifficulty(rng: () => number, index: number, attemptBudget: number): Pick<BlipAttempt, 'targetCell' | 'windowMs'> {
+  const progress = index / Math.max(1, attemptBudget - 1); // 0 → 1 across the run
   const windowMs = BASE_WINDOW_MS - (BASE_WINDOW_MS - MIN_WINDOW_MS) * progress;
   const targetCell = Math.floor(rng() * CELL_COUNT);
   return { targetCell, windowMs };
 }
 
-export function createInitialState(seed: number): BlipState {
+export function createInitialState(seed: number, attemptBudget: number = ATTEMPT_BUDGET): BlipState {
   const rng = createRng(seed);
   const attempts: BlipAttempt[] = [];
-  for (let i = 0; i < ATTEMPT_BUDGET; i++) {
-    attempts.push({ ...attemptDifficulty(rng, i), result: null, tappedCell: null });
+  for (let i = 0; i < attemptBudget; i++) {
+    attempts.push({ ...attemptDifficulty(rng, i, attemptBudget), result: null, tappedCell: null });
   }
-  return { seed, attempts, attemptsUsed: 0, hits: 0, won: false, lost: false };
+  return { seed, attempts, attemptBudget, attemptsUsed: 0, hits: 0, won: false, lost: false };
 }
 
 function settleAttempt(state: BlipState, result: 'hit' | 'miss', tappedCell: number | null): BlipState {
@@ -65,7 +66,7 @@ function settleAttempt(state: BlipState, result: 'hit' | 'miss', tappedCell: num
   const hits = state.hits + (result === 'hit' ? 1 : 0);
 
   const won = hits >= TARGET_HITS;
-  const remaining = ATTEMPT_BUDGET - attemptsUsed;
+  const remaining = state.attemptBudget - attemptsUsed;
   const lost = !won && hits + remaining < TARGET_HITS;
 
   return { ...state, attempts, attemptsUsed, hits, won, lost };

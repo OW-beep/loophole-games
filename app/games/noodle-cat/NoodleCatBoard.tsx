@@ -9,6 +9,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'playing' | 'won' | 'lost';
@@ -57,7 +58,7 @@ export function NoodleCatBoard({
   }
 
   const resetRun = useCallback(() => {
-    bowlsRef.current = createBowls(activeSeedRef.current);
+    bowlsRef.current = createBowls(activeSeedRef.current, coinRoundActiveRef.current ? coinBudgetRef.current : BOWL_COUNT);
     bowlIndexRef.current = 0;
     tapsRef.current = 0;
     finishedRef.current = false;
@@ -68,12 +69,18 @@ export function NoodleCatBoard({
     setStatus('ready');
   }, []);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(BOWL_COUNT);
+  const coinRoundActiveRef = useRef(false);
+
   const startCoinRound = useCallback(() => {
     activeSeedRef.current = rollCoinSeed();
     modeRef.current = 'coin';
+    coinBudgetRef.current = scaleLimit(BOWL_COUNT, difficulty, 1);
+    coinRoundActiveRef.current = true;
     setCoinRoundActive(true);
     resetRun();
-  }, [resetRun]);
+  }, [resetRun, difficulty]);
 
   const finish = useCallback(
     (won: boolean) => {
@@ -94,7 +101,7 @@ export function NoodleCatBoard({
         setShowResult(true);
         setDailyDone(true);
       } else {
-        const delta = computeCoinDelta({ won, movesUsed: bowlIndexRef.current, movesLimit: BOWL_COUNT });
+        const delta = computeCoinDelta({ won, movesUsed: bowlIndexRef.current, movesLimit: coinBudgetRef.current, difficulty });
         setLastCoinDelta(delta);
         setCoins((prev) => {
           const next = Math.max(0, prev + delta);
@@ -124,7 +131,7 @@ export function NoodleCatBoard({
     const bowl = bowlsRef.current[bowlIndexRef.current];
     if (tapsRef.current >= bowl.targetTaps) {
       bowlIndexRef.current += 1;
-      if (bowlIndexRef.current >= BOWL_COUNT) {
+      if (bowlIndexRef.current >= (coinRoundActiveRef.current ? coinBudgetRef.current : BOWL_COUNT)) {
         finish(true);
       } else {
         tapsRef.current = 0;
@@ -160,14 +167,14 @@ export function NoodleCatBoard({
     return () => clearInterval(id);
   }, [status, bowlIndex, finish]);
 
-  const bowl = bowlsRef.current[Math.min(bowlIndexRef.current, BOWL_COUNT - 1)];
+  const bowl = bowlsRef.current[Math.min(bowlIndexRef.current, bowlsRef.current.length - 1)];
   const elapsed = status === 'playing' ? Date.now() - bowlStartRef.current : 0;
   const timeLeftRatio = status === 'playing' ? Math.max(0, 1 - elapsed / bowl.timeMs) : 1;
   const noodleProgress = Math.min(1, taps / bowl.targetTaps);
 
   return (
     <div>
-      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={bowlIndex} movesLimit={BOWL_COUNT} />
+      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={bowlIndex} movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : BOWL_COUNT} />
 
       <div
         className="relative mb-5 border-2 border-graphite dark:border-white/80 overflow-hidden touch-none select-none mx-auto bg-white dark:bg-panel-dark"
@@ -229,7 +236,7 @@ export function NoodleCatBoard({
       </div>
 
       <div className="stat-line text-ink/50 dark:text-white/40 text-center mb-3">
-        mash tap / click / space · bowl {Math.min(bowlIndex + 1, BOWL_COUNT)}/{BOWL_COUNT} · {taps}/{bowl.targetTaps} taps
+        mash tap / click / space · bowl {Math.min(bowlIndex + 1, bowlsRef.current.length)}/{coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : BOWL_COUNT} · {taps}/{bowl.targetTaps} taps
       </div>
 
       <ResultModal
@@ -240,7 +247,7 @@ export function NoodleCatBoard({
         puzzleNumber={puzzleNumber}
         won={status === 'won'}
         moves={bowlIndex}
-        movesLimit={BOWL_COUNT}
+        movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : BOWL_COUNT}
         score={bowlIndex}
         streak={streak}
       />
@@ -256,6 +263,7 @@ export function NoodleCatBoard({
           lastDelta={lastCoinDelta}
           onStart={startCoinRound}
           onShowLeaderboard={() => setShowLeaderboard(true)}
+          onDifficultyChange={setDifficulty}
         />
       )}
 

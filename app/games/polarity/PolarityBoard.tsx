@@ -9,6 +9,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const GAME_SLUG = 'polarity';
@@ -144,8 +145,12 @@ export function PolarityBoard({ seed, dateString, puzzleNumber }: { seed: number
   const coinRoundSettledRef = useRef(false);
   const [lastCoinDelta, setLastCoinDelta] = useState(0);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(SLIDE_BUDGET);
+
   function startCoinRound() {
     coinRoundSettledRef.current = false;
+    coinBudgetRef.current = scaleLimit(SLIDE_BUDGET, difficulty);
     setCoinSelected(null);
     setCoinState(createInitialState(rollCoinSeed()));
   }
@@ -162,7 +167,7 @@ export function PolarityBoard({ seed, dateString, puzzleNumber }: { seed: number
 
   function handleCoinDir(dr: number, dc: number) {
     if (coinSelected === null || !coinState || coinState.won || coinState.lost) return;
-    setCoinState((prev) => (prev ? applySlide(prev, coinSelected, dr, dc) : prev));
+    setCoinState((prev) => (prev ? applySlide(prev, coinSelected, dr, dc, coinBudgetRef.current) : prev));
   }
 
   useEffect(() => {
@@ -191,7 +196,7 @@ export function PolarityBoard({ seed, dateString, puzzleNumber }: { seed: number
     if (!coinState.won && !coinState.lost) return;
     coinRoundSettledRef.current = true;
 
-    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.slidesUsed, movesLimit: SLIDE_BUDGET });
+    const delta = computeCoinDelta({ won: coinState.won, movesUsed: coinState.slidesUsed, movesLimit: coinBudgetRef.current, difficulty });
     setLastCoinDelta(delta);
     setCoins((prev) => {
       const next = Math.max(0, prev + delta);
@@ -199,7 +204,7 @@ export function PolarityBoard({ seed, dateString, puzzleNumber }: { seed: number
       if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
       return next;
     });
-  }, [coinState, nickname]);
+  }, [coinState, nickname, difficulty]);
 
   function handleSaveNickname(name: string) {
     saveNickname(name);
@@ -234,6 +239,7 @@ export function PolarityBoard({ seed, dateString, puzzleNumber }: { seed: number
         lastDelta={lastCoinDelta}
         onStart={startCoinRound}
         onShowLeaderboard={() => setShowLeaderboard(true)}
+        onDifficultyChange={setDifficulty}
       >
         {coinState && (
           <PolarityView

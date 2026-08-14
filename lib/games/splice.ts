@@ -66,7 +66,7 @@ function checkWon(top: number[], bottom: number[]): boolean {
   return top.every((v) => v <= STRAND_LENGTH) && bottom.every((v) => v > STRAND_LENGTH);
 }
 
-export function applySplice(state: SpliceState, start: number, end: number): SpliceState {
+export function applySplice(state: SpliceState, start: number, end: number, budget: number = SWAP_BUDGET): SpliceState {
   if (state.won || state.lost) return state;
   const lo = Math.min(start, end);
   const hi = Math.max(start, end);
@@ -75,7 +75,7 @@ export function applySplice(state: SpliceState, start: number, end: number): Spl
   const { top, bottom } = swapRange(state.top, state.bottom, lo, hi);
   const swapsUsed = state.swapsUsed + 1;
   const won = checkWon(top, bottom);
-  const lost = !won && swapsUsed >= SWAP_BUDGET;
+  const lost = !won && swapsUsed >= budget;
 
   return { top, bottom, swapsUsed, won, lost };
 }

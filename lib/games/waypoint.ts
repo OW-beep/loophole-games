@@ -129,7 +129,7 @@ export function isAdjacentToCurrent(state: WaypointState, cellIndex: number): bo
  * - Adjacent + unfilled but wrong: costs one guess from the budget.
  * - Adjacent + unfilled + correct: locks in the next number.
  */
-export function guessNext(state: WaypointState, cellIndex: number): WaypointState {
+export function guessNext(state: WaypointState, cellIndex: number, budget: number = MOVE_BUDGET): WaypointState {
   if (state.won || state.lost) return state;
   if (state.filled.has(cellIndex)) return state;
   if (!isAdjacentToCurrent(state, cellIndex)) return state;
@@ -143,7 +143,7 @@ export function guessNext(state: WaypointState, cellIndex: number): WaypointStat
       ...state,
       movesUsed,
       lastWrongCell: cellIndex,
-      lost: movesUsed >= MOVE_BUDGET,
+      lost: movesUsed >= budget,
     };
   }
 

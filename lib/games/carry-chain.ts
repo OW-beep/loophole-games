@@ -53,7 +53,7 @@ export function createInitialState(seed: number): CarryChainState {
   return { row, mergesUsed: 0, target, total: sum(row), won: false, lost: false };
 }
 
-export function applyMerge(state: CarryChainState, i: number): CarryChainState {
+export function applyMerge(state: CarryChainState, i: number, budget: number = MERGE_BUDGET): CarryChainState {
   if (state.won || state.lost) return state;
   if (state.row.length < 2) return state;
 
@@ -61,7 +61,7 @@ export function applyMerge(state: CarryChainState, i: number): CarryChainState {
   const mergesUsed = state.mergesUsed + 1;
   const total = sum(nextRow);
   const won = total === state.target;
-  const lost = !won && (mergesUsed >= MERGE_BUDGET || nextRow.length === 1);
+  const lost = !won && (mergesUsed >= budget || nextRow.length === 1);
 
   return { row: nextRow, mergesUsed, target: state.target, total, won, lost };
 }

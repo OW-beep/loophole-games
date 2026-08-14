@@ -15,6 +15,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const GAME_SLUG = 'splice';
@@ -122,8 +123,12 @@ export function SpliceBoard({ seed, dateString, puzzleNumber }: { seed: number; 
   const coinRoundSettledRef = useRef(false);
   const [lastCoinDelta, setLastCoinDelta] = useState(0);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(SWAP_BUDGET);
+
   function startCoinRound() {
     coinRoundSettledRef.current = false;
+    coinBudgetRef.current = scaleLimit(SWAP_BUDGET, difficulty);
     setCoinRangeStart(null);
     setCoinState(createInitialState(rollCoinSeed()));
   }
@@ -134,7 +139,7 @@ export function SpliceBoard({ seed, dateString, puzzleNumber }: { seed: number; 
       setCoinRangeStart(col);
       return;
     }
-    setCoinState((prev) => (prev ? applySplice(prev, coinRangeStart, col) : prev));
+    setCoinState((prev) => (prev ? applySplice(prev, coinRangeStart, col, coinBudgetRef.current) : prev));
     setCoinRangeStart(null);
   }
 
@@ -146,7 +151,8 @@ export function SpliceBoard({ seed, dateString, puzzleNumber }: { seed: number; 
     const delta = computeCoinDelta({
       won: coinState.won,
       movesUsed: coinState.swapsUsed,
-      movesLimit: SWAP_BUDGET,
+      movesLimit: coinBudgetRef.current,
+      difficulty,
     });
     setLastCoinDelta(delta);
     setCoins((prev) => {
@@ -155,7 +161,7 @@ export function SpliceBoard({ seed, dateString, puzzleNumber }: { seed: number; 
       if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
       return next;
     });
-  }, [coinState, nickname]);
+  }, [coinState, nickname, difficulty]);
 
   function handleSaveNickname(name: string) {
     saveNickname(name);
@@ -194,6 +200,7 @@ export function SpliceBoard({ seed, dateString, puzzleNumber }: { seed: number; 
         lastDelta={lastCoinDelta}
         onStart={startCoinRound}
         onShowLeaderboard={() => setShowLeaderboard(true)}
+        onDifficultyChange={setDifficulty}
       >
         {coinState && (
           <StrandView

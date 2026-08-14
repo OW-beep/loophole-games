@@ -23,6 +23,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 type Status = 'ready' | 'playing' | 'won' | 'lost';
@@ -73,7 +74,7 @@ export function BooRushBoard({
   }
 
   const resetRun = useCallback(() => {
-    gatesRef.current = createCourse(activeSeedRef.current);
+    gatesRef.current = createCourse(activeSeedRef.current, coinRoundActiveRef.current ? coinBudgetRef.current : COURSE_LENGTH);
     scrollRef.current = 0;
     bodyRef.current = createInitialBody();
     clearedRef.current = 0;
@@ -85,12 +86,18 @@ export function BooRushBoard({
     setStatus('ready');
   }, []);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(COURSE_LENGTH);
+  const coinRoundActiveRef = useRef(false);
+
   const startCoinRound = useCallback(() => {
     activeSeedRef.current = rollCoinSeed();
     modeRef.current = 'coin';
+    coinBudgetRef.current = scaleLimit(COURSE_LENGTH, difficulty, 1);
+    coinRoundActiveRef.current = true;
     setCoinRoundActive(true);
     resetRun();
-  }, [resetRun]);
+  }, [resetRun, difficulty]);
 
   const startOrFlap = useCallback(() => {
     if (statusRef.current === 'won' || statusRef.current === 'lost') return;
@@ -143,7 +150,7 @@ export function BooRushBoard({
         setShowResult(true);
         setDailyDone(true);
       } else {
-        const delta = computeCoinDelta({ won, movesUsed: clearedRef.current, movesLimit: COURSE_LENGTH });
+        const delta = computeCoinDelta({ won, movesUsed: clearedRef.current, movesLimit: coinBudgetRef.current, difficulty });
         setLastCoinDelta(delta);
         setCoins((prev) => {
           const next = Math.max(0, prev + delta);
@@ -247,7 +254,7 @@ export function BooRushBoard({
               gate.cleared = true;
               clearedRef.current += 1;
               setScore(clearedRef.current);
-              if (clearedRef.current >= COURSE_LENGTH) finish(true);
+              if (clearedRef.current >= (coinRoundActiveRef.current ? coinBudgetRef.current : COURSE_LENGTH)) finish(true);
             }
             if (checkGateCollision(bodyRef.current.y, screenX, gate)) {
               finish(false);
@@ -270,7 +277,7 @@ export function BooRushBoard({
 
   return (
     <div>
-      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={score} movesLimit={COURSE_LENGTH} />
+      <GameHeader game={game} puzzleNumber={puzzleNumber} movesUsed={score} movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : COURSE_LENGTH} />
 
       <div
         className="relative mb-5 border-2 border-graphite dark:border-white/80 overflow-hidden touch-none select-none mx-auto"
@@ -289,7 +296,7 @@ export function BooRushBoard({
       </div>
 
       <div className="stat-line text-ink/50 dark:text-white/40 text-center mb-3">
-        tap / click / space to flap · clear all {COURSE_LENGTH} gates without touching them
+        tap / click / space to flap · clear all {coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : COURSE_LENGTH} gates without touching them
       </div>
 
       <ResultModal
@@ -300,7 +307,7 @@ export function BooRushBoard({
         puzzleNumber={puzzleNumber}
         won={status === 'won'}
         moves={score}
-        movesLimit={COURSE_LENGTH}
+        movesLimit={coinRoundActive && modeRef.current === 'coin' ? coinBudgetRef.current : COURSE_LENGTH}
         score={score}
         streak={streak}
       />
@@ -316,6 +323,7 @@ export function BooRushBoard({
           lastDelta={lastCoinDelta}
           onStart={startCoinRound}
           onShowLeaderboard={() => setShowLeaderboard(true)}
+          onDifficultyChange={setDifficulty}
         />
       )}
 

@@ -93,7 +93,7 @@ export function createInitialState(seed: number): BraceYardState {
   };
 }
 
-export function shipCrate(state: BraceYardState, i: number): BraceYardState {
+export function shipCrate(state: BraceYardState, i: number, budget: number = SHIP_BUDGET): BraceYardState {
   if (state.won || state.lost) return state;
   if (!isShippable(state.weights, i)) return state; // invalid attempt — free, no cost
 
@@ -103,7 +103,7 @@ export function shipCrate(state: BraceYardState, i: number): BraceYardState {
   const shipped = state.shipped + 1;
   const score = state.score + gained;
   const won = score >= state.target;
-  const lost = !won && (shipped >= SHIP_BUDGET || !hasAnyShippable(weights));
+  const lost = !won && (shipped >= budget || !hasAnyShippable(weights));
 
   return { weights, shipped, score, target: state.target, won, lost };
 }

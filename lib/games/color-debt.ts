@@ -197,7 +197,7 @@ function isSwappable(cell: Cell): boolean {
   return cell !== null && cell.kind !== 'bad';
 }
 
-export function trySwap(state: ColorDebtState, aIdx: number, bIdx: number, rng: () => number): ColorDebtState {
+export function trySwap(state: ColorDebtState, aIdx: number, bIdx: number, rng: () => number, budget: number = MOVES_LIMIT): ColorDebtState {
   if (state.won || state.lost) return state;
   const a = state.grid[aIdx];
   const b = state.grid[bIdx];
@@ -227,7 +227,7 @@ export function trySwap(state: ColorDebtState, aIdx: number, bIdx: number, rng: 
   const score = state.score + scoreGained;
   const badCount = countBadTiles(aged);
   const won = score >= TARGET_SCORE && badCount === 0;
-  const lost = !won && movesUsed >= MOVES_LIMIT;
+  const lost = !won && movesUsed >= budget;
 
   return { grid: aged, score, movesUsed, won, lost, lastClearedCount: clearedCount };
 }

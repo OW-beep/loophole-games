@@ -83,7 +83,7 @@ export function createInitialState(seed: number): TetherState {
   return { posA, posB, goalA, goalB, walls, movesUsed: 0, won: false, lost: false };
 }
 
-export function applyMove(state: TetherState, dir: Dir): TetherState {
+export function applyMove(state: TetherState, dir: Dir, budget: number = MOVE_LIMIT): TetherState {
   if (state.won || state.lost) return state;
   const [dr, dc] = DIRS[dir];
   const na = step(state.posA, dr, dc, state.walls);
@@ -92,6 +92,6 @@ export function applyMove(state: TetherState, dir: Dir): TetherState {
 
   const movesUsed = state.movesUsed + 1;
   const won = na === state.goalA && nb === state.goalB;
-  const lost = !won && movesUsed >= MOVE_LIMIT;
+  const lost = !won && movesUsed >= budget;
   return { ...state, posA: na, posB: nb, movesUsed, won, lost };
 }

@@ -18,11 +18,11 @@ export interface BowlConfig {
 /** Generates today's bowls from the daily seed. Tap targets rise and time
  * budgets shrink across the run, with a little seeded variance per bowl so
  * the exact numbers aren't identical every day even at the same difficulty. */
-export function createBowls(seed: number): BowlConfig[] {
+export function createBowls(seed: number, bowlCount: number = BOWL_COUNT): BowlConfig[] {
   const rng = createRng(seed);
   const bowls: BowlConfig[] = [];
-  for (let i = 0; i < BOWL_COUNT; i++) {
-    const progress = BOWL_COUNT > 1 ? i / (BOWL_COUNT - 1) : 0;
+  for (let i = 0; i < bowlCount; i++) {
+    const progress = bowlCount > 1 ? i / (bowlCount - 1) : 0;
     const targetTaps = Math.round(BASE_TARGET_TAPS + progress * 10 + rng() * 4);
     const timeMs = Math.round(BASE_TIME_MS - progress * 1400 + rng() * 400);
     bowls.push({ targetTaps, timeMs });

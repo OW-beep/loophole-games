@@ -18,6 +18,7 @@ import { CoinLeaderboard } from '@/components/CoinLeaderboard';
 import { CoinModeSection } from '@/components/CoinModeSection';
 import { GAMES } from '@/lib/games/registry';
 import { loadCoinBalance, saveCoinBalance, rollCoinSeed, computeCoinDelta, GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
+import { scaleLimit, type Difficulty } from '@/lib/difficulty';
 import { getNickname, saveNickname, submitScore } from '@/lib/leaderboard-client';
 
 const GAME_SLUG = 'gravity-word';
@@ -110,10 +111,14 @@ export function GravityWordBoard({ seed, dateString, puzzleNumber }: { seed: num
   const coinRoundSettledRef = useRef(false);
   const [lastCoinDelta, setLastCoinDelta] = useState(0);
 
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const coinBudgetRef = useRef(FLIPS_LIMIT);
+
   function startCoinRound() {
     const coinSeed = rollCoinSeed();
     coinRngRef.current = createRng(coinSeed + 7777);
     coinRoundSettledRef.current = false;
+    coinBudgetRef.current = scaleLimit(FLIPS_LIMIT, difficulty);
     setCoinState(createInitialState(coinSeed));
   }
 
@@ -121,7 +126,7 @@ export function GravityWordBoard({ seed, dateString, puzzleNumber }: { seed: num
     if (!coinState || coinState.won || coinState.lost) return;
     setCoinState((prev) => {
       if (!prev) return prev;
-      const next = setGravity(prev, dir, coinRngRef.current);
+      const next = setGravity(prev, dir, coinRngRef.current, coinBudgetRef.current);
       if (next.lastWords.length > 0) setCoinToast(next.lastWords);
       return next;
     });
@@ -179,7 +184,8 @@ export function GravityWordBoard({ seed, dateString, puzzleNumber }: { seed: num
     const delta = computeCoinDelta({
       won: coinState.won,
       movesUsed: coinState.flipsUsed,
-      movesLimit: FLIPS_LIMIT,
+      movesLimit: coinBudgetRef.current,
+      difficulty,
     });
     setLastCoinDelta(delta);
     setCoins((prev) => {
@@ -188,7 +194,7 @@ export function GravityWordBoard({ seed, dateString, puzzleNumber }: { seed: num
       if (nickname) submitScore(GLOBAL_LEADERBOARD_SLUG, nickname, next);
       return next;
     });
-  }, [coinState, nickname]);
+  }, [coinState, nickname, difficulty]);
 
   function handleSaveNickname(name: string) {
     saveNickname(name);
@@ -234,6 +240,7 @@ export function GravityWordBoard({ seed, dateString, puzzleNumber }: { seed: num
         lastDelta={lastCoinDelta}
         onStart={startCoinRound}
         onShowLeaderboard={() => setShowLeaderboard(true)}
+        onDifficultyChange={setDifficulty}
       >
         {coinState && (
           <>

@@ -179,7 +179,7 @@ export function createInitialState(seed: number): GravityWordState {
   return { grid, score: 0, flipsUsed: 0, won: false, lost: false, lastWords: [] };
 }
 
-export function setGravity(state: GravityWordState, dir: GravityDir, rng: () => number): GravityWordState {
+export function setGravity(state: GravityWordState, dir: GravityDir, rng: () => number, budget: number = FLIPS_LIMIT): GravityWordState {
   if (state.won || state.lost) return state;
 
   const compacted = refillOppositeEdge(compact(state.grid, dir), dir, rng);
@@ -188,7 +188,7 @@ export function setGravity(state: GravityWordState, dir: GravityDir, rng: () => 
   const flipsUsed = state.flipsUsed + 1;
   const score = state.score + scoreGained;
   const won = score >= TARGET_SCORE;
-  const lost = !won && flipsUsed >= FLIPS_LIMIT;
+  const lost = !won && flipsUsed >= budget;
 
   return { grid, score, flipsUsed, won, lost, lastWords: words };
 }
