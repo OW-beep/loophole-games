@@ -4,13 +4,17 @@ import { useEffect, useState } from 'react';
 import { fetchLeaderboard, type LeaderboardEntry } from '@/lib/leaderboard-client';
 import { GLOBAL_LEADERBOARD_SLUG } from '@/lib/coin-mode';
 
+type Mode = 'current' | 'best';
+
 export function CoinLeaderboard({ onClose }: { onClose: () => void }) {
+  const [mode, setMode] = useState<Mode>('current');
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let alive = true;
-    fetchLeaderboard(GLOBAL_LEADERBOARD_SLUG).then((e) => {
+    setLoading(true);
+    fetchLeaderboard(GLOBAL_LEADERBOARD_SLUG, mode).then((e) => {
       if (alive) {
         setEntries(e);
         setLoading(false);
@@ -19,7 +23,7 @@ export function CoinLeaderboard({ onClose }: { onClose: () => void }) {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [mode]);
 
   return (
     <div className="fixed inset-0 bg-graphite/60 dark:bg-black/70 flex items-center justify-center p-4 z-50">
@@ -29,6 +33,36 @@ export function CoinLeaderboard({ onClose }: { onClose: () => void }) {
           🕹 Coin Mode
         </p>
         <h2 className="font-display font-bold text-xl mb-4">High scores</h2>
+
+        <div className="grid grid-cols-2 gap-1.5 mb-4">
+          <button
+            onClick={() => setMode('current')}
+            className={[
+              'stat-line border-2 px-2 py-1.5 transition-colors',
+              mode === 'current'
+                ? 'border-coin bg-coin text-white'
+                : 'border-index dark:border-index-dark text-ink/60 dark:text-white/50 hover:border-coin',
+            ].join(' ')}
+          >
+            Current
+          </button>
+          <button
+            onClick={() => setMode('best')}
+            className={[
+              'stat-line border-2 px-2 py-1.5 transition-colors',
+              mode === 'best'
+                ? 'border-coin bg-coin text-white'
+                : 'border-index dark:border-index-dark text-ink/60 dark:text-white/50 hover:border-coin',
+            ].join(' ')}
+          >
+            All-time best
+          </button>
+        </div>
+        <p className="stat-line text-ink/40 dark:text-white/30 mb-4">
+          {mode === 'current'
+            ? 'Live wallet balance \u2014 a loss can lower your spot.'
+            : 'Highest balance each player has ever reached \u2014 this one never drops.'}
+        </p>
 
         {loading && <p className="stat-line text-ink/50 dark:text-white/40 mb-4">Loading…</p>}
 

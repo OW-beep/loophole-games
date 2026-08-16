@@ -35,9 +35,9 @@ export async function submitScore(game: string, name: string, score: number): Pr
   }
 }
 
-export async function fetchLeaderboard(game: string): Promise<LeaderboardEntry[]> {
+export async function fetchLeaderboard(game: string, mode: 'current' | 'best' = 'current'): Promise<LeaderboardEntry[]> {
   try {
-    const res = await fetch(`/api/leaderboard/${game}`, { cache: 'no-store' });
+    const res = await fetch(`/api/leaderboard/${game}${mode === 'best' ? '?mode=best' : ''}`, { cache: 'no-store' });
     const data = await res.json();
     return Array.isArray(data.entries) ? data.entries : [];
   } catch {
