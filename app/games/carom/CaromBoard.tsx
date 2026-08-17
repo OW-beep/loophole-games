@@ -140,17 +140,15 @@ function BattleView({
   state,
   aimLane,
   aimMode,
-  onAimLane,
   onAimMode,
-  onFire,
+  onFireLane,
   disabled,
 }: {
   state: CaromState;
   aimLane: number;
   aimMode: FireMode;
-  onAimLane: (lane: number) => void;
   onAimMode: (mode: FireMode) => void;
-  onFire: () => void;
+  onFireLane: (lane: number) => void;
   disabled: boolean;
 }) {
   const remaining = totalRemaining(state);
@@ -179,53 +177,49 @@ function BattleView({
         </p>
       )}
 
-      <div className="flex justify-center gap-1.5 mb-3">
-        {state.lanes.map((l, lane) => (
-          <button
-            key={lane}
-            onClick={() => onAimLane(lane)}
-            disabled={disabled}
-            className={[
-              'w-12 h-12 rounded-md border-2 flex flex-col items-center justify-center font-mono text-xs disabled:opacity-30 transition-colors',
-              aimLane === lane ? 'border-carom bg-carom-soft dark:bg-carom/20' : 'border-graphite/40 dark:border-white/25',
-            ].join(' ')}
-          >
-            <span>{l.count}</span>
-            {l.shielded && <span className="text-[9px]">🛡</span>}
-          </button>
-        ))}
-      </div>
-
+      {/* Mode is a sticky toggle, not a per-shot choice — pick it once and
+          every lane tap below fires immediately in that mode. Tap = shot,
+          nothing else to confirm. */}
       <div className="grid grid-cols-2 gap-2 mb-3">
         <button
           onClick={() => onAimMode('direct')}
           disabled={disabled}
           className={[
-            'stat-line border-2 rounded-lg py-2 disabled:opacity-30 transition-colors',
+            'stat-line border-2 rounded-lg py-2.5 disabled:opacity-30 transition-colors',
             aimMode === 'direct' ? 'border-graphite dark:border-white/80 bg-graphite text-paper dark:bg-white dark:text-graphite' : 'border-graphite/40 dark:border-white/25',
           ].join(' ')}
         >
-          Direct
+          🎯 Direct
         </button>
         <button
           onClick={() => onAimMode('bank')}
           disabled={disabled}
           className={[
-            'stat-line border-2 rounded-lg py-2 disabled:opacity-30 transition-colors',
+            'stat-line border-2 rounded-lg py-2.5 disabled:opacity-30 transition-colors',
             aimMode === 'bank' ? 'border-carom bg-carom text-white' : 'border-graphite/40 dark:border-white/25',
           ].join(' ')}
         >
-          Bank
+          🔁 Bank
         </button>
       </div>
 
-      <button
-        onClick={onFire}
-        disabled={disabled}
-        className="stat-line w-full border-2 border-graphite dark:border-white/80 rounded-lg py-2.5 disabled:opacity-30 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
-      >
-        Fire
-      </button>
+      <p className="stat-line text-center text-ink/40 dark:text-white/30 mb-2">Tap a lane to fire</p>
+      <div className="flex justify-center gap-2">
+        {state.lanes.map((l, lane) => (
+          <button
+            key={lane}
+            onClick={() => onFireLane(lane)}
+            disabled={disabled}
+            className={[
+              'w-14 h-14 rounded-lg border-2 flex flex-col items-center justify-center font-mono text-sm disabled:opacity-30 transition-colors active:scale-95',
+              'border-graphite dark:border-white/70 hover:bg-carom-soft dark:hover:bg-carom/20',
+            ].join(' ')}
+          >
+            <span className="text-base font-bold">{l.count}</span>
+            {l.shielded && <span className="text-[10px]">🛡</span>}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -243,9 +237,10 @@ export function CaromBoard({ seed, dateString, puzzleNumber }: { seed: number; d
 
   const dailyFinished = state.won || state.lost;
 
-  function handleFire() {
+  function handleFireLane(lane: number) {
     if (dailyFinished) return;
-    setState((prev) => fire(prev, aimLane, aimMode));
+    setAimLane(lane);
+    setState((prev) => fire(prev, lane, aimMode));
   }
 
   useEffect(() => {
@@ -282,9 +277,10 @@ export function CaromBoard({ seed, dateString, puzzleNumber }: { seed: number; d
     setCoinState({ ...fresh, shotBudget: scaleLimit(fresh.shotBudget, difficulty, totalRemaining(fresh)) });
   }
 
-  function coinFire() {
+  function coinFireLane(lane: number) {
     if (!coinState || coinState.won || coinState.lost) return;
-    setCoinState((prev) => (prev ? fire(prev, coinAimLane, coinAimMode) : prev));
+    setCoinAimLane(lane);
+    setCoinState((prev) => (prev ? fire(prev, lane, coinAimMode) : prev));
   }
 
   useEffect(() => {
@@ -324,9 +320,8 @@ export function CaromBoard({ seed, dateString, puzzleNumber }: { seed: number; d
         state={state}
         aimLane={aimLane}
         aimMode={aimMode}
-        onAimLane={setAimLane}
         onAimMode={setAimMode}
-        onFire={handleFire}
+        onFireLane={handleFireLane}
         disabled={dailyFinished}
       />
 
@@ -360,9 +355,8 @@ export function CaromBoard({ seed, dateString, puzzleNumber }: { seed: number; d
             state={coinState}
             aimLane={coinAimLane}
             aimMode={coinAimMode}
-            onAimLane={setCoinAimLane}
             onAimMode={setCoinAimMode}
-            onFire={coinFire}
+            onFireLane={coinFireLane}
             disabled={coinState.won || coinState.lost}
           />
         )}

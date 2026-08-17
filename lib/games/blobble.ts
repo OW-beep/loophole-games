@@ -17,7 +17,7 @@ export const RESTITUTION = 0.55;
 export const GROUND_FRICTION = 0.985; // per-frame-ish horizontal damping while rolling on the floor
 export const REST_SPEED = 26;         // px/s below which a grounded blob counts as "stopped"
 export const MAX_LAUNCH_SPEED = 780;
-export const LAUNCH_BUDGET = 6;
+export const LAUNCH_BUDGET = 9;
 export const HIT_THRESHOLD = 180;     // impact speed needed to break a block instead of bouncing off it
 
 export const ANCHOR = { x: 56, y: GROUND_Y - BLOB_RADIUS };
@@ -37,7 +37,7 @@ const BLOCK_H = 34;
  * ground-level and floating targets, spaced so they don't overlap. */
 export function createBlocks(seed: number): Block[] {
   const rng = createRng(seed);
-  const count = 5 + Math.floor(rng() * 3); // 5–7 blocks
+  const count = 7 + Math.floor(rng() * 4); // 7–10 blocks
   const blocks: Block[] = [];
   const minX = 160;
   const maxX = CANVAS_WIDTH - 40;

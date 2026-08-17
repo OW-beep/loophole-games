@@ -5,7 +5,7 @@ import { createRng } from '../daily-seed';
  * (seeded) target arc to grow the sprout one stage. Pure timing, no physics.
  */
 
-export const STAGE_COUNT = 6;
+export const STAGE_COUNT = 9;
 export const MAX_MISSES = 3;
 
 export interface StageConfig {

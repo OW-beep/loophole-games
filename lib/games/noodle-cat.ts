@@ -6,7 +6,7 @@ import { createRng } from '../daily-seed';
  * this is the index's one pure-reflex entry.
  */
 
-export const BOWL_COUNT = 5;
+export const BOWL_COUNT = 8;
 const BASE_TARGET_TAPS = 14;
 const BASE_TIME_MS = 6000;
 

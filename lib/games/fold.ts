@@ -1,11 +1,11 @@
 import { createRng, randInt } from '../daily-seed';
 
-export const STRIP_LENGTH = 12;
-export const FOLD_BUDGET = 6;
+export const STRIP_LENGTH = 18;
+export const FOLD_BUDGET = 8;
 const MIN_CELL_VALUE = 1;
 const MAX_CELL_VALUE = 9;
 const MIN_CONSTRUCTION_FOLDS = 2;
-const MAX_CONSTRUCTION_FOLDS = 4;
+const MAX_CONSTRUCTION_FOLDS = 6;
 
 export interface FoldState {
   strip: number[];

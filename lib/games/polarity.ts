@@ -1,9 +1,9 @@
 import { createRng, randInt, seededShuffle } from '../daily-seed';
 
-export const GRID_SIZE = 4;
+export const GRID_SIZE = 6;
 const TOTAL_CELLS = GRID_SIZE * GRID_SIZE;
-const MAGNET_COUNT = 8; // 4 positive + 4 negative
-export const SLIDE_BUDGET = 8;
+const MAGNET_COUNT = 10; // 5 positive + 5 negative
+export const SLIDE_BUDGET = 12;
 
 export type MagnetPolarity = '+' | '-';
 

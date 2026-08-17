@@ -1,9 +1,9 @@
 import { createRng, randInt } from '../daily-seed';
 
 export const GRID_SIZE = 4; // bounding box is GRID_SIZE^3
-export const MIN_CUBES = 10;
-export const MAX_CUBES = 18;
-export const GUESS_BUDGET = 6;
+export const MIN_CUBES = 6;
+export const MAX_CUBES = 34;
+export const GUESS_BUDGET = 9;
 
 export interface Voxel {
   x: number;

@@ -1,7 +1,7 @@
 import { createRng, randInt } from '../daily-seed';
 
-export const ROW_LENGTH = 9;
-export const MERGE_BUDGET = 5;
+export const ROW_LENGTH = 12;
+export const MERGE_BUDGET = 8;
 const MIN_CELL_VALUE = 1;
 const MAX_CELL_VALUE = 4;
 const MIN_CONSTRUCTION_MERGES = 2;
