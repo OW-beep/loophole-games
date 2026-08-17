@@ -4,42 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import type { GameMeta } from '@/lib/games/registry';
 
-const TEXT_CLASS: Record<string, string> = {
-  echo: 'text-echo', mirror: 'text-mirror', debt: 'text-debt', gravity: 'text-gravity',
-  fold: 'text-fold', carry: 'text-carry', brace: 'text-brace', splice: 'text-splice',
-  heat: 'text-heat', oneline: 'text-oneline', overflow: 'text-overflow', polarity: 'text-polarity',
-  shadow: 'text-shadow', tether: 'text-tether', drift: 'text-drift', phase: 'text-phase',
-  boo: 'text-boo',
-  blobble: 'text-blobble', sprout: 'text-sprout', chef: 'text-chef', noodle: 'text-noodle',
-  acorn: 'text-acorn',
-  cloud: 'text-cloud',
-  peek: 'text-peek',
-  duel: 'text-duel',
-  pigment: 'text-pigment',
-  waypoint: 'text-waypoint',
-  cairn: 'text-cairn',
-  decant: 'text-decant',
-  cipher: 'text-cipher',
-  clearway: 'text-clearway',
-  overdraw: 'text-overdraw',
-  burrow: 'text-burrow',
-  vantage: 'text-vantage',
-  tumble: 'text-tumble',
-  untangle: 'text-untangle',
-  flicker: 'text-flicker',
-  lastlight: 'text-lastlight',
-  blueprint: 'text-blueprint',
-  bloom: 'text-bloom',
-  apex: 'text-apex',
-  pulse: 'text-pulse',
-  blip: 'text-blip',
-  croak: 'text-croak',
-  bounce: 'text-bounce',
-  wiggle: 'text-wiggle',
-  stax: 'text-stax',
-  clash: 'text-clash',
-  carom: 'text-carom',
-};interface GameHeaderProps {
+interface GameHeaderProps {
   game: GameMeta;
   puzzleNumber: number;
   movesUsed: number;
@@ -52,27 +17,38 @@ export function GameHeader({ game, puzzleNumber, movesUsed, movesLimit }: GameHe
 
   return (
     <>
-      <div className="flex items-start justify-between gap-4 mb-6">
-        <div>
-          <Link href="/" className="stat-line text-ink/40 dark:text-white/30 hover:underline">
-            ← Index
-          </Link>
-          <h1 className={`font-display font-bold text-3xl mt-1 ${TEXT_CLASS[game.color]}`}>
-            {game.name}
-          </h1>
-          <p className="stat-line text-ink/50 dark:text-white/40">
-            Puzzle #{puzzleNumber} · {game.difficulty}
-          </p>
-        </div>
+      {/* Marquee: a small nod to an arcade cabinet's lit-up header sign —
+          solid color band, bold white type, "bolt" dots at the corners —
+          rather than a plain text title like the rest of the site's pages. */}
+      <div className={`relative rounded-t-lg px-4 py-2.5 mb-0 bg-${game.color} overflow-hidden`}>
+        <span className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-white/40" aria-hidden />
+        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-white/40" aria-hidden />
+        <Link
+          href="/"
+          className="stat-line text-white/70 hover:text-white hover:underline transition-colors"
+        >
+          ← Index
+        </Link>
+        <h1 className="font-display font-bold text-2xl sm:text-3xl text-white tracking-tight">
+          {game.name}
+        </h1>
+      </div>
+
+      <div className="flex items-center justify-between gap-4 mb-6 border-2 border-t-0 border-graphite dark:border-white/80 rounded-b-lg px-4 py-2.5 bg-panel dark:bg-panel-dark">
+        <p className="stat-line text-ink/50 dark:text-white/40">
+          Puzzle #{puzzleNumber} · {game.difficulty}
+        </p>
         <div className="flex items-center gap-3 shrink-0">
-          <div className="text-right">
-            <p className="stat-line text-ink/40 dark:text-white/30">Moves left</p>
-            <p className="font-mono text-2xl font-medium tabular-nums leading-none">{movesLeft}</p>
+          <div className="flex items-center gap-2 bg-graphite dark:bg-black/40 rounded px-2.5 py-1">
+            <span className="stat-line text-white/50">MOVES</span>
+            <span className="font-mono text-lg font-bold tabular-nums leading-none text-white">
+              {String(movesLeft).padStart(2, '0')}
+            </span>
           </div>
           <button
             onClick={() => setOpen(true)}
             aria-label="How to play"
-            className="w-9 h-9 border-2 border-graphite dark:border-white/80 rounded-full font-display font-bold hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
+            className="w-9 h-9 border-2 border-graphite dark:border-white/80 rounded-full font-display font-bold shadow-tag dark:shadow-tag-dark hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
           >
             ?
           </button>

@@ -10,7 +10,7 @@
 // All the geometry/scoring math lives here as pure, seed-free functions so
 // it can be unit tested without touching Three.js or the DOM.
 
-export const TARGET_HEIGHT = 14;
+export const TARGET_HEIGHT = 20;
 export const BASE_WIDTH = 1.5;
 export const MIN_SURVIVABLE_WIDTH = 0.14;
 export const PERFECT_TOLERANCE = 0.05;

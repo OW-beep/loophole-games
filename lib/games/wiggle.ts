@@ -19,11 +19,11 @@
 
 import { createRng } from '../daily-seed';
 
-export const GRID_SIZE = 6;
+export const GRID_SIZE = 7;
 const TOTAL = GRID_SIZE * GRID_SIZE;
-const PATH_LENGTH = 14; // cells visited by the generated solution, including the start
+const PATH_LENGTH = 20; // cells visited by the generated solution, including the start
 const LEAF_STEP = 2; // place a leaf every other step along the generated path
-const MOVE_SLACK = 3;
+const MOVE_SLACK = 4;
 const MAX_GENERATION_ATTEMPTS = 400;
 
 export type Dir = 'up' | 'down' | 'left' | 'right';

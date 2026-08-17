@@ -14,8 +14,8 @@ import { createRng } from '../daily-seed';
 
 export const GRID_SIZE = 3;
 export const CELL_COUNT = GRID_SIZE * GRID_SIZE;
-export const ATTEMPT_BUDGET = 8;
-export const TARGET_HITS = 6;
+export const ATTEMPT_BUDGET = 12;
+export const TARGET_HITS = 9;
 
 // The lit window shrinks from attempt 0 to the last attempt, so the run
 // gets harder as it goes rather than being uniformly easy or hard.

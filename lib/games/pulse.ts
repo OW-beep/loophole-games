@@ -13,8 +13,8 @@
 
 import { createRng } from '../daily-seed';
 
-export const ATTEMPT_BUDGET = 8;
-export const TARGET_HITS = 6;
+export const ATTEMPT_BUDGET = 12;
+export const TARGET_HITS = 9;
 
 export const TRACK_MIN = 0;
 export const TRACK_MAX = 100;
@@ -37,27 +37,28 @@ export interface PulseAttempt {
 export interface PulseState {
   seed: number;
   attempts: PulseAttempt[];
+  attemptBudget: number;
   attemptsUsed: number;
   hits: number;
   won: boolean;
   lost: boolean;
 }
 
-function attemptDifficulty(rng: () => number, index: number): Pick<PulseAttempt, 'zoneStart' | 'zoneWidth' | 'periodMs'> {
-  const progress = index / Math.max(1, ATTEMPT_BUDGET - 1); // 0 → 1 across the run
+function attemptDifficulty(rng: () => number, index: number, attemptBudget: number): Pick<PulseAttempt, 'zoneStart' | 'zoneWidth' | 'periodMs'> {
+  const progress = index / Math.max(1, attemptBudget - 1); // 0 → 1 across the run
   const zoneWidth = BASE_ZONE_WIDTH - (BASE_ZONE_WIDTH - MIN_ZONE_WIDTH) * progress;
   const periodMs = BASE_PERIOD_MS - (BASE_PERIOD_MS - MIN_PERIOD_MS) * progress;
   const zoneStart = rng() * (TRACK_MAX - TRACK_MIN - zoneWidth);
   return { zoneStart, zoneWidth, periodMs };
 }
 
-export function createInitialState(seed: number): PulseState {
+export function createInitialState(seed: number, attemptBudget: number = ATTEMPT_BUDGET): PulseState {
   const rng = createRng(seed);
   const attempts: PulseAttempt[] = [];
-  for (let i = 0; i < ATTEMPT_BUDGET; i++) {
-    attempts.push({ ...attemptDifficulty(rng, i), hit: null, tapPosition: null });
+  for (let i = 0; i < attemptBudget; i++) {
+    attempts.push({ ...attemptDifficulty(rng, i, attemptBudget), hit: null, tapPosition: null });
   }
-  return { seed, attempts, attemptsUsed: 0, hits: 0, won: false, lost: false };
+  return { seed, attempts, attemptBudget, attemptsUsed: 0, hits: 0, won: false, lost: false };
 }
 
 /** The marker's position (0-100) at a given elapsed time, for the given attempt's sweep period. */
@@ -82,7 +83,7 @@ export function applyTap(state: PulseState, position: number): PulseState {
   const hits = state.hits + (hit ? 1 : 0);
 
   const won = hits >= TARGET_HITS;
-  const remaining = ATTEMPT_BUDGET - attemptsUsed;
+  const remaining = state.attemptBudget - attemptsUsed;
   const lost = !won && hits + remaining < TARGET_HITS;
 
   return { ...state, attempts, attemptsUsed, hits, won, lost };

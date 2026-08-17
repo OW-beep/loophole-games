@@ -18,9 +18,9 @@ import { createRng } from '../daily-seed';
 
 export const COLS = 5;
 const MIN_QUEUE = 1;
-const MAX_QUEUE = 3;
+const MAX_QUEUE = 4;
 const SHIELD_CHANCE = 0.45;
-const SHOT_SLACK = 3;
+const SHOT_SLACK = 4;
 
 export type FireMode = 'direct' | 'bank';
 

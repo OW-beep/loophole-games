@@ -15,13 +15,13 @@
 
 import { createRng } from '../daily-seed';
 
-export const TURN_BUDGET = 8;
+export const TURN_BUDGET = 12;
 export const HERO_MAX_HP = 20;
 export const ATTACK_DMG = 3;
 export const SPECIAL_DMG = 6;
 export const SPECIAL_COOLDOWN = 2;
-const ENEMY_HP_MIN = 16;
-const ENEMY_HP_MAX = 22;
+const ENEMY_HP_MIN = 22;
+const ENEMY_HP_MAX = 30;
 const INCOMING_MIN = 2;
 const INCOMING_MAX = 7;
 const MAX_GENERATION_ATTEMPTS = 200;

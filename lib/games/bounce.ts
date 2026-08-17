@@ -10,10 +10,10 @@
 
 import { createRng, seededShuffle } from '../daily-seed';
 
-export const GRID_SIZE = 5;
+export const GRID_SIZE = 7;
 const TOTAL = GRID_SIZE * GRID_SIZE;
-export const BASE_MOVE_LIMIT = 10;
-export const STAR_COUNT = 3;
+export const BASE_MOVE_LIMIT = 18;
+export const STAR_COUNT = 4;
 export const STAR_BONUS_MOVES = 1;
 
 export type Dir = 'up' | 'down' | 'left' | 'right';
