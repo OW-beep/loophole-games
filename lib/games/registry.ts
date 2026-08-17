@@ -27,7 +27,8 @@ export type GameSlug =
   | 'bounce'
   | 'wiggle'
   | 'stax'
-  | 'clash';
+  | 'clash'
+  | 'carom';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards';
 
@@ -2279,6 +2280,54 @@ export const GAMES: GameMeta[] = [
       {
         q: 'Can I play Clash more than once a day?',
         a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh battle each time.',
+      },
+    ],
+  },
+  {
+    slug: 'carom',
+    index: '049',
+    name: 'Carom',
+    tagline: 'Shields stop what comes straight at them.',
+    description:
+      'Five lanes of stacked invaders. Fire straight up a lane to clear it \u2014 unless it\u2019s shielded, in which case a direct shot is wasted. Fire from the mirror lane instead and the shot banks in off the side wall, past the shield entirely.',
+    color: 'carom',
+    avgSolveTime: '3 min',
+    difficulty: 'Medium',
+    category: 'arcade',
+    howToPlay: [
+      'Five lanes stand in front of you, each stacked with one to three invaders. Clearing a lane means clearing every invader in it, frontmost first.',
+      'Direct fire goes straight up the lane you\u2019re standing in.',
+      'Bank fire goes in off the side wall instead \u2014 fired from lane N, it lands in the mirrored lane on the far side (lane 4 mirrors lane 0, lane 3 mirrors lane 1, and so on).',
+      'A shielded lane blocks Direct fire aimed at it completely \u2014 the shot is wasted. Bank fire ignores shields entirely, since it never comes in from below.',
+      'Clear every lane within your shot budget to win.',
+    ],
+    designNotes: [
+      'The whole game is built around one rule: a shield only defends against fire from directly below it. Bank shots approach from the side, so they\u2019re never blocked \u2014 which means "fire Direct at every open lane, Bank at every shielded one" is always a valid clear, and that guarantee doesn\u2019t need a solver or a generation retry loop to prove. It\u2019s true by construction, the same way a rule works in a card game rather than a puzzle that has to be checked.',
+      'That also means Carom never needed the retry-until-solvable generation every other guaranteed puzzle here uses \u2014 the daily layout is just picked once per seed, straight through, because the fallback strategy always works regardless of what gets rolled.',
+      'The little UFO invaders are built from the same smooth, oversized-eye primitive style as Bounce and Croak \u2014 continuing the site\u2019s look rather than switching to a harsher, more typically "alien invasion" aesthetic for this one game.',
+    ],
+    strategyTips: [
+      'Clear open (unshielded) lanes with Direct fire first \u2014 there\u2019s no reason to spend a Bank shot on a lane that doesn\u2019t need one.',
+      'For a shielded lane, remember you fire FROM the mirror lane, not from the shielded lane itself \u2014 lane 0\u2019s shield is cleared by Banking from lane 4.',
+      'Firing Direct at a shielded lane is a complete waste \u2014 it never chips the shield or the invaders behind it, so treat it the same as a miss.',
+      'Your shot budget has a few spares built in, but not many \u2014 double-check which mode you\u2019re about to fire before committing, especially on lanes with three stacked invaders.',
+    ],
+    faq: [
+      {
+        q: 'What happens if I fire Direct at a shielded lane?',
+        a: 'Nothing \u2014 the shot is completely wasted and the lane is untouched. It still counts against your shot budget, so it\u2019s worth avoiding.',
+      },
+      {
+        q: 'Does Bank fire ever get blocked by a shield?',
+        a: 'No, never \u2014 shields only stop fire coming straight up from below, and a Bank shot always comes in off the side wall instead.',
+      },
+      {
+        q: 'How do I know which lane a Bank shot will hit?',
+        a: 'It always lands in the mirror lane: lane 0 \u2194 lane 4, and lane 1 \u2194 lane 3. Lane 2 mirrors itself.',
+      },
+      {
+        q: 'Can I play Carom more than once a day?',
+        a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh formation each time.',
       },
     ],
   },

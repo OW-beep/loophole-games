@@ -38,6 +38,7 @@ const TEXT_CLASS: Record<string, string> = {
   wiggle: 'text-wiggle',
   stax: 'text-stax',
   clash: 'text-clash',
+  carom: 'text-carom',
 };interface GameHeaderProps {
   game: GameMeta;
   puzzleNumber: number;

@@ -247,6 +247,10 @@ const config: Config = {
           DEFAULT: '#5A6ACF',
           soft: '#E2E5FA',
         },
+        carom: {
+          DEFAULT: '#2FB6A8',
+          soft: '#DBF3EF',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
