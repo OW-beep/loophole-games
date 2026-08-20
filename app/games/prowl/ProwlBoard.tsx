@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import {
@@ -186,6 +186,7 @@ const FACING_ANGLE: Record<Dir, number> = {
  * keeping with the rest of the catalog's house style. */
 function Agent({ targetCell, facing }: { targetCell: number; facing: Dir }) {
   const groupRef = useRef<THREE.Group>(null);
+  const beaconRef = useRef<THREE.Mesh>(null);
   const animRef = useRef({ fromX: 0, fromZ: 0, toX: 0, toZ: 0, start: 0 });
   const currentRef = useRef<[number, number]>([0, 0]);
 
@@ -208,10 +209,25 @@ function Agent({ targetCell, facing }: { targetCell: number; facing: Dir }) {
     currentRef.current = [x, z];
     g.position.set(x, bob, z);
     g.rotation.y = THREE.MathUtils.lerp(g.rotation.y, FACING_ANGLE[facing], 0.35);
+    if (beaconRef.current) {
+      const pulse = 0.55 + Math.sin(performance.now() * 0.004) * 0.2;
+      (beaconRef.current.material as THREE.MeshStandardMaterial).opacity = pulse;
+    }
   });
 
   return (
     <group ref={groupRef}>
+      {/* "you are here" locator \u2014 a ground ring plus a thin vertical beam, tall
+          enough to poke above the rooftops, so the player stays findable from
+          any camera angle including a straight-down bird's-eye view. */}
+      <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.32, 0.4, 24]} />
+        <meshStandardMaterial color="#4AD8E0" emissive="#4AD8E0" emissiveIntensity={1.2} transparent opacity={0.9} />
+      </mesh>
+      <mesh ref={beaconRef} position={[0, 2.2, 0]}>
+        <cylinderGeometry args={[0.02, 0.02, 4.2, 8]} />
+        <meshStandardMaterial color="#4AD8E0" emissive="#4AD8E0" emissiveIntensity={1.5} transparent opacity={0.6} depthWrite={false} />
+      </mesh>
       {/* coat / body */}
       <mesh position={[0, 0.24, 0]}>
         <coneGeometry args={[0.22, 0.42, 16]} />
@@ -314,14 +330,22 @@ function Sentinel({ guard }: { guard: Guard }) {
   );
 }
 
-/** Keeps OrbitControls' target and the camera gliding a step behind the player each turn. */
-function FollowCam({ playerCell }: { playerCell: number }) {
-  const { camera } = useThree();
-  const controlsTarget = useRef(new THREE.Vector3());
+/**
+ * Follows the player by moving OrbitControls' orbit *target* only \u2014 it never
+ * touches camera.position directly. Steering the camera by hand and letting
+ * it re-center on the player used to fight each other (both were writing to
+ * camera.position every frame, so a drag would immediately get pulled back).
+ * With damping enabled, OrbitControls recomputes position from
+ * target + the player's own orbit angles each frame, so dragging to look
+ * around now stays smooth and never snaps back \u2014 the camera just orbits
+ * around wherever the player currently is.
+ */
+function CameraRig({ controlsRef, playerCell }: { controlsRef: React.RefObject<any>; playerCell: number }) {
   useFrame(() => {
+    const controls = controlsRef.current;
+    if (!controls) return;
     const [x, z] = cellPos(playerCell);
-    controlsTarget.current.lerp(new THREE.Vector3(x, 0.4, z), 0.08);
-    camera.position.lerp(new THREE.Vector3(x, camera.position.y, z + 6), 0.02);
+    controls.target.lerp(new THREE.Vector3(x, 0.4, z), 0.08);
   });
   return null;
 }
@@ -348,6 +372,7 @@ function DirBtn({ d, onPress, disabled }: { d: { dir: Dir; label: string }; onPr
 function CityView({ state, onMove, disabled }: { state: ProwlState; onMove: (d: Dir) => void; disabled: boolean }) {
   const limit = currentMoveLimit(state);
   const lastFacingRef = useRef<Dir>('down');
+  const controlsRef = useRef<any>(null);
 
   return (
     <div>
@@ -367,7 +392,7 @@ function CityView({ state, onMove, disabled }: { state: ProwlState; onMove: (d: 
         className="rounded-lg border-2 border-graphite dark:border-white/70 mb-4 mx-auto overflow-hidden"
         style={{ width: '100%', maxWidth: 420, height: 340, background: '#12141C' }}
       >
-        <Canvas camera={{ position: [0, 7.5, 7], fov: 48 }} shadows>
+        <Canvas camera={{ position: [0, 8.5, 8.5], fov: 50 }} shadows>
           <fog attach="fog" args={['#12141C', 8, 20]} />
           <ambientLight intensity={0.45} />
           <directionalLight position={[4, 8, 3]} intensity={0.6} color="#AEC6FF" />
@@ -381,10 +406,23 @@ function CityView({ state, onMove, disabled }: { state: ProwlState; onMove: (d: 
             <Sentinel key={g.id} guard={g} />
           ))}
           <Agent targetCell={state.player} facing={lastFacingRef.current} />
-          <FollowCam playerCell={state.player} />
-          <OrbitControls enablePan={false} minDistance={4} maxDistance={16} maxPolarAngle={Math.PI / 2.1} />
+          <CameraRig controlsRef={controlsRef} playerCell={state.player} />
+          <OrbitControls
+            ref={controlsRef}
+            enablePan={false}
+            enableDamping
+            dampingFactor={0.12}
+            rotateSpeed={0.7}
+            minDistance={3}
+            maxDistance={18}
+            minPolarAngle={0.05}
+            maxPolarAngle={Math.PI / 2.05}
+          />
         </Canvas>
       </div>
+      <p className="stat-line text-center text-ink/40 dark:text-white/30 mb-2">
+        Drag to look around \u2014 the cyan beacon marks your position. Scroll or pinch to zoom.
+      </p>
 
       <div className="flex flex-col items-center gap-2">
         <div className="grid grid-cols-3 gap-2 w-36">
