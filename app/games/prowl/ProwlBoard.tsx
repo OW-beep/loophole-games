@@ -177,8 +177,8 @@ function Bob({
 const FACING_ANGLE: Record<Dir, number> = {
   up: Math.PI, // -z
   down: 0, // +z
-  left: Math.PI / 2,
-  right: -Math.PI / 2,
+  left: -Math.PI / 2, // -x (was swapped with right \u2014 caused the character to visually
+  right: Math.PI / 2, //   face the opposite way it was actually walking on left/right moves)
 };
 
 /** Cute, sleek "agent" — chibi proportions (big head, small body), trench
@@ -419,6 +419,23 @@ function CameraRig({
   return null;
 }
 
+/** Keeps a plain ref (readable from outside the Canvas, e.g. by button
+ * click handlers) updated each frame with the camera's current "away from
+ * camera" direction on the ground plane. */
+function CameraForwardTracker({ controlsRef, forwardRef }: { controlsRef: React.RefObject<any>; forwardRef: React.RefObject<[number, number]> }) {
+  const { camera } = useThree();
+  useFrame(() => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+    const dx = controls.target.x - camera.position.x;
+    const dz = controls.target.z - camera.position.z;
+    const len = Math.hypot(dx, dz) || 1;
+    forwardRef.current[0] = dx / len;
+    forwardRef.current[1] = dz / len;
+  });
+  return null;
+}
+
 const ARROWS: { dir: Dir; label: string; key: string }[] = [
   { dir: 'up', label: '↑', key: 'ArrowUp' },
   { dir: 'left', label: '←', key: 'ArrowLeft' },
@@ -438,11 +455,72 @@ function DirBtn({ d, onPress, disabled }: { d: { dir: Dir; label: string }; onPr
   );
 }
 
-function CityView({ state, onMove, disabled }: { state: ProwlState; onMove: (d: Dir) => void; disabled: boolean }) {
+function CityView({
+  state,
+  onMove,
+  disabled,
+  keyboardEnabled,
+}: {
+  state: ProwlState;
+  onMove: (d: Dir) => void;
+  disabled: boolean;
+  keyboardEnabled?: boolean;
+}) {
   const limit = currentMoveLimit(state);
   const lastFacingRef = useRef<Dir>('down');
   const controlsRef = useRef<any>(null);
+  const cameraForwardRef = useRef<[number, number]>([0, -1]); // world-space [x,z], updated every frame
   const [recenterSignal, setRecenterSignal] = useState(0);
+
+  /** Maps a screen-relative press ("the up button") to whichever world grid
+   * direction currently reads as "away from camera" on screen, so the arrow
+   * pad still feels correct after the camera has been rotated. */
+  function resolveScreenDir(pressed: Dir): Dir {
+    const [fx, fz] = cameraForwardRef.current; // "away from camera" on the ground plane
+    const rx = -fz;
+    const rz = fx; // camera-right on the ground plane
+    const wanted: [number, number] =
+      pressed === 'up' ? [fx, fz] : pressed === 'down' ? [-fx, -fz] : pressed === 'right' ? [rx, rz] : [-rx, -rz];
+    const candidates: [Dir, number, number][] = [
+      ['up', 0, -1],
+      ['down', 0, 1],
+      ['left', -1, 0],
+      ['right', 1, 0],
+    ];
+    let best: Dir = pressed;
+    let bestDot = -Infinity;
+    for (const [dir, dx, dz] of candidates) {
+      const dot = wanted[0] * dx + wanted[1] * dz;
+      if (dot > bestDot) {
+        bestDot = dot;
+        best = dir;
+      }
+    }
+    return best;
+  }
+
+  function handlePress(pressed: Dir) {
+    if (disabled) return;
+    const resolved = resolveScreenDir(pressed);
+    lastFacingRef.current = resolved;
+    onMove(resolved);
+  }
+
+  // Keyboard input (daily board only, to avoid two boards both reacting to
+  // the same keypress when Coin Mode is also on screen) goes through the
+  // exact same resolver + facing update as a button tap, so the character's
+  // facing never falls out of sync with keyboard-driven moves.
+  useEffect(() => {
+    if (!keyboardEnabled) return;
+    function onKey(e: KeyboardEvent) {
+      const found = ARROWS.find((a) => a.key === e.key);
+      if (!found) return;
+      e.preventDefault();
+      handlePress(found.dir);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
 
   return (
     <div>
@@ -477,6 +555,7 @@ function CityView({ state, onMove, disabled }: { state: ProwlState; onMove: (d: 
           ))}
           <Agent targetCell={state.player} facing={lastFacingRef.current} />
           <CameraRig controlsRef={controlsRef} playerCell={state.player} recenterSignal={recenterSignal} />
+          <CameraForwardTracker controlsRef={controlsRef} forwardRef={cameraForwardRef} />
           <OrbitControls
             ref={controlsRef}
             enablePan={false}
@@ -505,41 +584,13 @@ function CityView({ state, onMove, disabled }: { state: ProwlState; onMove: (d: 
       <div className="flex flex-col items-center gap-2">
         <div className="grid grid-cols-3 gap-2 w-36">
           <div />
-          <DirBtn
-            d={ARROWS[0]}
-            onPress={(d) => {
-              lastFacingRef.current = d;
-              onMove(d);
-            }}
-            disabled={disabled}
-          />
+          <DirBtn d={ARROWS[0]} onPress={handlePress} disabled={disabled} />
           <div />
-          <DirBtn
-            d={ARROWS[1]}
-            onPress={(d) => {
-              lastFacingRef.current = d;
-              onMove(d);
-            }}
-            disabled={disabled}
-          />
+          <DirBtn d={ARROWS[1]} onPress={handlePress} disabled={disabled} />
           <div />
-          <DirBtn
-            d={ARROWS[3]}
-            onPress={(d) => {
-              lastFacingRef.current = d;
-              onMove(d);
-            }}
-            disabled={disabled}
-          />
+          <DirBtn d={ARROWS[3]} onPress={handlePress} disabled={disabled} />
           <div />
-          <DirBtn
-            d={ARROWS[2]}
-            onPress={(d) => {
-              lastFacingRef.current = d;
-              onMove(d);
-            }}
-            disabled={disabled}
-          />
+          <DirBtn d={ARROWS[2]} onPress={handlePress} disabled={disabled} />
           <div />
         </div>
       </div>
@@ -563,17 +614,6 @@ export function ProwlBoard({ seed, dateString, puzzleNumber }: { seed: number; d
     if (dailyFinished) return;
     setState((prev) => applyMove(prev, dir));
   }
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      const found = ARROWS.find((a) => a.key === e.key);
-      if (!found || dailyFinished) return;
-      e.preventDefault();
-      move(found.dir);
-    }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  });
 
   useEffect(() => {
     if ((state.won || state.lost) && !finishedRef.current) {
@@ -646,7 +686,7 @@ export function ProwlBoard({ seed, dateString, puzzleNumber }: { seed: number; d
       </p>
       {resultMessage && <p className="stat-line text-center text-debt mb-2">{resultMessage}</p>}
 
-      <CityView state={state} onMove={move} disabled={dailyFinished} />
+      <CityView state={state} onMove={move} disabled={dailyFinished} keyboardEnabled />
 
       <ResultModal
         open={showResult}
