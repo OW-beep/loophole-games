@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import {
@@ -331,22 +331,91 @@ function Sentinel({ guard }: { guard: Guard }) {
 }
 
 /**
- * Follows the player by moving OrbitControls' orbit *target* only \u2014 it never
- * touches camera.position directly. Steering the camera by hand and letting
- * it re-center on the player used to fight each other (both were writing to
- * camera.position every frame, so a drag would immediately get pulled back).
- * With damping enabled, OrbitControls recomputes position from
- * target + the player's own orbit angles each frame, so dragging to look
- * around now stays smooth and never snaps back \u2014 the camera just orbits
- * around wherever the player currently is.
+ * Re-centers the camera on discrete events only \u2014 right after the player
+ * moves, or when the player explicitly asks to via the Recenter button \u2014
+ * instead of every single frame. Continuously nudging OrbitControls' target
+ * toward the player fights the player's own drag (OrbitControls recomputes
+ * its orbit angle from position vs. target on every update, so a moving
+ * target keeps re-pulling the view even mid-drag). Only touching the camera
+ * at real gameplay moments removes that fight entirely: between moves, free
+ * look is completely undisturbed.
  */
-function CameraRig({ controlsRef, playerCell }: { controlsRef: React.RefObject<any>; playerCell: number }) {
-  useFrame(() => {
+function CameraRig({
+  controlsRef,
+  playerCell,
+  recenterSignal,
+}: {
+  controlsRef: React.RefObject<any>;
+  playerCell: number;
+  recenterSignal: number;
+}) {
+  const { camera } = useThree();
+  const mountedRef = useRef(false);
+  const tweenRef = useRef<{ fromX: number; fromZ: number; toX: number; toZ: number; start: number } | null>(null);
+
+  function targetVec(cell: number) {
+    const [x, z] = cellPos(cell);
+    return new THREE.Vector3(x, 0.4, z);
+  }
+
+  function fullRecenter(cell: number) {
     const controls = controlsRef.current;
     if (!controls) return;
-    const [x, z] = cellPos(playerCell);
-    controls.target.lerp(new THREE.Vector3(x, 0.4, z), 0.08);
+    const [x, z] = cellPos(cell);
+    camera.position.set(x, 8.5, z + 8.5);
+    controls.target.set(x, 0.4, z);
+    controls.update();
+  }
+
+  // Frame the player correctly the instant the scene mounts, wherever today's
+  // start cell happens to be \u2014 rather than staring at the grid's world-space
+  // center, which is rarely where the run actually begins.
+  useEffect(() => {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+    fullRecenter(playerCell);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // A move happened: glide the orbit target to the new cell over a third of a
+  // second, then stop touching the camera until the next move or recenter.
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    const controls = controlsRef.current;
+    if (!controls) return;
+    tweenRef.current = {
+      fromX: controls.target.x,
+      fromZ: controls.target.z,
+      toX: targetVec(playerCell).x,
+      toZ: targetVec(playerCell).z,
+      start: performance.now(),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playerCell]);
+
+  // The Recenter button: snap the camera back to a clean behind-the-player framing on demand.
+  const firstRecenterSignal = useRef(true);
+  useEffect(() => {
+    if (firstRecenterSignal.current) {
+      firstRecenterSignal.current = false;
+      return;
+    }
+    fullRecenter(playerCell);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recenterSignal]);
+
+  useFrame(() => {
+    const tween = tweenRef.current;
+    if (!tween) return;
+    const controls = controlsRef.current;
+    if (!controls) return;
+    const t = Math.min(1, (performance.now() - tween.start) / 320);
+    const eased = 1 - Math.pow(1 - t, 2);
+    controls.target.set(tween.fromX + (tween.toX - tween.fromX) * eased, 0.4, tween.fromZ + (tween.toZ - tween.fromZ) * eased);
+    controls.update();
+    if (t >= 1) tweenRef.current = null;
   });
+
   return null;
 }
 
@@ -373,6 +442,7 @@ function CityView({ state, onMove, disabled }: { state: ProwlState; onMove: (d: 
   const limit = currentMoveLimit(state);
   const lastFacingRef = useRef<Dir>('down');
   const controlsRef = useRef<any>(null);
+  const [recenterSignal, setRecenterSignal] = useState(0);
 
   return (
     <div>
@@ -406,7 +476,7 @@ function CityView({ state, onMove, disabled }: { state: ProwlState; onMove: (d: 
             <Sentinel key={g.id} guard={g} />
           ))}
           <Agent targetCell={state.player} facing={lastFacingRef.current} />
-          <CameraRig controlsRef={controlsRef} playerCell={state.player} />
+          <CameraRig controlsRef={controlsRef} playerCell={state.player} recenterSignal={recenterSignal} />
           <OrbitControls
             ref={controlsRef}
             enablePan={false}
@@ -420,9 +490,17 @@ function CityView({ state, onMove, disabled }: { state: ProwlState; onMove: (d: 
           />
         </Canvas>
       </div>
-      <p className="stat-line text-center text-ink/40 dark:text-white/30 mb-2">
-        Drag to look around \u2014 the cyan beacon marks your position. Scroll or pinch to zoom.
-      </p>
+      <div className="flex items-center justify-center gap-2 mb-2">
+        <p className="stat-line text-center text-ink/40 dark:text-white/30">
+          Drag to look around \u2014 the cyan beacon marks your position.
+        </p>
+        <button
+          onClick={() => setRecenterSignal((n) => n + 1)}
+          className="stat-line shrink-0 border border-graphite/60 dark:border-white/40 rounded px-2 py-0.5 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
+        >
+          Recenter
+        </button>
+      </div>
 
       <div className="flex flex-col items-center gap-2">
         <div className="grid grid-cols-3 gap-2 w-36">
