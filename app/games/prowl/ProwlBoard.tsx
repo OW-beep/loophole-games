@@ -571,7 +571,7 @@ function CityView({
       </div>
       <div className="flex items-center justify-center gap-2 mb-2">
         <p className="stat-line text-center text-ink/40 dark:text-white/30">
-          Drag to look around \u2014 the cyan beacon marks your position.
+          Drag to look around — the cyan beacon marks your position.
         </p>
         <button
           onClick={() => setRecenterSignal((n) => n + 1)}

@@ -251,6 +251,14 @@ const config: Config = {
           DEFAULT: '#2FB6A8',
           soft: '#DBF3EF',
         },
+        prowl: {
+          DEFAULT: '#3E4C7A',
+          soft: '#E4E8F5',
+        },
+        skein: {
+          DEFAULT: '#3F7A72',
+          soft: '#DCEEEA',
+        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],

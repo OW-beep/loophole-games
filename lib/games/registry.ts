@@ -29,7 +29,8 @@ export type GameSlug =
   | 'stax'
   | 'clash'
   | 'carom'
-  | 'prowl';
+  | 'prowl'
+  | 'skein';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards' | 'stealth';
 
@@ -2373,6 +2374,53 @@ export const GAMES: GameMeta[] = [
       {
         q: 'What sets the difficulty in Coin Mode?',
         a: 'Easy/Normal/Hard changes guard count and vision range together with the move budget, since the challenge here is about patrol density more than raw move efficiency.',
+      },
+    ],
+  },
+  {
+    slug: 'skein',
+    index: '051',
+    name: 'Skein',
+    tagline: 'Every crossing is a knot you tied yourself.',
+    description:
+      'A tangle of knots and threads. Drag the knots around until no two threads cross \u2014 today\u2019s graph is generated already solved, then scrambled, so it always comes apart within your move budget.',
+    color: 'skein',
+    avgSolveTime: '3 min',
+    difficulty: 'Medium',
+    category: 'puzzle',
+    howToPlay: [
+      'Drag any knot to a new position on the board. Threads follow the knots they\u2019re tied to.',
+      'A thread turns red when it\u2019s currently crossing another thread \u2014 that\u2019s your only feedback, updated live as you drag.',
+      'Releasing a knot in a new spot counts as one move, whether or not it helped.',
+      'Get every thread crossing-free before your moves run out to win.',
+    ],
+    designNotes: [
+      'Every day\u2019s graph is generated already untangled: points are placed on the board and threads are added one at a time, rejecting any candidate that would cross a thread already accepted. That rejection step is the entire solvability guarantee \u2014 the accepted layout never crosses itself, by construction, before a single knot gets moved.',
+      'The puzzle is built by shuffling which knot sits at which point, not by moving the points themselves \u2014 so dragging every knot back to its own original spot is always one valid solution, and the move budget is sized directly from how many knots actually ended up out of place.',
+      'Unlike Cipher\u2019s all-or-nothing feedback, Skein tells you exactly what\u2019s still wrong at all times \u2014 every crossing thread is visibly red, live, even mid-drag before you\u2019ve committed to a move. The puzzle is entirely about reading that signal, not about being kept in the dark.',
+    ],
+    strategyTips: [
+      'Start with a knot that has only one thread attached \u2014 moving it can only ever affect that single thread, so it\u2019s a safe, low-risk first move.',
+      'Watch the live crossing color while you drag, before releasing \u2014 you don\u2019t have to commit a move to see whether a position would actually help.',
+      'A move that temporarily adds a crossing elsewhere isn\u2019t necessarily wrong \u2014 sometimes a knot has to pass through a worse spot on the way to a better one.',
+      'Knots with several threads attached are worth moving last, once their neighbors have already settled \u2014 moving a highly-connected knot early can undo progress you haven\u2019t made yet.',
+    ],
+    faq: [
+      {
+        q: 'Does dragging a knot without releasing it cost a move?',
+        a: 'No \u2014 only releasing (dropping) a knot in a new spot counts as a move. You can drag around freely to preview crossings first.',
+      },
+      {
+        q: 'Is there always a way to reach zero crossings?',
+        a: 'Yes \u2014 the graph is generated from an already-untangled layout, so dragging every displaced knot back to its own original spot is always a guaranteed solution within the move budget.',
+      },
+      {
+        q: 'Do I need to restore the exact original layout to win?',
+        a: 'No \u2014 any arrangement with zero crossings wins, not necessarily the one the puzzle started from. There\u2019s often more than one untangled layout.',
+      },
+      {
+        q: 'What changes with difficulty in Coin Mode?',
+        a: 'Easy/Normal/Hard changes how many knots and threads the graph has, which changes both how tangled the start looks and the move budget available to fix it.',
       },
     ],
   },
