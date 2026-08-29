@@ -5,11 +5,11 @@ import { BLOG_POSTS } from '@/lib/blog/registry';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://loophole.games';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages = ['', '/about', '/faq', '/privacy', '/terms', '/blog'].map((path) => ({
+  const staticPages = ['', '/about', '/faq', '/privacy', '/terms', '/blog', '/arcade/oni-smash', '/characters/oni'].map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: new Date(),
     changeFrequency: path === '' ? ('daily' as const) : ('monthly' as const),
-    priority: path === '' ? 1 : 0.5,
+    priority: path === '' ? 1 : path.startsWith('/arcade') ? 0.9 : 0.5,
   }));
 
   const gamePages = GAMES.map((g) => ({

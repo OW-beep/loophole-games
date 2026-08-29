@@ -1,0 +1,240 @@
+/* Arcade section — a deliberately loud, high-energy visual style that
+   breaks from the calmer editorial "Loophole" branding used everywhere
+   else on the site. Scoped to .arcade-root so it never leaks out. */
+
+.arcade-root {
+  --arcade-bg: #0B0710;
+  --arcade-pink: #FF2E63;
+  --arcade-yellow: #FFD400;
+  --arcade-cyan: #00E5FF;
+  --arcade-purple: #7B2FF7;
+  --arcade-red: #E8283A;
+  background: var(--arcade-bg);
+  color: #FFF6E5;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: var(--font-display, inherit);
+}
+
+/* ---------- exploding burst background ---------- */
+.arcade-burst {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.arcade-burst::before,
+.arcade-burst::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 220vmax;
+  height: 220vmax;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(
+    from 0deg,
+    var(--arcade-pink) 0deg 20deg,
+    transparent 20deg 40deg,
+    var(--arcade-yellow) 40deg 60deg,
+    transparent 60deg 80deg,
+    var(--arcade-cyan) 80deg 100deg,
+    transparent 100deg 120deg,
+    var(--arcade-purple) 120deg 140deg,
+    transparent 140deg 160deg,
+    var(--arcade-pink) 160deg 180deg,
+    transparent 180deg 200deg,
+    var(--arcade-yellow) 200deg 220deg,
+    transparent 220deg 240deg,
+    var(--arcade-cyan) 240deg 260deg,
+    transparent 260deg 280deg,
+    var(--arcade-purple) 280deg 300deg,
+    transparent 300deg 320deg,
+    var(--arcade-pink) 320deg 340deg,
+    transparent 340deg 360deg
+  );
+  opacity: 0.22;
+  animation: arcade-spin 40s linear infinite;
+}
+.arcade-burst::after {
+  animation-duration: 60s;
+  animation-direction: reverse;
+  opacity: 0.12;
+  top: 58%;
+}
+@keyframes arcade-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* ---------- chunky pop-art title text ---------- */
+.arcade-title {
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  color: var(--arcade-yellow);
+  -webkit-text-stroke: 3px #141018;
+  text-shadow:
+    4px 4px 0 var(--arcade-pink),
+    8px 8px 0 #141018;
+  line-height: 0.9;
+}
+@media (min-width: 640px) {
+  .arcade-title {
+    -webkit-text-stroke: 5px #141018;
+    text-shadow:
+      6px 6px 0 var(--arcade-pink),
+      12px 12px 0 #141018;
+  }
+}
+
+.arcade-cta {
+  animation: arcade-pulse 1.4s ease-in-out infinite;
+}
+@keyframes arcade-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+/* ---------- mascot poses ---------- */
+.oni-mascot {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.45));
+}
+.oni-mascot .oni-eyes-hurt {
+  display: none;
+}
+.oni-mascot .oni-fist-back {
+  transform-origin: 230px 190px;
+}
+.oni-mascot .oni-fist-front {
+  transform-origin: 70px 190px;
+}
+
+/* idle: gentle breathing loop */
+.oni-pose-idle {
+  animation: oni-breathe 2.6s ease-in-out infinite;
+}
+@keyframes oni-breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.02) translateY(-4px); }
+}
+
+/* punch: front fist jabs forward and back, whole body lunges */
+.oni-pose-punch {
+  animation: oni-lunge 0.32s ease-out 1;
+}
+.oni-pose-punch .oni-fist-front {
+  animation: oni-jab 0.32s ease-out 1;
+}
+@keyframes oni-lunge {
+  0% { transform: translateX(0); }
+  40% { transform: translateX(10px); }
+  100% { transform: translateX(0); }
+}
+@keyframes oni-jab {
+  0% { transform: translateX(0) scale(1); }
+  40% { transform: translateX(46px) scale(1.15); }
+  100% { transform: translateX(0) scale(1); }
+}
+
+/* hurt: shake + x_x eyes */
+.oni-pose-hurt .oni-eyes {
+  display: none;
+}
+.oni-pose-hurt .oni-eyes-hurt {
+  display: block;
+}
+.oni-pose-hurt {
+  animation: oni-shake 0.4s ease-in-out 1;
+}
+@keyframes oni-shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-6px) rotate(-3deg); }
+  75% { transform: translateX(6px) rotate(3deg); }
+}
+
+/* victory: both fists pump, happy bounce */
+.oni-pose-victory {
+  animation: oni-bounce 0.6s ease-in-out infinite;
+}
+@keyframes oni-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+/* ---------- game feel: shake + particles ---------- */
+.arcade-shake {
+  animation: arcade-hit-shake 0.15s linear 1;
+}
+@keyframes arcade-hit-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-4px, 2px); }
+  50% { transform: translate(4px, -2px); }
+  75% { transform: translate(-3px, -2px); }
+}
+
+.arcade-particle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  pointer-events: none;
+  animation: arcade-particle-burst 0.5s ease-out forwards;
+}
+@keyframes arcade-particle-burst {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--px, 40px), var(--py, -40px)) scale(0.3) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+.arcade-combo-pop {
+  animation: arcade-combo-pop 0.25s ease-out 1;
+}
+@keyframes arcade-combo-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+/* falling rock */
+.arcade-rock {
+  position: absolute;
+  top: -60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: #141018;
+  cursor: pointer;
+  border: 4px solid #141018;
+  animation-name: arcade-fall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+@keyframes arcade-fall {
+  from { transform: translateY(0); }
+  to { transform: translateY(var(--fall-distance, 640px)); }
+}
+
+/* neon arcade-cabinet stat readout */
+.arcade-stat-panel {
+  background: #141018;
+  border: 3px solid var(--arcade-cyan);
+  box-shadow:
+    0 0 8px var(--arcade-cyan),
+    inset 0 0 12px rgba(0, 229, 255, 0.25);
+  font-family: var(--font-mono, monospace);
+}

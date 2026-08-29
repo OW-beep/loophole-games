@@ -15,6 +15,12 @@ export function SiteHeader() {
           </span>
         </Link>
         <nav className="flex items-center gap-4">
+          <Link
+            href="/arcade/oni-smash"
+            className="stat-line hidden sm:inline px-2 py-1 rounded bg-gradient-to-r from-pink-600 to-orange-500 text-white font-bold hover:opacity-90"
+          >
+            🔥 Arcade
+          </Link>
           <Link href="/blog" className="stat-line hover:underline hidden sm:inline">
             Blog
           </Link>
