@@ -30,7 +30,9 @@ export type GameSlug =
   | 'clash'
   | 'carom'
   | 'prowl'
-  | 'regent';
+  | 'regent'
+  | 'skein'
+  | 'vials';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards' | 'stealth';
 
@@ -2422,6 +2424,100 @@ export const GAMES: GameMeta[] = [
       {
         q: 'Can I play Regent more than once a day?',
         a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh board each time.',
+      },
+    ],
+  },
+  {
+    slug: 'skein',
+    index: '052',
+    name: 'Skein',
+    tagline: 'Drag the knots until no two threads cross.',
+    description:
+      'A tangled web of knots and threads that\u2019s secretly untangleable: drag each knot to a new spot until every thread lies flat with no crossings left \u2014 all within your move budget.',
+    color: 'skein',
+    avgSolveTime: '3\u20134 min',
+    difficulty: 'Medium',
+    category: 'puzzle',
+    howToPlay: [
+      'You\u2019re looking at a graph: knots (circles) connected by threads (lines). It starts in a tangled mess where several threads cross each other.',
+      'Drag any knot to a new position on the board. The lines connected to it follow along as you drag.',
+      'Threads currently crossing another thread are highlighted in red \u2014 clear those first.',
+      'You win once every thread lies flat with zero crossings, all within your move budget. Each drag-and-release counts as one move.',
+    ],
+    designNotes: [
+      'Skein is Loophole\u2019s take on graph planarity puzzles (in the spirit of games like Planarity/Untangle): every board starts life as a planar graph \u2014 one that CAN be drawn with zero crossings \u2014 which is then scrambled by moving its knots to random positions until the tangle looks hopeless.',
+      'Because the underlying graph is planar by construction, a zero-crossing arrangement is always guaranteed to exist. The challenge is entirely about figuring out where each knot belongs, not about the puzzle secretly being unsolvable.',
+      'The crossing count updates live as you drag, before you even let go \u2014 so you can preview whether a spot will help before you commit the move.',
+    ],
+    strategyTips: [
+      'Start with the knot that has the most red (crossing) threads attached to it \u2014 moving it clears the most conflicts per move.',
+      'Drag toward open space near the edge of the board first. It\u2019s easier to untangle outward than to shuffle knots around each other in a crowded center.',
+      'Watch the live crossing count while you drag \u2014 if it ticks up as you approach a spot, keep moving past it rather than dropping there.',
+      'Threads between knots that are already crossing-free can still get pulled into a new crossing by an unrelated move \u2014 recheck the whole board after every drag, not just the knot you moved.',
+    ],
+    faq: [
+      {
+        q: 'Is every board actually solvable?',
+        a: 'Yes \u2014 each board is generated from a graph that\u2019s planar by design, so an arrangement with zero crossings always exists before it\u2019s ever scrambled.',
+      },
+      {
+        q: 'What counts as one move?',
+        a: 'One drag-and-release of a single knot, regardless of how far you move it or how many threads it\u2019s connected to.',
+      },
+      {
+        q: 'Do I need to worry about threads I\u2019m not dragging?',
+        a: 'Yes \u2014 moving one knot can create a new crossing between two threads that were previously fine. Recheck the whole board after each move.',
+      },
+      {
+        q: 'Can I play Skein more than once a day?',
+        a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh tangle each time.',
+      },
+    ],
+  },
+  {
+    slug: 'vials',
+    index: '053',
+    name: 'Vials',
+    tagline: 'Pour until every color sits in its own tube.',
+    description:
+      'A water-sort style pouring puzzle: tubes start stacked with a jumble of colored liquid. Tap one tube to pick it up, tap another to pour \u2014 sort every color into its own tube within your move budget.',
+    color: 'vials',
+    avgSolveTime: '3\u20135 min',
+    difficulty: 'Medium',
+    category: 'puzzle',
+    howToPlay: [
+      'Tap a tube to pick it up \u2014 it lifts slightly to show it\u2019s selected.',
+      'Tap a second tube to pour the top color from the first tube into it.',
+      'A pour only works if the receiving tube is empty or its top color matches what you\u2019re pouring \u2014 an invalid pour shakes the tube instead.',
+      'You win once every color sits together in a single tube, all within your move budget.',
+    ],
+    designNotes: [
+      'Vials is Loophole\u2019s take on the water-sort puzzle genre \u2014 tap-to-pour rather than drag-and-drop, which keeps it equally comfortable on mobile and desktop.',
+      'Each day\u2019s tube arrangement is generated by starting from a fully sorted state and pouring backward a set number of times, which guarantees a solution exists without needing a separate solver pass.',
+      'The shake animation on an invalid pour is deliberate immediate feedback \u2014 you find out a move doesn\u2019t work before it costs you anything, since invalid pours don\u2019t consume a move.',
+    ],
+    strategyTips: [
+      'Look for a tube that\u2019s already one color, fully full \u2014 that\u2019s solved and can be ignored for the rest of the puzzle.',
+      'Keep at least one tube empty as long as you can. An empty tube is your only way to temporarily park a color that\u2019s blocking one underneath it.',
+      'Pour the smallest possible amount when you\u2019re just repositioning \u2014 pouring an entire matching run at once can bury a color you needed access to.',
+      'Work from the top color down: a tube\u2019s bottom colors are inaccessible until everything above them is cleared, so plan which top color to clear first.',
+    ],
+    faq: [
+      {
+        q: 'Does an invalid pour cost me a move?',
+        a: 'No \u2014 if the receiving tube can\u2019t accept the color, the tube just shakes and nothing is used from your move budget.',
+      },
+      {
+        q: 'How many colors are there?',
+        a: 'The exact count can vary slightly by difficulty, but every board is generated from a fully sorted state, so a solution always exists.',
+      },
+      {
+        q: 'What happens if I pour a partial stack?',
+        a: 'Only the contiguous run of the same color on top of the tube pours over \u2014 it stops as soon as it hits a different color or the receiving tube fills up.',
+      },
+      {
+        q: 'Can I play Vials more than once a day?',
+        a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh set of tubes each time.',
       },
     ],
   },

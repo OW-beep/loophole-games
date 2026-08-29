@@ -251,13 +251,29 @@ const config: Config = {
           DEFAULT: '#2FB6A8',
           soft: '#DBF3EF',
         },
-        prowl: {
-          DEFAULT: '#3E4C7A',
-          soft: '#E4E8F5',
+        // 51st game color
+        regent: {
+          DEFAULT: '#6B3FA0',
+          soft: '#EAE0F5',
         },
+        // 52nd game color
         skein: {
           DEFAULT: '#3F7A72',
-          soft: '#DCEEEA',
+          soft: '#DFEEEB',
+        },
+        // 52nd game color
+        vials: {
+          DEFAULT: '#3FA0A0',
+          soft: '#DFF3F3',
+        },
+        // Global "bolt" accents — not tied to any one game, used for
+        // shared chrome (header, hero, buttons) to give the whole site
+        // a more energetic, arcade-marquee pop across every page.
+        bolt: {
+          pink: '#FF2E63',
+          yellow: '#FFD400',
+          cyan: '#00E5FF',
+          purple: '#7B2FF7',
         },
       },
       fontFamily: {
@@ -271,11 +287,17 @@ const config: Config = {
       boxShadow: {
         tag: '3px 3px 0 0 rgba(27, 29, 34, 0.9)',
         'tag-dark': '3px 3px 0 0 rgba(0, 0, 0, 0.6)',
+        pop: '5px 5px 0 0 #FF2E63',
+        'pop-cyan': '5px 5px 0 0 #00E5FF',
       },
       keyframes: {
         'punch-pop': {
           '0%': { transform: 'scale(0.94)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        'marquee-glow': {
+          '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+          '50%': { opacity: '1', transform: 'scale(1.3)' },
         },
         'merge-pulse': {
           '0%': { transform: 'scale(1)' },
@@ -287,11 +309,18 @@ const config: Config = {
           '40%': { transform: 'scaleY(0.55)' },
           '100%': { transform: 'scaleY(1)' },
         },
+        'shake': {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-4px)' },
+          '75%': { transform: 'translateX(4px)' },
+        },
       },
       animation: {
         'punch-pop': 'punch-pop 0.25s ease-out',
         'merge-pulse': 'merge-pulse 0.2s ease-in-out',
         'chomp': 'chomp 0.18s ease-in-out',
+        'shake': 'shake 0.3s ease-in-out',
+        'marquee-glow': 'marquee-glow 1.4s ease-in-out infinite',
       },
     },
   },
