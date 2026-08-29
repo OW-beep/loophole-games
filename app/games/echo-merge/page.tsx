@@ -13,9 +13,9 @@ export async function generateMetadata({
   searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   return buildGameMetadata(getGame('echo-merge')!, await searchParams, {
-    title: 'Echo Merge — a tile puzzle where your last move replays itself',
+    title: 'Echo Merge — Free Tile Merge Puzzle Game',
     description:
-      'Slide and merge numbered tiles, but every move echoes automatically one turn later. A new Echo Merge puzzle every day.',
+      'A free merge puzzle game: slide and merge numbered tiles, but every move echoes automatically one turn later. A new Echo Merge puzzle every day.',
   });
 }
 

@@ -13,9 +13,9 @@ export async function generateMetadata({
   searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   return buildGameMetadata(getGame('carry-chain')!, await searchParams, {
-    title: 'Carry Chain — merge numbers down a row, but every merge leaves a +1 behind',
+    title: 'Carry Chain — Free Number Chain Math Puzzle Game',
     description:
-      'Merge adjacent numbers down a row. Every merge carries +1 onto the next tile over. Land the total on the exact target before you run out of merges.',
+      'A free number puzzle game: merge adjacent numbers down a row, but every merge carries +1 onto the next tile over. Land the total on the exact target.',
   });
 }
 

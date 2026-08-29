@@ -13,9 +13,9 @@ export async function generateMetadata({
   searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   return buildGameMetadata(getGame('color-debt')!, await searchParams, {
-    title: 'Color Debt — a match-3 where every match leaves something behind',
+    title: 'Color Debt — Free Match-3 Puzzle Game Online',
     description:
-      'Match tiles to clear them, but every match spawns debt tiles that lock the board if you ignore them too long. A new Color Debt puzzle every day.',
+      'A free match-3 puzzle game where clearing tiles spawns debt tiles that lock the board if you ignore them too long. A new Color Debt puzzle every day.',
   });
 }
 

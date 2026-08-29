@@ -65,6 +65,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Monetag Vignette ad tag — must stay in <head> for site verification */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(s){s.dataset.zone='11650727',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
+          }}
+        />
         {/* Google Search Console ownership verification */}
         <meta name="google-site-verification" content="KYZp6leIoJkmXQipodIUtUhXTopgEfgqFiQ7eJZuRZA" />
         {/* Prevents a light-mode flash for users who previously chose dark mode. */}

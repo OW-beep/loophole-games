@@ -30,7 +30,7 @@ export type GameSlug =
   | 'clash'
   | 'carom'
   | 'prowl'
-  | 'skein';
+  | 'regent';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards' | 'stealth';
 
@@ -72,7 +72,7 @@ export const GAMES: GameMeta[] = [
     name: 'Echo Merge',
     tagline: 'Your last move haunts the board.',
     description:
-      'Slide numbered tiles to merge them — but every move you make echoes automatically one turn later. Read the echo, set the trap, chain the combo.',
+      'A tile merge puzzle game: slide numbered tiles to merge them \u2014 but every move you make echoes automatically one turn later. Read the echo, set the trap, chain the combo.',
     color: 'echo',
     avgSolveTime: '3:20',
     difficulty: 'Medium',
@@ -118,7 +118,7 @@ export const GAMES: GameMeta[] = [
     name: 'Mirror Loop',
     tagline: "You can see where the beam starts. You can't see where it ends.",
     description:
-      'Rotate mirrors on a grid to route three colored light beams into their matching targets \u2014 but each beam disappears after hitting its first mirror. You have to reason about where it goes from there.',
+      'A mirror puzzle game played on a grid: rotate mirrors to route three colored light beams into their matching targets \u2014 but each beam disappears after hitting its first mirror. You have to reason about where it goes from there.',
     color: 'mirror',
     avgSolveTime: '3:30',
     difficulty: 'Hard',
@@ -298,7 +298,7 @@ export const GAMES: GameMeta[] = [
     name: 'Carry Chain',
     tagline: 'Every merge leaves a little extra behind.',
     description:
-      'Merge adjacent numbers down a row, but every merge bumps the next number over by one. Land the row\u2019s total on the exact target before you run out of merges.',
+      'A number puzzle game with a twist: merge adjacent numbers down a row, but every merge bumps the next number over by one. Land the row\u2019s total on the exact target before you run out of merges.',
     color: 'carry',
     avgSolveTime: '2:50',
     difficulty: 'Medium',
@@ -2378,49 +2378,50 @@ export const GAMES: GameMeta[] = [
     ],
   },
   {
-    slug: 'skein',
+    slug: 'regent',
     index: '051',
-    name: 'Skein',
-    tagline: 'Every crossing is a knot you tied yourself.',
+    name: 'Regent',
+    tagline: 'One crown per row, per column, per color. None touching.',
     description:
-      'A tangle of knots and threads. Drag the knots around until no two threads cross \u2014 today\u2019s graph is generated already solved, then scrambled, so it always comes apart within your move budget.',
-    color: 'skein',
-    avgSolveTime: '3 min',
-    difficulty: 'Medium',
+      'A 6\u00d76 board split into six colored regions. Place exactly one crown in every row, every column, and every color \u2014 with no two crowns touching, even diagonally.',
+    color: 'regent',
+    avgSolveTime: '3\u20134 min',
+    difficulty: 'Hard',
     category: 'puzzle',
     howToPlay: [
-      'Drag any knot to a new position on the board. Threads follow the knots they\u2019re tied to.',
-      'A thread turns red when it\u2019s currently crossing another thread \u2014 that\u2019s your only feedback, updated live as you drag.',
-      'Releasing a knot in a new spot counts as one move, whether or not it helped.',
-      'Get every thread crossing-free before your moves run out to win.',
+      'The board is divided into six colored regions. Tap a cell to place a crown; tap it again to remove it.',
+      'When finished, there must be exactly one crown in every row, every column, and every color region.',
+      'No two crowns may touch \u2014 not even diagonally. A cell directly beside, above, below, or diagonal to a crown can\u2019t hold another one.',
+      'Cells flash red when a crown you\u2019ve placed conflicts with another \u2014 use that to find and fix the problem.',
+      'Solve it within your tap budget.',
     ],
     designNotes: [
-      'Every day\u2019s graph is generated already untangled: points are placed on the board and threads are added one at a time, rejecting any candidate that would cross a thread already accepted. That rejection step is the entire solvability guarantee \u2014 the accepted layout never crosses itself, by construction, before a single knot gets moved.',
-      'The puzzle is built by shuffling which knot sits at which point, not by moving the points themselves \u2014 so dragging every knot back to its own original spot is always one valid solution, and the move budget is sized directly from how many knots actually ended up out of place.',
-      'Unlike Cipher\u2019s all-or-nothing feedback, Skein tells you exactly what\u2019s still wrong at all times \u2014 every crossing thread is visibly red, live, even mid-drag before you\u2019ve committed to a move. The puzzle is entirely about reading that signal, not about being kept in the dark.',
+      'This is Loophole\u2019s take on the region-constrained placement puzzle format that spread quickly overseas in 2025 \u2014 one clean rule (row, column, color, no touching) that\u2019s simple to state and genuinely hard to hold in your head at once.',
+      'The color regions aren\u2019t hand-drawn: each day\u2019s solution is generated first (six crown positions, one per row and column, none touching), then the board is grown outward from those six points like a randomized flood fill until every cell belongs to a region. A solver then checks the board and nudges region boundaries \u2014 always keeping every color a single connected shape \u2014 to squeeze out alternate solutions before publishing.',
+      'Touching is deliberately limited to immediate neighbors (including diagonals) rather than full chess-queen diagonal lines \u2014 it keeps the reasoning about color regions, not long-range line-of-sight, at the center of the puzzle.',
     ],
     strategyTips: [
-      'Start with a knot that has only one thread attached \u2014 moving it can only ever affect that single thread, so it\u2019s a safe, low-risk first move.',
-      'Watch the live crossing color while you drag, before releasing \u2014 you don\u2019t have to commit a move to see whether a position would actually help.',
-      'A move that temporarily adds a crossing elsewhere isn\u2019t necessarily wrong \u2014 sometimes a knot has to pass through a worse spot on the way to a better one.',
-      'Knots with several threads attached are worth moving last, once their neighbors have already settled \u2014 moving a highly-connected knot early can undo progress you haven\u2019t made yet.',
+      'Start with the smallest color region \u2014 a region with only a few cells leaves you the least room to be wrong, so it narrows the rest of the board fastest.',
+      'Once a row, column, or color has a crown, every other cell sharing that row, column, or color is eliminated \u2014 mentally cross those off before you consider your next placement.',
+      'A region that\u2019s confined entirely to one row or column must have its crown at the intersection \u2014 look for those forced cells before guessing.',
+      'The touching rule quietly eliminates a lot of a region\u2019s cells too: any cell diagonally beside an already-placed crown is dead, even if its row and column are still open.',
     ],
     faq: [
       {
-        q: 'Does dragging a knot without releasing it cost a move?',
-        a: 'No \u2014 only releasing (dropping) a knot in a new spot counts as a move. You can drag around freely to preview crossings first.',
+        q: 'Does "touching" include diagonal neighbors?',
+        a: 'Yes \u2014 no two crowns can be placed in cells that are adjacent in any of the eight directions, including diagonally.',
       },
       {
-        q: 'Is there always a way to reach zero crossings?',
-        a: 'Yes \u2014 the graph is generated from an already-untangled layout, so dragging every displaced knot back to its own original spot is always a guaranteed solution within the move budget.',
+        q: 'Is there always exactly one solution?',
+        a: 'Almost always \u2014 each board is generated and then checked against a solver, which nudges the color regions until alternate solutions are gone. On the rare board where a second arrangement slips through, either one still counts as solving it.',
       },
       {
-        q: 'Do I need to restore the exact original layout to win?',
-        a: 'No \u2014 any arrangement with zero crossings wins, not necessarily the one the puzzle started from. There\u2019s often more than one untangled layout.',
+        q: 'Does removing a crown cost me anything?',
+        a: 'Only a tap from your budget, the same as placing one \u2014 there\u2019s no separate penalty for correcting a mistake.',
       },
       {
-        q: 'What changes with difficulty in Coin Mode?',
-        a: 'Easy/Normal/Hard changes how many knots and threads the graph has, which changes both how tangled the start looks and the move budget available to fix it.',
+        q: 'Can I play Regent more than once a day?',
+        a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh board each time.',
       },
     ],
   },

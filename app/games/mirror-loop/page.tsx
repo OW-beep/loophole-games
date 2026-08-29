@@ -13,9 +13,9 @@ export async function generateMetadata({
   searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   return buildGameMetadata(getGame('mirror-loop')!, await searchParams, {
-    title: 'Mirror Loop — route three light beams with one shared rotation budget',
+    title: 'Mirror Loop — Free Mirror Reflection Puzzle Game',
     description:
-      'Rotate mirrors to send three colored beams into their matching targets, sharing one tight rotation budget. A new Mirror Loop puzzle every day.',
+      'A free mirror puzzle game: rotate mirrors to send three colored light beams into their matching targets, sharing one tight rotation budget. A new puzzle every day.',
   });
 }
 
