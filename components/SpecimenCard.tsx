@@ -42,6 +42,7 @@ export const STRIPE_CLASS: Record<string, string> = {
   skein: 'bg-skein',
   vials: 'bg-vials',
   oni: 'bg-oni',
+  wanderwood: 'bg-wanderwood',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -99,6 +100,7 @@ export const SOFT_CLASS: Record<string, string> = {
   skein: 'group-hover:bg-skein-soft dark:group-hover:bg-skein/10',
   vials: 'group-hover:bg-vials-soft dark:group-hover:bg-vials/10',
   oni: 'group-hover:bg-oni-soft dark:group-hover:bg-oni/10',
+  wanderwood: 'group-hover:bg-wanderwood-soft dark:group-hover:bg-wanderwood/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {

@@ -266,6 +266,11 @@ const config: Config = {
           DEFAULT: '#E8283A',
           soft: '#FBDDE0',
         },
+        // 55th game color — Wanderwood (Arcade)
+        wanderwood: {
+          DEFAULT: '#4C8C5A',
+          soft: '#E1F0DE',
+        },
         // 52nd game color
         vials: {
           DEFAULT: '#3FA0A0',

@@ -33,7 +33,8 @@ export type GameSlug =
   | 'regent'
   | 'skein'
   | 'vials'
-  | 'oni-smash';
+  | 'oni-smash'
+  | 'wanderwood';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards' | 'stealth';
 
@@ -2568,6 +2569,49 @@ export const GAMES: GameMeta[] = [
       {
         q: 'Who is Oni?',
         a: 'Loophole Arcade\u2019s mascot \u2014 see his character page for the full story.',
+      },
+    ],
+  },
+  {
+    slug: 'wanderwood',
+    index: '055',
+    name: 'Wanderwood',
+    tagline: 'Roam the glade. Collect every gem.',
+    description:
+      'A free 3D exploration game: pick a fox, bunny, raccoon, mouse, or wanderer and roam an open glade collecting glowing gems as fast as you can. No daily limit \u2014 play as many rounds as you want.',
+    color: 'wanderwood',
+    avgSolveTime: '1\u20133 min per round',
+    difficulty: 'Easy',
+    category: 'arcade',
+    href: '/arcade/wanderwood',
+    howToPlay: [
+      'Pick a character on the select screen \u2014 four animals or two human wanderers, all playable.',
+      'Use the arrow keys or WASD to move (or the on-screen joystick on mobile).',
+      'Walk into a glowing gem to collect it. Collect all of them to clear the glade.',
+      'Your time is tracked from the moment you start \u2014 try to beat your best.',
+    ],
+    designNotes: [
+      'Wanderwood is Loophole Arcade\u2019s first fully 3D game, built with the same no-daily-limit, endless-replay philosophy as Oni Smash.',
+      'Every character \u2014 human and animal \u2014 shares one consistent, rounded "toy figurine" art style and the same underlying walk-cycle rig, so switching characters changes who you\u2019re playing as without changing how the game feels to control.',
+      'The glade layout is randomized each time you start a round, so the gem locations are never in exactly the same place twice.',
+    ],
+    strategyTips: [
+      'Gems glow and bob in place, which makes them easiest to spot against the grass at a glance from a slight distance \u2014 no need to hug the ground looking for them.',
+      'Plan a rough loop around the glade rather than chasing the nearest gem one at a time \u2014 backtracking costs more time than a wider, more deliberate path.',
+      'The camera trails slightly behind your character, so slow down a touch before sharp turns to keep your bearings.',
+    ],
+    faq: [
+      {
+        q: 'Is there a daily limit like the other games?',
+        a: 'No \u2014 Wanderwood is endless. Play as many rounds as you want, any time, with a new gem layout each time.',
+      },
+      {
+        q: 'Can I switch characters between rounds?',
+        a: 'Yes \u2014 finishing a round or refreshing takes you back to the character select screen.',
+      },
+      {
+        q: 'Is my best time saved?',
+        a: 'Yes, locally in your browser, and it\u2019s shown when you clear a glade.',
       },
     ],
   },
