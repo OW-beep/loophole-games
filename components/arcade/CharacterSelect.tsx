@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { Environment } from '@react-three/drei';
 import { AnimalCharacter, type AnimalSpecies } from './AnimalCharacter';
 import { HumanCharacter, type HumanVariant } from './HumanCharacter';
 import type { PlayableCharacter } from './PlayerController';
@@ -23,9 +24,11 @@ function PreviewCard({ entry, selected, onSelect }: { entry: (typeof ROSTER)[num
       style={{ borderColor: selected ? 'var(--arcade-yellow)' : 'transparent', background: '#1a1024' }}
     >
       <div style={{ height: 140 }}>
-        <Canvas camera={{ position: [0, 0.9, 2.1], fov: 40 }}>
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[2, 3, 2]} intensity={0.9} />
+        <Canvas camera={{ position: [0, 0.9, 2.1], fov: 40 }} dpr={[1, 2]}>
+          <Environment preset="studio" />
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[2, 3, 2]} intensity={1} />
+          <directionalLight position={[-2, 1, -1]} intensity={0.4} color="#B9D8FF" />
           <group position={[0, -0.55, 0]} rotation={[0, Math.PI * 0.15, 0]}>
             {entry.value.kind === 'animal' ? (
               <AnimalCharacter species={entry.value.species} speed={0} />

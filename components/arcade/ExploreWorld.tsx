@@ -2,6 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 
 export const WORLD_RADIUS = 14;
@@ -21,16 +22,16 @@ function Tree({ position, scale = 1 }: { position: [number, number, number]; sca
   return (
     <group position={position} scale={scale}>
       <mesh position={[0, 0.5, 0]} castShadow>
-        <cylinderGeometry args={[0.12, 0.16, 1, 8]} />
-        <meshStandardMaterial color="#8A6141" roughness={0.9} />
+        <cylinderGeometry args={[0.12, 0.16, 1, 24]} />
+        <meshStandardMaterial color="#8A6141" roughness={0.8} envMapIntensity={0.8} />
       </mesh>
       <mesh position={[0, 1.25, 0]} castShadow>
-        <sphereGeometry args={[0.62, 12, 12]} />
-        <meshStandardMaterial color="#4C8C5A" roughness={0.85} />
+        <sphereGeometry args={[0.62, 32, 32]} />
+        <meshStandardMaterial color="#4C8C5A" roughness={0.7} envMapIntensity={0.9} />
       </mesh>
       <mesh position={[0.3, 1.45, 0.1]} scale={0.7}>
-        <sphereGeometry args={[0.5, 10, 10]} />
-        <meshStandardMaterial color="#5DA268" roughness={0.85} />
+        <sphereGeometry args={[0.5, 32, 32]} />
+        <meshStandardMaterial color="#5DA268" roughness={0.7} envMapIntensity={0.9} />
       </mesh>
     </group>
   );
@@ -39,8 +40,8 @@ function Tree({ position, scale = 1 }: { position: [number, number, number]; sca
 function Rock({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
   return (
     <mesh position={[position[0], position[1] + 0.15 * scale, position[2]]} scale={scale} castShadow rotation={[0.3, 0.6, 0.1]}>
-      <dodecahedronGeometry args={[0.3, 0]} />
-      <meshStandardMaterial color="#9C9488" roughness={0.9} flatShading />
+      <dodecahedronGeometry args={[0.3, 1]} />
+      <meshStandardMaterial color="#9C9488" roughness={0.75} envMapIntensity={0.8} />
     </mesh>
   );
 }
@@ -48,9 +49,21 @@ function Rock({ position, scale = 1 }: { position: [number, number, number]; sca
 export function Ground() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <circleGeometry args={[WORLD_RADIUS, 48]} />
-      <meshStandardMaterial color="#8FCB80" roughness={1} />
+      <circleGeometry args={[WORLD_RADIUS, 96]} />
+      <meshStandardMaterial color="#8FCB80" roughness={0.9} envMapIntensity={0.6} />
     </mesh>
+  );
+}
+
+/** Adds soft environment reflections (so the glossier character/prop
+ * materials actually have something to reflect) plus a soft contact
+ * shadow blob under the play area for extra grounding and polish. */
+export function WorldAtmosphere() {
+  return (
+    <>
+      <Environment preset="park" />
+      <ContactShadows position={[0, 0.01, 0]} opacity={0.35} scale={WORLD_RADIUS * 2.2} blur={2.4} far={4} />
+    </>
   );
 }
 
@@ -116,8 +129,8 @@ export function Gem({ item, onCollect }: { item: Collectible; onCollect: (id: nu
   return (
     <group ref={ref} position={item.position} onClick={() => onCollect(item.id)}>
       <mesh castShadow>
-        <octahedronGeometry args={[0.22, 0]} />
-        <meshStandardMaterial color={item.color} emissive={item.color} emissiveIntensity={0.35} roughness={0.3} />
+        <octahedronGeometry args={[0.22, 2]} />
+        <meshStandardMaterial color={item.color} emissive={item.color} emissiveIntensity={0.35} roughness={0.15} envMapIntensity={1.3} />
       </mesh>
       <pointLight color={item.color} intensity={0.6} distance={1.6} />
     </group>

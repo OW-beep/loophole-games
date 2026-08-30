@@ -5,7 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CharacterSelect } from './CharacterSelect';
 import { PlayerRig, VirtualJoystick, useMoveInput, type PlayableCharacter } from './PlayerController';
-import { Ground, WorldDecor, Gem, SparkleBurst, generateCollectibles, type Collectible } from './ExploreWorld';
+import { Ground, WorldDecor, WorldAtmosphere, Gem, SparkleBurst, generateCollectibles, type Collectible } from './ExploreWorld';
 
 const TOTAL_GEMS = 12;
 const HIGH_SCORE_KEY = 'loophole:arcade:wanderwood:best-time-ms';
@@ -56,6 +56,7 @@ function Scene({
       <ambientLight intensity={0.75} />
       <directionalLight position={[8, 12, 6]} intensity={1} castShadow />
       <fog attach="fog" args={['#bfe8d8', 12, 26]} />
+      <WorldAtmosphere />
       <Ground />
       <WorldDecor seed={seed} />
       {collectibles.map((item) => (
@@ -116,7 +117,7 @@ export function WanderwoodGame() {
 
       {status !== 'select' && character && (
         <div className="relative rounded-2xl overflow-hidden border-4 border-black" style={{ height: 520, background: '#bfe8d8' }}>
-          <Canvas shadows camera={{ position: [0, 3.4, 8], fov: 55 }}>
+          <Canvas shadows camera={{ position: [0, 3.4, 8], fov: 55 }} dpr={[1, 2]}>
             <Scene character={character} seed={seed} collectibles={collectibles} onCollect={handleCollect} joystickRef={joystickRef} />
             {bursts.map((b) => (
               <SparkleBurst key={b.id} position={b.position} color={b.color} />

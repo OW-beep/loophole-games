@@ -69,40 +69,40 @@ export function AnimalCharacter({
     <group ref={group}>
       {/* body */}
       <mesh position={[0, 0.42, 0]} castShadow>
-        <capsuleGeometry args={[0.26, 0.22, 8, 16]} />
-        <meshStandardMaterial color={palette.body} roughness={0.75} />
+        <capsuleGeometry args={[0.26,  0.22, 24, 48]} />
+        <meshStandardMaterial color={palette.body} roughness={0.5} envMapIntensity={1} />
       </mesh>
       {/* belly patch */}
       <mesh position={[0, 0.36, 0.2]} scale={[0.7, 0.8, 0.5]}>
-        <sphereGeometry args={[0.24, 16, 16]} />
-        <meshStandardMaterial color={palette.belly} roughness={0.8} />
+        <sphereGeometry args={[0.24, 48, 48]} />
+        <meshStandardMaterial color={palette.belly} roughness={0.55} envMapIntensity={1} />
       </mesh>
 
       {/* head */}
       <group position={[0, 0.82, 0.02]}>
         <mesh castShadow>
-          <sphereGeometry args={[0.27, 24, 24]} />
-          <meshStandardMaterial color={palette.body} roughness={0.7} />
+          <sphereGeometry args={[0.27, 48, 48]} />
+          <meshStandardMaterial color={palette.body} roughness={0.48} envMapIntensity={1.1} />
         </mesh>
         {/* snout */}
         <mesh position={[0, -0.05, 0.22]} scale={species === 'mouse' ? [0.6, 0.55, 0.7] : [0.75, 0.65, 0.85]}>
-          <sphereGeometry args={[0.15, 16, 16]} />
-          <meshStandardMaterial color={species === 'fox' || species === 'raccoon' ? palette.belly : palette.body} roughness={0.8} />
+          <sphereGeometry args={[0.15, 48, 48]} />
+          <meshStandardMaterial color={species === 'fox' || species === 'raccoon' ? palette.belly : palette.body} roughness={0.55} envMapIntensity={1} />
         </mesh>
         <mesh position={[0, -0.06, 0.34]}>
-          <sphereGeometry args={[0.045, 12, 12]} />
-          <meshStandardMaterial color={palette.accent} roughness={0.4} />
+          <sphereGeometry args={[0.045, 48, 48]} />
+          <meshStandardMaterial color={palette.accent} roughness={0.3} envMapIntensity={1.2} />
         </mesh>
 
         {/* eyes */}
         {[-1, 1].map((side) => (
           <group key={side} position={[0.12 * side, 0.03, 0.21]}>
             <mesh>
-              <sphereGeometry args={[0.045, 12, 12]} />
-              <meshStandardMaterial color="#231C18" roughness={0.2} />
+              <sphereGeometry args={[0.045, 48, 48]} />
+              <meshStandardMaterial color="#231C18" roughness={0.15} envMapIntensity={1.4} />
             </mesh>
             <mesh position={[0.012 * side, 0.012, 0.03]}>
-              <sphereGeometry args={[0.014, 8, 8]} />
+              <sphereGeometry args={[0.014, 48, 48]} />
               <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={0.6} />
             </mesh>
           </group>
@@ -113,8 +113,8 @@ export function AnimalCharacter({
           <>
             {[-1, 1].map((side) => (
               <mesh key={side} position={[0.12 * side, 0.02, 0.19]} rotation={[0, 0, 0]}>
-                <sphereGeometry args={[0.08, 12, 12]} />
-                <meshStandardMaterial color={palette.accent} roughness={0.6} />
+                <sphereGeometry args={[0.08, 48, 48]} />
+                <meshStandardMaterial color={palette.accent} roughness={0.4} envMapIntensity={1} />
               </mesh>
             ))}
           </>
@@ -124,12 +124,12 @@ export function AnimalCharacter({
         {[-1, 1].map((side) => (
           <group key={side} position={[0.16 * side, 0.22, -0.02]} rotation={[0, 0, side * (species === 'bunny' ? 0.12 : 0.3)]}>
             <mesh castShadow>
-              <capsuleGeometry args={[earShape[0], earShape[1] - earShape[0] * 2, 6, 12]} />
-              <meshStandardMaterial color={palette.body} roughness={0.75} />
+              <capsuleGeometry args={[earShape[0],  earShape[1] - earShape[0] * 2, 24, 48]} />
+              <meshStandardMaterial color={palette.body} roughness={0.5} envMapIntensity={1} />
             </mesh>
             <mesh position={[0, 0, 0.04]} scale={[0.6, 0.85, 0.4]}>
-              <capsuleGeometry args={[earShape[0] * 0.7, (earShape[1] - earShape[0] * 2) * 0.8, 6, 12]} />
-              <meshStandardMaterial color={palette.earInner} roughness={0.8} />
+              <capsuleGeometry args={[earShape[0] * 0.7,  (earShape[1] - earShape[0] * 2) * 0.8, 24, 48]} />
+              <meshStandardMaterial color={palette.earInner} roughness={0.55} envMapIntensity={1} />
             </mesh>
           </group>
         ))}
@@ -137,8 +137,8 @@ export function AnimalCharacter({
         {/* raccoon rings on ears substitute: stripe on head for fox/raccoon flair */}
         {species === 'fox' && (
           <mesh position={[0, 0.24, -0.08]} scale={[1, 0.4, 0.6]}>
-            <sphereGeometry args={[0.2, 16, 16]} />
-            <meshStandardMaterial color={palette.belly} roughness={0.8} />
+            <sphereGeometry args={[0.2, 48, 48]} />
+            <meshStandardMaterial color={palette.belly} roughness={0.55} envMapIntensity={1} />
           </mesh>
         )}
       </group>
@@ -147,8 +147,8 @@ export function AnimalCharacter({
       {[-1, 1].map((side) => (
         <group key={side} ref={side === -1 ? armL : armR} position={[0.24 * side, 0.5, 0.02]}>
           <mesh position={[0, -0.12, 0]} castShadow>
-            <capsuleGeometry args={[0.07, 0.16, 6, 12]} />
-            <meshStandardMaterial color={palette.body} roughness={0.75} />
+            <capsuleGeometry args={[0.07,  0.16, 24, 48]} />
+            <meshStandardMaterial color={palette.body} roughness={0.5} envMapIntensity={1} />
           </mesh>
         </group>
       ))}
@@ -157,12 +157,12 @@ export function AnimalCharacter({
       {[-1, 1].map((side) => (
         <group key={side} ref={side === -1 ? legL : legR} position={[0.11 * side, 0.24, 0]}>
           <mesh position={[0, -0.14, 0]} castShadow>
-            <capsuleGeometry args={[0.085, 0.16, 6, 12]} />
-            <meshStandardMaterial color={palette.body} roughness={0.75} />
+            <capsuleGeometry args={[0.085,  0.16, 24, 48]} />
+            <meshStandardMaterial color={palette.body} roughness={0.5} envMapIntensity={1} />
           </mesh>
           <mesh position={[0, -0.24, 0.03]} scale={[1, 0.6, 1.3]}>
-            <sphereGeometry args={[0.08, 10, 10]} />
-            <meshStandardMaterial color={palette.accent} roughness={0.7} />
+            <sphereGeometry args={[0.08, 48, 48]} />
+            <meshStandardMaterial color={palette.accent} roughness={0.48} envMapIntensity={1.1} />
           </mesh>
         </group>
       ))}
@@ -174,8 +174,8 @@ export function AnimalCharacter({
           scale={species === 'bunny' ? [1, 1, 1] : species === 'mouse' ? [0.35, 0.35, 1.6] : [0.6, 0.6, 1]}
           castShadow
         >
-          <sphereGeometry args={[species === 'bunny' ? 0.11 : 0.14, 14, 14]} />
-          <meshStandardMaterial color={species === 'raccoon' ? palette.accent : palette.body} roughness={0.75} />
+          <sphereGeometry args={[species === 'bunny' ? 0.11 : 0.14, 48, 48]} />
+          <meshStandardMaterial color={species === 'raccoon' ? palette.accent : palette.body} roughness={0.5} envMapIntensity={1} />
         </mesh>
       </group>
     </group>
