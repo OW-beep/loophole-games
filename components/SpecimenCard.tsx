@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { GameMeta } from '@/lib/games/registry';
+import { gameHref, type GameMeta } from '@/lib/games/registry';
 import { StreakBadge } from './StreakBadge';
 
 export const STRIPE_CLASS: Record<string, string> = {
@@ -38,7 +38,10 @@ export const STRIPE_CLASS: Record<string, string> = {
   clash: 'bg-clash',
   carom: 'bg-carom',
   prowl: 'bg-prowl',
+  regent: 'bg-regent',
   skein: 'bg-skein',
+  vials: 'bg-vials',
+  oni: 'bg-oni',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -92,14 +95,17 @@ export const SOFT_CLASS: Record<string, string> = {
   clash: 'group-hover:bg-clash-soft dark:group-hover:bg-clash/10',
   carom: 'group-hover:bg-carom-soft dark:group-hover:bg-carom/10',
   prowl: 'group-hover:bg-prowl-soft dark:group-hover:bg-prowl/10',
+  regent: 'group-hover:bg-regent-soft dark:group-hover:bg-regent/10',
   skein: 'group-hover:bg-skein-soft dark:group-hover:bg-skein/10',
+  vials: 'group-hover:bg-vials-soft dark:group-hover:bg-vials/10',
+  oni: 'group-hover:bg-oni-soft dark:group-hover:bg-oni/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {
   const isNew = Number(game.index) >= 42;
   return (
     <Link
-      href={`/games/${game.slug}`}
+      href={gameHref(game)}
       className={`specimen-card group block p-5 pl-7 transition-colors ${SOFT_CLASS[game.color]}`}
     >
       <span className={`tag-stripe ${STRIPE_CLASS[game.color]}`} aria-hidden />

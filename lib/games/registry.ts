@@ -32,7 +32,8 @@ export type GameSlug =
   | 'prowl'
   | 'regent'
   | 'skein'
-  | 'vials';
+  | 'vials'
+  | 'oni-smash';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards' | 'stealth';
 
@@ -56,6 +57,13 @@ export interface GameMeta {
   strategyTips: string[];
   /** Optional per-game FAQ. Rendered on the game page and emitted as FAQPage structured data when present. */
   faq?: GameFaqItem[];
+  /** Override the default `/games/{slug}` link — for entries that live at a different route (e.g. the Arcade section). */
+  href?: string;
+}
+
+/** The canonical link for a game — `/games/{slug}` unless the entry overrides it via `href`. */
+export function gameHref(game: GameMeta): string {
+  return game.href ?? `/games/${game.slug}`;
 }
 
 export const CATEGORY_LABEL: Record<GameCategory, string> = {
@@ -70,7 +78,7 @@ export const CATEGORY_LABEL: Record<GameCategory, string> = {
 export const GAMES: GameMeta[] = [
   {
     slug: 'echo-merge',
-    index: '01',
+    index: '001',
     name: 'Echo Merge',
     tagline: 'Your last move haunts the board.',
     description:
@@ -116,7 +124,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'mirror-loop',
-    index: '02',
+    index: '002',
     name: 'Mirror Loop',
     tagline: "You can see where the beam starts. You can't see where it ends.",
     description:
@@ -161,7 +169,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'color-debt',
-    index: '03',
+    index: '003',
     name: 'Color Debt',
     tagline: 'Every match you make, you’ll have to pay for.',
     description:
@@ -206,7 +214,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'gravity-word',
-    index: '04',
+    index: '004',
     name: 'Gravity Word',
     tagline: 'Flip gravity. Catch the words as they fall.',
     description:
@@ -251,7 +259,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'fold',
-    index: '05',
+    index: '005',
     name: 'Fold',
     tagline: 'Fold the strip. Watch the numbers add up.',
     description:
@@ -296,7 +304,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'carry-chain',
-    index: '06',
+    index: '006',
     name: 'Carry Chain',
     tagline: 'Every merge leaves a little extra behind.',
     description:
@@ -341,7 +349,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'brace-yard',
-    index: '07',
+    index: '007',
     name: 'Brace Yard',
     tagline: 'Ten shipments. Choose the heavy ones wisely.',
     description:
@@ -386,7 +394,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'splice',
-    index: '08',
+    index: '008',
     name: 'Splice',
     tagline: 'Swap a stretch of one strand for the other.',
     description:
@@ -430,7 +438,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'heatmap',
-    index: '09',
+    index: '009',
     name: 'Heatmap',
     tagline: 'Spread the heat. Equalize everything.',
     description:
@@ -475,7 +483,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'signal',
-    index: '10',
+    index: '010',
     name: 'Signal',
     tagline: 'Each cell expects exactly that many resolved neighbors.',
     description:
@@ -520,7 +528,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'overflow',
-    index: '11',
+    index: '011',
     name: 'Overflow',
     tagline: 'Tap to spill. Chain reactions score big.',
     description:
@@ -565,7 +573,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'polarity',
-    index: '12',
+    index: '012',
     name: 'Polarity',
     tagline: 'Opposites attract. Like poles block.',
     description:
@@ -610,7 +618,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'shadow',
-    index: '13',
+    index: '013',
     name: 'Shadow',
     tagline: 'Your last move haunts you — literally.',
     description:
@@ -655,7 +663,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'tether',
-    index: '14',
+    index: '014',
     name: 'Tether',
     tagline: 'Two characters, one direction at a time.',
     description:
@@ -700,7 +708,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'drift',
-    index: '15',
+    index: '015',
     name: 'Drift',
     tagline: 'You slide until something stops you.',
     description:
@@ -744,7 +752,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'phase',
-    index: '16',
+    index: '016',
     name: 'Phase',
     tagline: 'Solid on odd steps. Ghost on even steps.',
     description:
@@ -789,7 +797,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'boo-rush',
-    index: '17',
+    index: '017',
     name: 'Boo Rush',
     tagline: 'One tap. One ghost. A whole course of gates.',
     description:
@@ -834,7 +842,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'blobble',
-    index: '18',
+    index: '018',
     name: 'Blobble',
     tagline: 'Pull back. Let go. Bounce something loose.',
     description:
@@ -879,7 +887,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'sprout',
-    index: '19',
+    index: '019',
     name: 'Sprout',
     tagline: 'Water it at exactly the right moment.',
     description:
@@ -924,7 +932,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'wobble-chef',
-    index: '20',
+    index: '020',
     name: 'Wobble Chef',
     tagline: 'Today\u2019s menu, stacked one wobble at a time.',
     description:
@@ -969,7 +977,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'noodle-cat',
-    index: '21',
+    index: '021',
     name: 'Noodle Cat',
     tagline: 'Mash before the bowl gets cold.',
     description:
@@ -1014,7 +1022,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'acorn-dash',
-    index: '22',
+    index: '022',
     name: 'Acorn Dash',
     tagline: 'Drag to catch. Watch the sway. Chase the gold ones.',
     description:
@@ -1065,7 +1073,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'cloud-hop',
-    index: '23',
+    index: '023',
     name: 'Cloud Hop',
     tagline: 'Bounces on its own. You just have to steer.',
     description:
@@ -1113,7 +1121,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'twin-peek',
-    index: '24',
+    index: '024',
     name: 'Twin Peek',
     tagline: 'Flip two. Remember where the others were.',
     description:
@@ -1159,7 +1167,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'world-data-duel',
-    index: '25',
+    index: '025',
     name: 'World Data Duel',
     tagline: 'Know the World. Play the World.',
     description:
@@ -1207,7 +1215,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'pigment',
-    index: '26',
+    index: '026',
     name: 'Pigment',
     tagline: 'Mix by feel. Match by eye.',
     description:
@@ -1255,7 +1263,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'waypoint',
-    index: '27',
+    index: '027',
     name: 'Waypoint',
     tagline: 'Every step in order. No step wasted.',
     description:
@@ -1303,7 +1311,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'cairn',
-    index: '28',
+    index: '028',
     name: 'Cairn',
     tagline: 'Pair to ten. Clear the cairn.',
     description:
@@ -1351,7 +1359,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'decant',
-    index: '29',
+    index: '029',
     name: 'Decant',
     tagline: 'No cups. Just exactly enough.',
     description:
@@ -1398,7 +1406,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'cipher',
-    index: '30',
+    index: '030',
     name: 'Cipher',
     tagline: 'Every letter has a twin. Find them all.',
     description:
@@ -1445,7 +1453,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'clearway',
-    index: '31',
+    index: '031',
     name: 'Clearway',
     tagline: 'One way out. Everything else in the way.',
     description:
@@ -1492,7 +1500,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'overdraw',
-    index: '32',
+    index: '032',
     name: 'Overdraw',
     tagline: 'Everyone draws the same deck. Only you decide when to stop.',
     description:
@@ -1539,7 +1547,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'burrow',
-    index: '33',
+    index: '033',
     name: 'Burrow',
     tagline: 'Find the key. Mind the hazards. Get home.',
     description:
@@ -1586,7 +1594,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'vantage',
-    index: '34',
+    index: '034',
     name: 'Vantage',
     tagline: 'Turn it over. Count what\u2019s hiding.',
     description:
@@ -1633,7 +1641,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'tumble',
-    index: '35',
+    index: '035',
     name: 'Tumble',
     tagline: 'End over end. Land it standing up.',
     description:
@@ -1680,7 +1688,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'untangle',
-    index: '36',
+    index: '036',
     name: 'Untangle',
     tagline: 'Every tile has one true place.',
     description:
@@ -1727,7 +1735,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'flicker',
-    index: '37',
+    index: '037',
     name: 'Flicker',
     tagline: 'Every switch has a ripple.',
     description:
@@ -1773,7 +1781,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'lastlight',
-    index: '38',
+    index: '038',
     name: 'Lastlight',
     tagline: 'Whoever takes the last one wins.',
     description:
@@ -1820,7 +1828,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'blueprint',
-    index: '39',
+    index: '039',
     name: 'Blueprint',
     tagline: 'Three flat views. One true shape.',
     description:
@@ -1867,7 +1875,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'bloom',
-    index: '40',
+    index: '040',
     name: 'Bloom',
     tagline: 'One corner. One color. Every tile.',
     description:
@@ -1914,7 +1922,7 @@ export const GAMES: GameMeta[] = [
   },
   {
     slug: 'apex',
-    index: '41',
+    index: '041',
     name: 'Apex',
     tagline: 'Carry your speed. Mind the line.',
     description:
@@ -2518,6 +2526,48 @@ export const GAMES: GameMeta[] = [
       {
         q: 'Can I play Vials more than once a day?',
         a: 'Today\u2019s run is once-daily like every other game here, but Coin Mode unlocks right after \u2014 unlimited replays on a fresh set of tubes each time.',
+      },
+    ],
+  },
+  {
+    slug: 'oni-smash',
+    index: '054',
+    name: 'Oni Smash',
+    tagline: 'Punch the rocks before they land.',
+    description:
+      'A fast reflex arcade game: rocks fall from the top of the screen and you tap them before they hit the ground. Chain hits for a combo bonus, miss three and it\u2019s over. No daily limit \u2014 play as many rounds as you want.',
+    color: 'oni',
+    avgSolveTime: '1\u20132 min per round',
+    difficulty: 'Medium',
+    category: 'arcade',
+    href: '/arcade/oni-smash',
+    howToPlay: [
+      'Rocks fall from the top of the screen. Tap or click one before it reaches the ground to smash it.',
+      'Each smash adds to your score, and chaining smashes without a miss builds a combo multiplier.',
+      'Missing a rock (letting it hit the ground) resets your combo and costs a life. Lose three lives and the round ends.',
+      'The game speeds up the longer you survive \u2014 rocks fall faster and spawn more often over time.',
+    ],
+    designNotes: [
+      'Unlike every other game on Loophole, Oni Smash isn\u2019t a once-a-day puzzle \u2014 it\u2019s an endless, replay-as-much-as-you-want arcade game, built around chasing a personal high score rather than solving a fixed daily challenge.',
+      'It\u2019s the debut appearance of ONI, Loophole Arcade\u2019s mascot \u2014 read his full bio on his character page.',
+    ],
+    strategyTips: [
+      'Stay centered and let your eyes relax across the whole board rather than tracking one rock at a time \u2014 peripheral vision catches new spawns faster than focused tunnel vision.',
+      'Prioritize whichever rock is closest to the ground, not whichever is biggest or most recently spawned \u2014 losing a combo costs more than the few extra points a bigger rock is worth.',
+      'When the pace ramps up, resist the urge to speed up your taps randomly \u2014 a clean, deliberate rhythm keeps your combo alive longer than a frantic one.',
+    ],
+    faq: [
+      {
+        q: 'Is there a daily limit like the other games?',
+        a: 'No \u2014 Oni Smash is endless. Play as many rounds as you want, any time.',
+      },
+      {
+        q: 'Is my high score saved?',
+        a: 'Yes, locally in your browser, and it\u2019s shown at the end of every round.',
+      },
+      {
+        q: 'Who is Oni?',
+        a: 'Loophole Arcade\u2019s mascot \u2014 see his character page for the full story.',
       },
     ],
   },

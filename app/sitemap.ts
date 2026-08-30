@@ -1,19 +1,19 @@
 import type { MetadataRoute } from 'next';
-import { GAMES } from '@/lib/games/registry';
+import { GAMES, gameHref } from '@/lib/games/registry';
 import { BLOG_POSTS } from '@/lib/blog/registry';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://loophole.games';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages = ['', '/about', '/faq', '/privacy', '/terms', '/blog', '/arcade/oni-smash', '/characters/oni'].map((path) => ({
+  const staticPages = ['', '/about', '/faq', '/privacy', '/terms', '/blog', '/characters/oni'].map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: new Date(),
     changeFrequency: path === '' ? ('daily' as const) : ('monthly' as const),
-    priority: path === '' ? 1 : path.startsWith('/arcade') ? 0.9 : 0.5,
+    priority: path === '' ? 1 : 0.5,
   }));
 
   const gamePages = GAMES.map((g) => ({
-    url: `${SITE_URL}/games/${g.slug}`,
+    url: `${SITE_URL}${gameHref(g)}`,
     lastModified: new Date(),
     changeFrequency: 'daily' as const,
     priority: 0.9,

@@ -1,5 +1,5 @@
 import type { GameMeta } from '@/lib/games/registry';
-import { CATEGORY_LABEL, getSimilarGames } from '@/lib/games/registry';
+import { CATEGORY_LABEL, getSimilarGames, gameHref } from '@/lib/games/registry';
 import { getPostsForGame } from '@/lib/blog/registry';
 import { buildFaqJsonLd } from '@/lib/structured-data';
 import { JsonLd } from '@/components/JsonLd';
@@ -79,7 +79,7 @@ export function GameDetails({ game }: { game: GameMeta }) {
             {similarGames.map((g) => (
               <li key={g.slug}>
                 <Link
-                  href={`/games/${g.slug}`}
+                  href={gameHref(g)}
                   className="stat-line border-2 border-index dark:border-index-dark px-3 py-1.5 inline-block hover:border-graphite dark:hover:border-white/80 transition-colors"
                 >
                   {g.name}

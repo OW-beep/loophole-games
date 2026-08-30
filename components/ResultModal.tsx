@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { shareResult } from '@/lib/share';
-import { getGame, getSimilarGames } from '@/lib/games/registry';
+import { getGame, getSimilarGames, gameHref } from '@/lib/games/registry';
 
 interface ResultModalProps {
   open: boolean;
@@ -81,7 +81,7 @@ export function ResultModal({
   async function handleShare() {
     const result = await shareResult({
       gameName, puzzleNumber, won, moves, movesLimit, score,
-      url: `${siteUrl}/games/${gameSlug}`,
+      url: `${siteUrl}${thisGame ? gameHref(thisGame) : `/games/${gameSlug}`}`,
     });
     setShareState(result);
   }
@@ -161,7 +161,7 @@ export function ResultModal({
               {otherGames.map((g) => (
                 <Link
                   key={g.slug}
-                  href={`/games/${g.slug}`}
+                  href={gameHref(g)}
                   className="stat-line border border-graphite dark:border-white/60 px-2 py-1 hover:bg-graphite hover:text-paper dark:hover:bg-white dark:hover:text-graphite transition-colors"
                 >
                   {g.name}

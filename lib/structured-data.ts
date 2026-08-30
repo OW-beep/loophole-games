@@ -1,4 +1,4 @@
-import { GAMES, type GameMeta } from './games/registry';
+import { GAMES, gameHref, type GameMeta } from './games/registry';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://loophole.games';
 
@@ -19,7 +19,7 @@ export function buildGameListJsonLd() {
     itemListElement: GAMES.map((g, i) => ({
       '@type': 'ListItem',
       position: i + 1,
-      url: `${SITE_URL}/games/${g.slug}`,
+      url: `${SITE_URL}${gameHref(g)}`,
       name: g.name,
     })),
   };
@@ -31,7 +31,7 @@ export function buildGameJsonLd(game: GameMeta) {
     '@type': 'VideoGame',
     name: game.name,
     description: game.description,
-    url: `${SITE_URL}/games/${game.slug}`,
+    url: `${SITE_URL}${gameHref(game)}`,
     applicationCategory: 'Game',
     genre: 'Puzzle',
     gamePlatform: 'Web Browser',
@@ -72,7 +72,7 @@ export function buildBreadcrumbJsonLd(game: GameMeta) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Loophole', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: game.name, item: `${SITE_URL}/games/${game.slug}` },
+      { '@type': 'ListItem', position: 2, name: game.name, item: `${SITE_URL}${gameHref(game)}` },
     ],
   };
 }

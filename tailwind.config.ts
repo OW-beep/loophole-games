@@ -261,6 +261,11 @@ const config: Config = {
           DEFAULT: '#3F7A72',
           soft: '#DFEEEB',
         },
+        // 54th game color — Oni Smash (Arcade)
+        oni: {
+          DEFAULT: '#E8283A',
+          soft: '#FBDDE0',
+        },
         // 52nd game color
         vials: {
           DEFAULT: '#3FA0A0',

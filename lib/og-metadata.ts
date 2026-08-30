@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import type { GameMeta } from './games/registry';
+import { gameHref, type GameMeta } from './games/registry';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://loophole.games';
 
@@ -48,7 +48,7 @@ export function buildGameMetadata(
   return {
     title,
     description,
-    alternates: { canonical: `${SITE_URL}/games/${game.slug}` },
+    alternates: { canonical: `${SITE_URL}${gameHref(game)}` },
     openGraph: { title, description, images: [ogImage] },
     twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
   };
