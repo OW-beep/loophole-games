@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import { AnimalCharacter, type AnimalSpecies } from './AnimalCharacter';
@@ -25,17 +26,19 @@ function PreviewCard({ entry, selected, onSelect }: { entry: (typeof ROSTER)[num
     >
       <div style={{ height: 140 }}>
         <Canvas camera={{ position: [0, 0.9, 2.1], fov: 40 }} dpr={[1, 2]}>
-          <Environment preset="studio" />
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[2, 3, 2]} intensity={1} />
-          <directionalLight position={[-2, 1, -1]} intensity={0.4} color="#B9D8FF" />
-          <group position={[0, -0.55, 0]} rotation={[0, Math.PI * 0.15, 0]}>
-            {entry.value.kind === 'animal' ? (
-              <AnimalCharacter species={entry.value.species} speed={0} />
-            ) : (
-              <HumanCharacter variant={entry.value.variant} speed={0} />
-            )}
-          </group>
+          <Environment preset="studio" environmentIntensity={0.35} />
+          <ambientLight intensity={0.4} />
+          <directionalLight position={[2, 3, 2]} intensity={0.6} />
+          <directionalLight position={[-2, 1, -1]} intensity={0.25} color="#B9D8FF" />
+          <Suspense fallback={null}>
+            <group position={[0, -0.55, 0]} rotation={[0, Math.PI * 0.15, 0]}>
+              {entry.value.kind === 'animal' ? (
+                <AnimalCharacter species={entry.value.species} speed={0} />
+              ) : (
+                <HumanCharacter variant={entry.value.variant} speed={0} />
+              )}
+            </group>
+          </Suspense>
         </Canvas>
       </div>
       <p className="text-white text-sm font-bold py-1.5">{entry.label}</p>

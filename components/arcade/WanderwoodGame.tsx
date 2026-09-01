@@ -1,13 +1,13 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CharacterSelect } from './CharacterSelect';
 import { PlayerRig, VirtualJoystick, useMoveInput, type PlayableCharacter } from './PlayerController';
 import { Ground, WorldDecor, WorldAtmosphere, Gem, SparkleBurst, generateCollectibles, type Collectible } from './ExploreWorld';
 
-const TOTAL_GEMS = 12;
+const TOTAL_GEMS = 20;
 const HIGH_SCORE_KEY = 'loophole:arcade:wanderwood:best-time-ms';
 
 function loadBestTime(): number | null {
@@ -53,8 +53,8 @@ function Scene({
 
   return (
     <>
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[8, 12, 6]} intensity={1} castShadow />
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[8, 12, 6]} intensity={0.6} castShadow />
       <fog attach="fog" args={['#bfe8d8', 12, 26]} />
       <WorldAtmosphere />
       <Ground />
@@ -62,7 +62,9 @@ function Scene({
       {collectibles.map((item) => (
         <Gem key={item.id} item={item} onCollect={onCollect} />
       ))}
-      <PlayerRig character={character} onMove={checkPickups} joystickRef={joystickRef} />
+      <Suspense fallback={null}>
+        <PlayerRig character={character} onMove={checkPickups} joystickRef={joystickRef} />
+      </Suspense>
     </>
   );
 }
