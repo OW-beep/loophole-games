@@ -21,8 +21,8 @@ export function GameHeader({ game, puzzleNumber, movesUsed, movesLimit }: GameHe
           solid color band, bold white type, "bolt" dots at the corners —
           rather than a plain text title like the rest of the site's pages. */}
       <div className={`relative rounded-t-lg px-4 py-2.5 mb-0 bg-${game.color} overflow-hidden`}>
-        <span className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-white/40" aria-hidden />
-        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-white/40" aria-hidden />
+        <span className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-bolt-yellow animate-marquee-glow" aria-hidden />
+        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-bolt-yellow animate-marquee-glow" style={{ animationDelay: '0.7s' }} aria-hidden />
         <Link
           href="/"
           className="stat-line text-white/70 hover:text-white hover:underline transition-colors"
@@ -39,16 +39,16 @@ export function GameHeader({ game, puzzleNumber, movesUsed, movesLimit }: GameHe
           Puzzle #{puzzleNumber} · {game.difficulty}
         </p>
         <div className="flex items-center gap-3 shrink-0">
-          <div className="flex items-center gap-2 bg-graphite dark:bg-black/40 rounded px-2.5 py-1">
+          <div className="flex items-center gap-2 bg-graphite dark:bg-black/40 rounded px-2.5 py-1 border border-bolt-yellow/40">
             <span className="stat-line text-white/50">MOVES</span>
-            <span className="font-mono text-lg font-bold tabular-nums leading-none text-white">
+            <span className="font-mono text-lg font-bold tabular-nums leading-none text-bolt-yellow">
               {String(movesLeft).padStart(2, '0')}
             </span>
           </div>
           <button
             onClick={() => setOpen(true)}
             aria-label="How to play"
-            className="w-9 h-9 border-2 border-graphite dark:border-white/80 rounded-full font-display font-bold shadow-tag dark:shadow-tag-dark hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
+            className="w-9 h-9 border-2 border-graphite dark:border-white/80 rounded-full font-display font-bold shadow-tag dark:shadow-tag-dark hover:shadow-pop hover:border-bolt-pink hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
           >
             ?
           </button>

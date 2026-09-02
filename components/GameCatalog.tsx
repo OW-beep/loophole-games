@@ -11,7 +11,6 @@ const TABS: { key: GameCategory | 'all'; label: string; emoji: string }[] = [
   { key: 'word',     label: 'Word',      emoji: '🔤' },
   { key: 'arcade',   label: 'Arcade',    emoji: '👻' },
   { key: 'cards',    label: 'Cards',     emoji: '🃏' },
-  { key: 'stealth',  label: 'Stealth',   emoji: '🌃' },
 ];
 
 export function GameCatalog({ games }: { games: GameMeta[] }) {

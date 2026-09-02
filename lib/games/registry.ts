@@ -34,7 +34,8 @@ export type GameSlug =
   | 'skein'
   | 'vials'
   | 'oni-smash'
-  | 'wanderwood';
+  | 'wanderwood'
+  | 'yokai-bridge';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards' | 'stealth';
 
@@ -2612,6 +2613,54 @@ export const GAMES: GameMeta[] = [
       {
         q: 'Is my best time saved?',
         a: 'Yes, locally in your browser, and it\u2019s shown when you clear a glade.',
+      },
+    ],
+  },
+  {
+    slug: 'yokai-bridge',
+    index: '056',
+    name: 'Yokai Bridge',
+    tagline: 'Some planks are missing. Cross carefully.',
+    description:
+      'A free 3D crossing game: guide a friendly tanuki-yokai across an old lantern-lit bridge one hop at a time. Shift lanes to dodge missing planks and reach the torii gate on the far shore.',
+    color: 'yokai-bridge',
+    avgSolveTime: '2\u20134 min per crossing',
+    difficulty: 'Medium',
+    category: 'arcade',
+    href: '/arcade/yokai-bridge',
+    howToPlay: [
+      'Shift left or right to line up with a lane, then hop forward one plank at a time.',
+      'Some planks are missing \u2014 hopping onto a gap drops you gently into the mist below and ends the run.',
+      'At least one lane is always safe on every row, so a way across always exists if you look for it.',
+      'Reach the torii gate at the far end to complete the crossing. Collect glowing fireflies along the way for a bit of extra light on the path.',
+    ],
+    designNotes: [
+      'Yokai Bridge is Loophole Arcade\u2019s calmest game by design \u2014 movement is deliberate, one hop at a time, rather than a fast-twitch endless runner, to match the quiet, lantern-lit mood of the setting.',
+      'The tanuki is a classic figure in Japanese folklore associated with roadside shrines and river crossings, which made it a natural fit as a friendly, distinctly non-scary yokai for a nighttime bridge game.',
+      'Falling through a gap is deliberately gentle \u2014 a soft drop into misty water, not a jump-scare \u2014 in keeping with the game\u2019s whimsical rather than horror tone.',
+      'Every crossing is laid out from a fresh random seed, so the pattern of missing planks is different each time you play.',
+    ],
+    strategyTips: [
+      'Rows near the start and the torii gate itself are always fully safe \u2014 the real decision-making begins a few steps in.',
+      'Missing planks get more frequent (and occasionally appear in two lanes at once) the further you get \u2014 stay attentive rather than hopping on autopilot once you\u2019ve built a rhythm.',
+      'You can shift lanes before committing to a hop \u2014 there\u2019s no rush, so take the moment to look at the row ahead before you jump.',
+    ],
+    faq: [
+      {
+        q: 'Is it actually scary?',
+        a: 'No \u2014 the yokai here is a friendly tanuki, and falling just means a soft splash into the mist before you try again.',
+      },
+      {
+        q: 'Is it possible to get stuck with no safe way across?',
+        a: 'No \u2014 every row always has at least one lane with a plank, so a path across always exists.',
+      },
+      {
+        q: 'Do the fireflies do anything?',
+        a: 'They\u2019re a small bonus to look out for along the way \u2014 collecting them isn\u2019t required to reach the torii gate.',
+      },
+      {
+        q: 'Is there a daily limit like the other games?',
+        a: 'No \u2014 Yokai Bridge is endless. Cross as many times as you want, with a new layout each time.',
       },
     ],
   },

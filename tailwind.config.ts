@@ -271,6 +271,11 @@ const config: Config = {
           DEFAULT: '#4C8C5A',
           soft: '#E1F0DE',
         },
+        // 56th game color — Yokai Bridge (Arcade)
+        'yokai-bridge': {
+          DEFAULT: '#B23B2E',
+          soft: '#F6E0DC',
+        },
         // 52nd game color
         vials: {
           DEFAULT: '#3FA0A0',

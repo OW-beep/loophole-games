@@ -29,6 +29,41 @@ export default function HomePage() {
       <JsonLd data={buildGameListJsonLd()} />
       <RisingAdBanner />
 
+      <Link
+        href="/arcade/oni-smash"
+        className="group relative flex items-center gap-4 rounded-2xl p-4 sm:p-5 mb-6 overflow-hidden border-4 transition-transform hover:-translate-y-0.5"
+        style={{ background: 'linear-gradient(90deg, #1a0f24 0%, #2a0f1f 100%)', borderColor: '#FF2E63' }}
+      >
+        <span
+          className="absolute inset-0 opacity-20 pointer-events-none"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 0L40 20L20 40L0 20Z' fill='none' stroke='%23FFD400' stroke-width='1'/%3E%3C/svg%3E\")",
+          }}
+          aria-hidden
+        />
+        <span className="text-4xl sm:text-5xl shrink-0 group-hover:scale-110 transition-transform" aria-hidden>
+          👊
+        </span>
+        <div className="relative">
+          <p className="stat-line" style={{ color: '#FFD400' }}>
+            NEW · ARCADE
+          </p>
+          <p className="font-display font-bold text-xl sm:text-2xl text-white">
+            Oni Smash — punch the rocks, beat your high score
+          </p>
+          <p className="text-sm text-white/60 hidden sm:block">
+            A fast, free reflex game. No daily limit — play as many rounds as you want.
+          </p>
+        </div>
+        <span
+          className="ml-auto shrink-0 stat-line px-3 py-1.5 rounded-full font-bold hidden sm:inline"
+          style={{ background: '#FFD400', color: '#141018' }}
+        >
+          PLAY NOW →
+        </span>
+      </Link>
+
       <section
         className="rounded-2xl p-6 sm:p-8 mb-10"
         style={{ background: '#0b0e14', color: '#e9e7e1', border: '1px solid #262c38' }}

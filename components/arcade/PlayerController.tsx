@@ -96,11 +96,15 @@ export function PlayerRig({
       }
     }
 
-    // third-person follow camera, smoothly trailing behind the character
+    // Fixed-angle follow camera: it only translates to track the
+    // character's position and never rotates around them. This keeps
+    // "up" always meaning "away from camera" regardless of which way the
+    // character is currently facing — far more predictable on keyboard
+    // than a camera that swings around behind your facing direction.
     const behind = new THREE.Vector3(
-      group.current.position.x - Math.sin(group.current.rotation.y) * 4.2,
-      group.current.position.y + 3.4,
-      group.current.position.z - Math.cos(group.current.rotation.y) * 4.2
+      group.current.position.x,
+      group.current.position.y + 3.6,
+      group.current.position.z + 4.6
     );
     camera.position.lerp(behind, Math.min(1, delta * 4));
     cameraTarget.current.lerp(new THREE.Vector3(group.current.position.x, 0.6, group.current.position.z), Math.min(1, delta * 6));

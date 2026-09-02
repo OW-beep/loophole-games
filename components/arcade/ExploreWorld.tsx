@@ -38,11 +38,25 @@ function Tree({ position, scale = 1 }: { position: [number, number, number]; sca
 }
 
 function Rock({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+  // A rock is a small cluster of jagged, flat-shaded, matte-gray chunks —
+  // irregular and grounded, the visual opposite of a gem's single clean
+  // glassy shape. flatShading keeps every facet reading as a hard, dull
+  // stone surface rather than a smooth polished one.
   return (
-    <mesh position={[position[0], position[1] + 0.15 * scale, position[2]]} scale={scale} castShadow rotation={[0.3, 0.6, 0.1]}>
-      <dodecahedronGeometry args={[0.3, 1]} />
-      <meshStandardMaterial color="#9C9488" roughness={0.75} envMapIntensity={0.8} />
-    </mesh>
+    <group position={[position[0], position[1], position[2]]} scale={scale}>
+      <mesh position={[0, 0.16, 0]} rotation={[0.3, 0.6, 0.1]} castShadow receiveShadow>
+        <dodecahedronGeometry args={[0.28, 0]} />
+        <meshStandardMaterial color="#8A8378" roughness={0.95} metalness={0} flatShading envMapIntensity={0.25} />
+      </mesh>
+      <mesh position={[0.16, 0.08, 0.1]} rotation={[0.8, 0.2, 0.5]} scale={0.55} castShadow receiveShadow>
+        <dodecahedronGeometry args={[0.28, 0]} />
+        <meshStandardMaterial color="#6E685E" roughness={0.95} metalness={0} flatShading envMapIntensity={0.25} />
+      </mesh>
+      <mesh position={[-0.14, 0.05, -0.08]} rotation={[0.2, 1.1, 0.3]} scale={0.4} castShadow receiveShadow>
+        <dodecahedronGeometry args={[0.28, 0]} />
+        <meshStandardMaterial color="#9C9488" roughness={0.95} metalness={0} flatShading envMapIntensity={0.25} />
+      </mesh>
+    </group>
   );
 }
 
@@ -61,7 +75,7 @@ export function Ground() {
 export function WorldAtmosphere() {
   return (
     <>
-      <Environment preset="park" />
+      <Environment preset="park" environmentIntensity={0.4} />
       <ContactShadows position={[0, 0.01, 0]} opacity={0.35} scale={WORLD_RADIUS * 2.2} blur={2.4} far={4} />
     </>
   );
@@ -101,11 +115,12 @@ export interface Collectible {
   id: number;
   position: [number, number, number];
   color: string;
+  scale: number;
 }
 
 export function generateCollectibles(seed: number, count: number): Collectible[] {
   const rng = mulberry32(seed + 9999);
-  const colors = ['#FFD400', '#00E5FF', '#FF6FA8', '#7CE07C', '#C58CFF'];
+  const colors = ['#FFD400', '#00E5FF', '#FF6FA8', '#7CE07C', '#C58CFF', '#FF9640'];
   const items: Collectible[] = [];
   for (let i = 0; i < count; i++) {
     const angle = rng() * Math.PI * 2;
@@ -114,6 +129,7 @@ export function generateCollectibles(seed: number, count: number): Collectible[]
       id: i,
       position: [Math.cos(angle) * dist, 0.35, Math.sin(angle) * dist],
       color: colors[i % colors.length],
+      scale: 0.8 + rng() * 0.5,
     });
   }
   return items;
@@ -127,12 +143,31 @@ export function Gem({ item, onCollect }: { item: Collectible; onCollect: (id: nu
     ref.current.position.y = item.position[1] + Math.sin(stateThree.clock.elapsedTime * 2.4 + item.id) * 0.08;
   });
   return (
-    <group ref={ref} position={item.position} onClick={() => onCollect(item.id)}>
+    <group ref={ref} position={item.position} scale={item.scale} onClick={() => onCollect(item.id)}>
+      {/* faceted glassy crystal — transmission + a high index of refraction
+          is what actually sells "gem" versus a rock's flat matte stone */}
       <mesh castShadow>
-        <octahedronGeometry args={[0.22, 2]} />
-        <meshStandardMaterial color={item.color} emissive={item.color} emissiveIntensity={0.35} roughness={0.15} envMapIntensity={1.3} />
+        <icosahedronGeometry args={[0.19, 0]} />
+        <meshPhysicalMaterial
+          color={item.color}
+          transmission={0.88}
+          thickness={0.6}
+          roughness={0.04}
+          ior={2.3}
+          clearcoat={1}
+          clearcoatRoughness={0.08}
+          emissive={item.color}
+          emissiveIntensity={0.12}
+          attenuationColor={item.color}
+          attenuationDistance={0.4}
+        />
       </mesh>
-      <pointLight color={item.color} intensity={0.6} distance={1.6} />
+      {/* tiny bright core so the gem still reads clearly even in shade */}
+      <mesh scale={0.35}>
+        <icosahedronGeometry args={[0.19, 0]} />
+        <meshStandardMaterial color={item.color} emissive={item.color} emissiveIntensity={1.4} toneMapped={false} />
+      </mesh>
+      <pointLight color={item.color} intensity={0.5} distance={1.6} />
     </group>
   );
 }
