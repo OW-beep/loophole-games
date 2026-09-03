@@ -35,7 +35,8 @@ export type GameSlug =
   | 'vials'
   | 'oni-smash'
   | 'wanderwood'
-  | 'yokai-bridge';
+  | 'yokai-bridge'
+  | 'prism-cascade';
 
 export type GameCategory = 'puzzle' | 'movement' | 'word' | 'arcade' | 'cards' | 'stealth';
 
@@ -2661,6 +2662,55 @@ export const GAMES: GameMeta[] = [
       {
         q: 'Is there a daily limit like the other games?',
         a: 'No \u2014 Yokai Bridge is endless. Cross as many times as you want, with a new layout each time.',
+      },
+    ],
+  },
+  {
+    slug: 'prism-cascade',
+    index: '057',
+    name: 'Prism Cascade',
+    tagline: 'Connect the gems. Chain the cascade.',
+    description:
+      'A free falling-gem puzzle game: drop colored gem pairs into the well and connect four or more of the same color to clear them. Clearing sets off a chain reaction as gems fall to fill the gaps \u2014 chain multiple pops from a single drop for a big score multiplier, and fill the Overdrive meter to lower the match requirement and double your score for a short burst.',
+    color: 'prism-cascade',
+    avgSolveTime: '2\u20136 min per run',
+    difficulty: 'Medium',
+    category: 'arcade',
+    href: '/arcade/prism-cascade',
+    howToPlay: [
+      'Gem pairs fall from the top of a 6-wide well. Move them left or right, rotate to change which cell is on top/bottom/side, and drop them into place.',
+      'When four or more gems of the same color end up connected (up/down/left/right), they pop and disappear.',
+      'Gems above a pop fall to fill the gap \u2014 if that causes another group of four or more to connect, it pops too, chaining automatically. Each extra link in the chain multiplies your score for that drop.',
+      'Every gem you pop fills the Overdrive meter. When it\u2019s full, Overdrive kicks in: matches only need three gems instead of four, and all scoring doubles, for about nine seconds.',
+      'The well fills up and speeds up over time \u2014 the run ends when a new piece has nowhere to spawn.',
+    ],
+    designNotes: [
+      'Prism Cascade takes the falling-piece genre in a different direction than a line-clearing stacker: the win condition is connecting color groups and triggering chain reactions, closer to the classic "chain puzzle" lineage than to line-clearing games \u2014 which rewards deliberately setting up a big multi-group collapse rather than just clearing space as fast as possible.',
+      'The Overdrive meter is the game\u2019s core hook: it turns "keep playing safely" and "go for broke" into a real decision \u2014 popping small groups early builds toward a stretch where nearly anything you drop chains, which is where the biggest scores come from.',
+      'Piece rotation uses a small positional "kick" if the rotated shape would otherwise be blocked by the well\u2019s walls or the stack, matching the forgiving rotation feel most falling-block games use.',
+    ],
+    strategyTips: [
+      'Resist popping every group of exactly four the moment it appears \u2014 letting a couple of near-matches sit and grow means a single drop can pop several groups at once for a much bigger chain multiplier.',
+      'Keep one or two columns clear as a "reserve" for whichever color has been showing up rarely \u2014 you\u2019ll need somewhere to stack it while you wait for enough to connect.',
+      'Overdrive\u2019s lowered three-gem threshold is the best time to clear out odd leftover colors cluttering the board \u2014 use it to reset the well, not just to chain the color you already have the most of.',
+      'Watch the two-gem "next" preview before you commit to where the current piece goes \u2014 planning one piece ahead is usually enough to avoid boxing in a color you need.',
+    ],
+    faq: [
+      {
+        q: 'How does the chain multiplier work?',
+        a: 'Each group that pops from a single drop \u2014 including new groups created as gems fall to fill earlier gaps \u2014 counts as one link in the chain, and each additional link increases that drop\u2019s score multiplier.',
+      },
+      {
+        q: 'What exactly does Overdrive change?',
+        a: 'For its duration, groups of three connected gems pop instead of needing four, and all points earned are doubled.',
+      },
+      {
+        q: 'Is there a daily limit like the other games?',
+        a: 'No \u2014 Prism Cascade is endless. Play as many runs as you want, any time.',
+      },
+      {
+        q: 'Is my high score saved?',
+        a: 'Yes, locally in your browser, and it\u2019s shown at the end of every run.',
       },
     ],
   },

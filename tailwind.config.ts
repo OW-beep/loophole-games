@@ -276,6 +276,11 @@ const config: Config = {
           DEFAULT: '#B23B2E',
           soft: '#F6E0DC',
         },
+        // 57th game color — Prism Cascade (Arcade)
+        'prism-cascade': {
+          DEFAULT: '#7B2FF7',
+          soft: '#EAE0FB',
+        },
         // 52nd game color
         vials: {
           DEFAULT: '#3FA0A0',

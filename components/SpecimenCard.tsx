@@ -44,6 +44,7 @@ export const STRIPE_CLASS: Record<string, string> = {
   oni: 'bg-oni',
   wanderwood: 'bg-wanderwood',
   'yokai-bridge': 'bg-yokai-bridge',
+  'prism-cascade': 'bg-prism-cascade',
 };
 
 export const SOFT_CLASS: Record<string, string> = {
@@ -103,6 +104,7 @@ export const SOFT_CLASS: Record<string, string> = {
   oni: 'group-hover:bg-oni-soft dark:group-hover:bg-oni/10',
   wanderwood: 'group-hover:bg-wanderwood-soft dark:group-hover:bg-wanderwood/10',
   'yokai-bridge': 'group-hover:bg-yokai-bridge-soft dark:group-hover:bg-yokai-bridge/10',
+  'prism-cascade': 'group-hover:bg-prism-cascade-soft dark:group-hover:bg-prism-cascade/10',
 };
 
 export function SpecimenCard({ game }: { game: GameMeta }) {
